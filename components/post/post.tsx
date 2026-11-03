@@ -50,24 +50,32 @@ export function Post({ paper, children }: { paper: Paper; children: React.ReactN
     >
       <article className="post-body">
         {children}
-        <footer className="post-foot">
-          <nav className="post-deeper" aria-label="Go deeper">
-            <a href={`/research/${paper.slug}/detailed`}>
-              <b>Detailed walkthrough <span aria-hidden="true">→</span></b>
-              <span>The equations, figures and every experiment</span>
-            </a>
-            <a href={paper.pdf} target="_blank" rel="noreferrer" data-native>
-              <b>Full paper <span aria-hidden="true">↗</span></b>
-              <span>{paper.venueFull} · PDF</span>
-            </a>
-          </nav>
-          <a className="post-upnext" href={`/research/${next.slug}`}>
-            <span>Next</span>
-            <b>{next.headline} <i aria-hidden="true">→</i></b>
-          </a>
-        </footer>
+        <PaperFoot paper={paper} other={{ href: `/research/${paper.slug}/detailed`, title: "Detailed walkthrough", sub: "The equations, figures and every experiment" }} next={{ href: `/research/${next.slug}`, title: next.headline }} />
       </article>
     </PaperLayout>
+  );
+}
+
+/** Shared footer: the other version and the PDF, an optional citation, then the next paper. */
+export function PaperFoot({ paper, other, next, children }: { paper: Paper; other: { href: string; title: string; sub: string }; next: { href: string; title: string }; children?: React.ReactNode }) {
+  return (
+    <footer className="post-foot">
+      <nav className="post-deeper" aria-label="More on this paper">
+        <a href={other.href}>
+          <b>{other.title} <span aria-hidden="true">→</span></b>
+          <span>{other.sub}</span>
+        </a>
+        <a href={paper.pdf} target="_blank" rel="noreferrer" data-native>
+          <b>Full paper <span aria-hidden="true">↗</span></b>
+          <span>{paper.venueFull} · PDF</span>
+        </a>
+      </nav>
+      {children}
+      <a className="post-upnext" href={next.href}>
+        <span>Next</span>
+        <b>{next.title} <i aria-hidden="true">→</i></b>
+      </a>
+    </footer>
   );
 }
 

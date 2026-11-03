@@ -1,7 +1,8 @@
 import katex from "katex";
 import type { Paper } from "@/content/papers";
 import { PAPERS } from "@/content/papers";
-import { PaperLayout } from "@/components/post/post";
+import { PaperFoot, PaperLayout } from "@/components/post/post";
+import { Cite } from "@/components/article/cite";
 
 /** Display or inline TeX, rendered on the server. */
 export function Eq({ tex, note, inline = false }: { tex: string; note?: React.ReactNode; inline?: boolean }) {
@@ -29,18 +30,9 @@ export function Article({ paper, sections, children }: { paper: Paper; sections:
     >
       <article className="article">
         {children}
-        <div className="cite">
-          <p className="cite-label">Cite</p>
-          <pre>{`@article{${paper.authors[0].split(" ").pop()!.toLowerCase()}${paper.year},
-  title   = {${paper.title}},
-  author  = {${paper.authors.join(" and ")}},
-  journal = {${paper.venue}},
-  year    = {${paper.year}}
-}`}</pre>
-        </div>
-        <p className="post-next next-paper">
-          Next: <a href={`/research/${next.slug}/detailed`}>{next.title} →</a>
-        </p>
+        <PaperFoot paper={paper} other={{ href: `/research/${paper.slug}`, title: "Short version", sub: "The plain-language post, no equations" }} next={{ href: `/research/${next.slug}/detailed`, title: next.title }}>
+          <Cite paper={paper} />
+        </PaperFoot>
       </article>
     </PaperLayout>
   );

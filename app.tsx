@@ -7,7 +7,7 @@ export default function App() {
   return (
     <>
       <header className="site-header">
-        <a href="/research" className="brand" aria-label="Telepath Research">
+        <a href="/" className="brand" aria-label="Telepath Research">
           <Logo />
           Telepath Research
         </a>

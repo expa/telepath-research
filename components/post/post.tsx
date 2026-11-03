@@ -50,12 +50,20 @@ export function Post({ paper, children }: { paper: Paper; children: React.ReactN
       <article className="post-body">
         {children}
         <footer className="post-foot">
-          <p>
-            Want the equations and every experiment? Read the <a href={`/research/${paper.slug}/detailed`}>detailed walkthrough</a> or <a href={paper.pdf} target="_blank" rel="noreferrer" data-native>read the full paper</a>, “{paper.title}”.
-          </p>
-          <p className="post-next">
-            Next: <a href={`/research/${next.slug}`}>{next.headline} →</a>
-          </p>
+          <nav className="post-deeper" aria-label="Go deeper">
+            <a href={`/research/${paper.slug}/detailed`}>
+              <b>Detailed walkthrough <span aria-hidden="true">→</span></b>
+              <span>The equations, figures and every experiment</span>
+            </a>
+            <a href={paper.pdf} target="_blank" rel="noreferrer" data-native>
+              <b>Full paper <span aria-hidden="true">↗</span></b>
+              <span>{paper.venueFull} · PDF</span>
+            </a>
+          </nav>
+          <a className="post-upnext" href={`/research/${next.slug}`}>
+            <span>Next</span>
+            <b>{next.headline} <i aria-hidden="true">→</i></b>
+          </a>
         </footer>
       </article>
     </PaperLayout>

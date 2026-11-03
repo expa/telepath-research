@@ -236,8 +236,6 @@ input[type="range"]:focus-visible { outline: 2px solid var(--accent); outline-of
 .post-head h1 { font-size: clamp(34px, 5vw, 56px); line-height: 1.05; letter-spacing: -0.035em; font-weight: 500; margin: 0 auto 22px; text-wrap: balance; }
 .post-dek { font-size: clamp(19px, 2.1vw, 22px); line-height: 1.5; color: var(--ink-2); text-wrap: pretty; margin-top: 0; }
 .post-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
-.post-foot a { color: var(--ink); text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 1.5px; text-underline-offset: 4px; }
-.post-foot a:hover { color: var(--accent); }
 .post-body { padding: 0 clamp(20px, 5vw, 40px) 120px; font-size: 19px; line-height: 1.7; color: var(--ink-2); }
 .post-body > * { max-width: var(--col); margin-left: auto; margin-right: auto; }
 .post-body > p { margin-top: 0; margin-bottom: 1.15em; text-wrap: pretty; }
@@ -252,7 +250,21 @@ input[type="range"]:focus-visible { outline: 2px solid var(--accent); outline-of
 .post-facts div { margin: 0; }
 .post-facts dt { font-size: clamp(34px, 4.4vw, 46px); line-height: 1; letter-spacing: -0.03em; color: var(--accent); font-weight: 500; }
 .post-facts dd { margin: 10px 0 0; font-size: 15px; line-height: 1.5; color: var(--ink-2); }
-.post-foot { margin-top: 72px; padding-top: 28px; border-top: 1px solid var(--rule); font-size: 16px; color: var(--muted); }
+/* Post footer: two ways to go deeper, then the next post. */
+.post-foot { margin-top: 88px; }
+.post-foot a { text-decoration: none; color: var(--ink); }
+.post-foot b { font-weight: 500; }
+.post-foot b span, .post-foot b i { display: inline-block; font-style: normal; color: var(--muted); transition: transform 0.2s var(--ease), color 0.2s; }
+.post-foot a:hover b span, .post-foot a:hover b i { color: var(--accent); transform: translateX(3px); }
+.post-deeper { display: grid; grid-template-columns: 1fr 1fr; gap: 0 32px; }
+.post-deeper a { display: grid; gap: 4px; padding: 20px 0 22px; border-top: 1px solid var(--rule); }
+.post-deeper b { font-size: 18px; }
+.post-deeper a > span { font-size: 15px; line-height: 1.45; color: var(--muted); }
+.post-upnext { display: grid; gap: 8px; margin-top: 56px; padding-top: 24px; border-top: 1px solid var(--rule); }
+.post-upnext > span { font-size: 14px; color: var(--muted); }
+.post-upnext b { font-size: clamp(24px, 3vw, 32px); line-height: 1.15; letter-spacing: -0.025em; text-wrap: balance; transition: color 0.2s; }
+.post-upnext:hover b { color: var(--accent); }
+@media (max-width: 560px) { .post-deeper { grid-template-columns: 1fr; } }
 .post-next { font-size: 19px; color: var(--ink); margin-top: 20px; }
 .post-next a { text-decoration: none; color: var(--ink); }
 .post-next a:hover { color: var(--accent); }

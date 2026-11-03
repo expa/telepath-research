@@ -46,7 +46,6 @@ export function Toc({ sections: given, label = "Contents" }: { sections?: Sectio
   if (!sections.length) return null;
   return (
     <nav className="toc" aria-label={label}>
-      <span className="eyebrow">{label}</span>
       <ol>
         {sections.map((s) => (
           <li key={s.id}>

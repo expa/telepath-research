@@ -1,8 +1,11 @@
 import { Shared } from "modulato";
+import { CascadeBenchFigure } from "@/components/figures/cascade-bench";
+import { ReedBankFigure } from "@/components/figures/reed-bank";
+import { OrganicsCarouselFigure } from "@/components/figures/organics-carousel";
 import { PAPERS } from "@/content/papers";
 
-// Loops recorded from each paper's live figure.
-const ART: Record<string, string> = { "prospective-coding": "cascade", "self-supervised-rqf": "reed", organics: "carousel" };
+// Each paper's live figure, running on its own idle loop.
+const ART: Record<string, (p: { bare?: boolean }) => React.JSX.Element> = { "prospective-coding": CascadeBenchFigure, "self-supervised-rqf": ReedBankFigure, organics: OrganicsCarouselFigure };
 
 export default function Home() {
   return (
@@ -16,12 +19,12 @@ export default function Home() {
         {PAPERS.map((p) => (
           <article key={p.slug} className="post-row">
             <a href={`/research/${p.slug}`} className="post-row-art" tabIndex={-1} aria-hidden="true">
-              <video src={`/video/${ART[p.slug]}.mp4`} poster={`/cards/${ART[p.slug]}.jpg`} autoPlay muted loop playsInline />
+              <div inert>{(() => { const Art = ART[p.slug]; return <Art bare />; })()}</div>
             </a>
             <div>
               <p className="post-meta">{p.venue} {p.year}</p>
               <Shared id={`title:${p.slug}`}><h2><a href={`/research/${p.slug}`}>{p.headline}</a></h2></Shared>
-              <p>{p.dek}</p>
+              <Shared id={`dek:${p.slug}`}><p className="post-row-dek">{p.dek}</p></Shared>
               <p className="post-row-links">
                 <a href={`/research/${p.slug}`}>Read</a>
                 <a href={`/research/${p.slug}/detailed`}>Detailed walkthrough</a>

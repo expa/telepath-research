@@ -24,10 +24,9 @@ export function Post({ paper, children }: { paper: Paper; children: React.ReactN
       <header className="post-head">
         <div className="glow" aria-hidden="true"><span /></div>
         <Shared id={`title:${paper.slug}`}><h1>{paper.headline}</h1></Shared>
-        <p className="post-dek">{paper.dek}</p>
+        <Shared id={`dek:${paper.slug}`}><p className="post-dek">{paper.dek}</p></Shared>
         <p className="post-links">
-          <a href={paper.pdf} download data-native>Download the full paper (PDF)</a>
-          <a href={paper.pdf} target="_blank" rel="noreferrer" data-native>Read it online</a>
+          <a className="primary" href={paper.pdf} target="_blank" rel="noreferrer" data-native>Read the full paper</a>
           <a href={`/research/${paper.slug}/detailed`}>Detailed walkthrough</a>
           {paper.code ? <a href={paper.code} target="_blank" rel="noreferrer">Code</a> : null}
         </p>
@@ -36,7 +35,7 @@ export function Post({ paper, children }: { paper: Paper; children: React.ReactN
         {children}
         <footer className="post-foot">
           <p>
-            Want the equations and every experiment? Read the <a href={`/research/${paper.slug}/detailed`}>detailed walkthrough</a> or <a href={paper.pdf} download data-native>download the full paper</a>, “{paper.title}” (PDF).
+            Want the equations and every experiment? Read the <a href={`/research/${paper.slug}/detailed`}>detailed walkthrough</a> or <a href={paper.pdf} target="_blank" rel="noreferrer" data-native>read the full paper</a>, “{paper.title}”.
           </p>
           <p className="post-next">
             Next: <a href={`/research/${next.slug}`}>{next.headline} →</a>

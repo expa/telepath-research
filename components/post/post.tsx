@@ -8,7 +8,7 @@ export const dateOf = (iso: string) => new Date(`${iso}T12:00:00Z`).toLocaleDate
 type Section = { id: string; label: string };
 
 /** Shared page frame for posts and detailed walkthroughs: side rail, left-aligned header, one text column. */
-export function PaperLayout({ paper, title, dek, links, sections, children }: { paper: Paper; title: React.ReactNode; dek: React.ReactNode; links: React.ReactNode; sections?: Section[]; children: React.ReactNode }) {
+export function PaperLayout({ paper, back, title, dek, links, sections, children }: { paper: Paper; back?: React.ReactNode; title: React.ReactNode; dek: React.ReactNode; links?: React.ReactNode; sections?: Section[]; children: React.ReactNode }) {
   return (
     <main className="post">
       <aside className="post-rail">
@@ -23,6 +23,7 @@ export function PaperLayout({ paper, title, dek, links, sections, children }: { 
       </aside>
       <header className="post-head">
         <div className="glow" aria-hidden="true"><span /></div>
+        {back}
         {title}
         {dek}
         <p className="post-links">
@@ -49,16 +50,32 @@ export function Post({ paper, children }: { paper: Paper; children: React.ReactN
     >
       <article className="post-body">
         {children}
-        <footer className="post-foot">
-          <p>
-            Want the equations and every experiment? Read the <a href={`/research/${paper.slug}/detailed`}>detailed walkthrough</a> or <a href={paper.pdf} target="_blank" rel="noreferrer" data-native>read the full paper</a>, “{paper.title}”.
-          </p>
-          <p className="post-next">
-            Next: <a href={`/research/${next.slug}`}>{next.headline} →</a>
-          </p>
-        </footer>
+        <PaperFoot paper={paper} other={{ href: `/research/${paper.slug}/detailed`, title: "Detailed walkthrough", sub: "The equations, figures and every experiment" }} next={{ href: `/research/${next.slug}`, title: next.headline }} />
       </article>
     </PaperLayout>
+  );
+}
+
+/** Shared footer: the other version and the PDF, an optional citation, then the next paper. */
+export function PaperFoot({ paper, other, next, children }: { paper: Paper; other: { href: string; title: string; sub: string }; next: { href: string; title: string }; children?: React.ReactNode }) {
+  return (
+    <footer className="post-foot">
+      <nav className="post-deeper" aria-label="More on this paper">
+        <a href={other.href}>
+          <b>{other.title} <span aria-hidden="true">→</span></b>
+          <span>{other.sub}</span>
+        </a>
+        <a href={paper.pdf} target="_blank" rel="noreferrer" data-native>
+          <b>Full paper <span aria-hidden="true">↗</span></b>
+          <span>{paper.venueFull} · PDF</span>
+        </a>
+      </nav>
+      {children}
+      <a className="post-upnext" href={next.href}>
+        <span>Next</span>
+        <b>{next.title} <i aria-hidden="true">→</i></b>
+      </a>
+    </footer>
   );
 }
 

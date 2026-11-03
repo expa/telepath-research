@@ -1,20 +1,16 @@
 "use client";
-import { ClientOnly } from "./lazy";
 import { useMemo, useState } from "react";
-import { alphaOf, gain, impulse, omega0Of, qOf, type Rqf } from "@/lib/rqf";
+import { alphaOf, gain, impulse, omega0Of, type Rqf } from "@/lib/rqf";
 import { lin, logSample, logScale, pathOf, sample } from "@/lib/plot";
 import { Slider } from "./slider";
-
-const Helix3D = ClientOnly(() => import("./helix3d"));
 
 const TAU = 0.01; // 10 ms base time constant
 const TWO_PI = Math.PI * 2;
 
-export function FilterLab({ initialHz = 10, initialGamma = 0.12, show3d = true }: { initialHz?: number; initialGamma?: number; show3d?: boolean }) {
+export function FilterLab({ initialHz = 10, initialGamma = 0.12 }: { initialHz?: number; initialGamma?: number }) {
   const [hz, setHz] = useState(initialHz);
   const [gamma, setGamma] = useState(initialGamma);
   const f: Rqf = useMemo(() => ({ tau: TAU, omega: TWO_PI * hz, gamma }), [hz, gamma]);
-  const a = alphaOf(f);
   const f0 = omega0Of(f) / TWO_PI;
   const tau0 = TAU / gamma;
   const span = Math.min(4 * tau0, 1.2);
@@ -23,19 +19,16 @@ export function FilterLab({ initialHz = 10, initialGamma = 0.12, show3d = true }
     <>
       <div className="widget" role="group" aria-label="Recursive Quadrature Filter explorer">
         <div className="widget-head">
-          <span><b>Filter lab</b> · one RQF, τ = 10 ms</span>
-          <span className="mono">
-            resonance {f0.toFixed(1)} Hz · band {((2 * a) / TWO_PI).toFixed(1)} Hz · Q {qOf(f).toFixed(1)} · memory τ/γ = {(tau0 * 1000).toFixed(0)} ms
-          </span>
+          <span><b>One RQF</b></span>
+          <span>peaks at {f0.toFixed(1)} Hz · remembers about {(tau0 * 1000).toFixed(0)} ms</span>
         </div>
-        {show3d ? <Helix3D f={f} span={Math.min(3 * tau0, 0.9)} /> : null}
         <div className="widget-grid">
           <Spiral f={f} span={span} />
           <Impulse f={f} span={span} />
           <Response f={f} />
         </div>
         <div className="controls">
-          <Slider label="Phase-prior frequency ω/2π" value={hz} min={2} max={40} step={0.5} onChange={setHz} format={(v) => `${v.toFixed(1)} Hz`} />
+          <Slider label="Frequency ω/2π" value={hz} min={2} max={40} step={0.5} onChange={setHz} format={(v) => `${v.toFixed(1)} Hz`} />
           <Slider label="Bandwidth γ" value={gamma} min={0.03} max={0.8} step={0.01} onChange={setGamma} format={(v) => v.toFixed(2)} />
         </div>
       </div>

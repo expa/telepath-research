@@ -1,7 +1,8 @@
 import katex from "katex";
 import type { Paper } from "@/content/papers";
 import { PAPERS } from "@/content/papers";
-import { PaperLayout } from "@/components/post/post";
+import { PaperFoot, PaperLayout } from "@/components/post/post";
+import { Cite } from "@/components/article/cite";
 
 /** Display or inline TeX, rendered on the server. */
 export function Eq({ tex, note, inline = false }: { tex: string; note?: React.ReactNode; inline?: boolean }) {
@@ -24,23 +25,14 @@ export function Article({ paper, sections, children }: { paper: Paper; sections:
       paper={paper}
       title={<h1 className="long">{paper.title}</h1>}
       dek={<p className="post-dek">{paper.summary}</p>}
-      links={<a href={`/research/${paper.slug}`}>Short version</a>}
+      back={<a className="post-back" href={`/research/${paper.slug}`}><span aria-hidden="true">←</span> Back to the post</a>}
       sections={sections}
     >
       <article className="article">
         {children}
-        <div className="cite">
-          <p className="cite-label">Cite</p>
-          <pre>{`@article{${paper.authors[0].split(" ").pop()!.toLowerCase()}${paper.year},
-  title   = {${paper.title}},
-  author  = {${paper.authors.join(" and ")}},
-  journal = {${paper.venue}},
-  year    = {${paper.year}}
-}`}</pre>
-        </div>
-        <p className="post-next next-paper">
-          Next: <a href={`/research/${next.slug}/detailed`}>{next.title} →</a>
-        </p>
+        <PaperFoot paper={paper} other={{ href: `/research/${paper.slug}`, title: "Blog post", sub: "An overview of the breakthrough and the key ideas behind it" }} next={{ href: `/research/${next.slug}/detailed`, title: next.title }}>
+          <Cite paper={paper} />
+        </PaperFoot>
       </article>
     </PaperLayout>
   );
@@ -78,17 +70,3 @@ export function Callout({ label, children }: { label: string; children: React.Re
     </div>
   );
 }
-
-export function Stats({ items }: { items: { value: React.ReactNode; label: string }[] }) {
-  return (
-    <div className="stats">
-      {items.map((s) => (
-        <div className="stat" key={s.label}>
-          <b>{s.value}</b>
-          <span>{s.label}</span>
-        </div>
-      ))}
-    </div>
-  );
-}
-

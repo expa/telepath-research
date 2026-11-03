@@ -1,7 +1,8 @@
-import { Article, Callout, Eq, M, Section, Stats, Tldr } from "@/components/article/blocks";
+import { Article, Callout, Eq, M, Section, Tldr } from "@/components/article/blocks";
+import { Facts, Fig } from "@/components/post/post";
 import { paperOf } from "@/content/papers";
 import { FilterLab } from "@/components/widgets/filter-lab";
-import { CascadeLab, GradientDepth, LookAhead } from "@/components/widgets/cascade-lab";
+import { GradientDepth, LookAhead } from "@/components/widgets/cascade-lab";
 import { PairedBars } from "@/components/widgets/charts";
 import { CascadeBenchFigure } from "@/components/figures/cascade-bench";
 
@@ -35,19 +36,21 @@ export default function Page() {
         <p>Cortex has an answer. Pyramidal neurons driven by a sinusoidal current can fire at a phase that <em>leads</em> their input, and similar prospective responses show up in retina, cerebellum and muscle spindles. This paper turns that observation into an architectural fix for deep recurrent networks.</p>
       </Section>
 
-      <CascadeBenchFigure />
+      <Fig caption="Each rail is one layer following the one in front of it, the way a leaky integrator follows its input. The motion is the paper’s update rule: six layers, τ = 20 ms, a 4 Hz input, slowed down. Switch on look-ahead and the rails fall into line.">
+        <CascadeBenchFigure bare />
+      </Fig>
 
       <Section id="rqf" n={2} title="The Recursive Quadrature Filter">
         <p>Start from a leaky integrator whose state relaxes toward a blend of what it is told and what it expects:</p>
         <Eq tex={String.raw`\tau\,\dot y = -y + \big[\gamma\, z + (1-\gamma)\,\hat y\big]`} note="γ balances input tracking (γ → 1) against the internal prediction ŷ (γ → 0). This convex blend comes from an energy model of cortical function (Heeger, 2017)." />
         <p>What should the expectation <M>{"\\hat y"}</M> be? The <strong>internal-model principle</strong> says a system that tracks a structured signal should contain a model of that signal’s dynamics. The smallest model of an oscillation is a pure rotation, <M>{"\\dot y = i\\omega y"}</M>. Extrapolating the current state one time constant ahead under that model gives <M>{"\\hat y = (1 + i\\omega\\tau)\\,y"}</M>, and substituting yields the RQF:</p>
         <Eq tex={String.raw`\tau\,\dot y = -y + \gamma\, z + (1-\gamma)(1 + i\omega\tau)\, y \;\;\Longrightarrow\;\; \dot y = \lambda y + \alpha z`} note="α = γ/τ,  ω₀ = (1 − γ)ω,  λ = −α + iω₀. Stable for any γ in (0, 1)." />
-        <p>Two learnable numbers per unit, a frequency and a bandwidth, define a band-pass filter. The state is a complex number that spins at <M>{"\\omega_0"}</M> and decays at rate <M>{"\\alpha"}</M>. Drag the 3D view below: the impulse response is literally a corkscrew whose shadows on the walls are the familiar in-phase and quadrature traces.</p>
+        <p>Two learnable numbers per unit, a frequency and a bandwidth, define a band-pass filter. The state is a complex number that spins at <M>{"\\omega_0"}</M> and decays at rate <M>{"\\alpha"}</M>. Move the sliders below to see how those two numbers shape it.</p>
       </Section>
 
       <FilterLab initialHz={12} initialGamma={0.1} />
       <p className="widget-caption">
-        <b>One RQF, computed live from its closed form.</b> Left: the free response spiralling into the origin. Middle: the impulse response <M>{"y(t) = \\alpha e^{\\lambda t}"}</M>, ringing inside its envelope. Right: the frequency response, unit gain at ω₀ and shaded half-power band 2α. Raise γ and the spiral tightens, memory shortens and the band widens.
+        Computed from the closed form. Left: the state spiralling into the origin. Middle: the impulse response <M>{"y(t) = \\alpha e^{\\lambda t}"}</M>. Right: the frequency response, peaking at ω₀. Raise γ and memory shortens while the band widens.
       </p>
 
       <Section id="ssm" n={3} title="A state-space model in disguise">
@@ -68,10 +71,8 @@ export default function Page() {
       <div className="prose">
         <p>Discretised with the same zero-order hold, the prospective layer is still a single-pole recurrence. It just reads its input through two taps instead of one:</p>
         <Eq tex={String.raw`y_{n+1} = \bar A\, y_n + \big[\bar B + \gamma \bar A\big]\, z_{n+1} - \gamma\bar A\, z_n`} note="No new parameters, the same diagonal transition and parallel scan, plus an O(n) buffer for the previous drive." />
-        <p>It looks like the exponential-trapezoidal rule of Mamba-3, but it isn’t one: matching even the previous-input coefficient would need an interpolation weight above 1, outside Mamba-3’s admissible range. Here is the effect on a stack, simulated with exactly this rule:</p>
+        <p>It looks like the exponential-trapezoidal rule of Mamba-3, but it isn’t one: matching even the previous-input coefficient would need an interpolation weight above 1, outside Mamba-3’s admissible range. This is the rule that drives the bench in the first figure when look-ahead is on.</p>
       </div>
-
-      <CascadeLab />
 
       <Section id="credit" n={5} title="Why learning gets easier">
         <p>To see the mechanism clearly, the paper uses a diagnostic regime called <strong>spatial-only backpropagation</strong>: every earlier recurrent state is treated as a constant, so the error can only travel down through the layers within a single time step, never back through time. This is a probe, not a recommended way to train.</p>
@@ -84,12 +85,11 @@ export default function Page() {
         <p>Every comparison holds everything fixed (architecture, optimiser, schedule, seeds and parameter count) and changes only the input path. Five seeds each.</p>
       </Section>
 
-      <Stats
+      <Facts
         items={[
-          { value: <>96.09<em>%</em></>, label: "Raw-audio Speech Commands, 16,000 samples per clip, with a 31.9k-parameter six-layer RQF" },
-          { value: <>83.56<em>%</em></>, label: "Path-X (16,384 steps) with a minimal forward-only RQF: no gating, normalisation or bidirectionality" },
-          { value: <><em>+15.2</em> pts</>, label: "Prospective advantage for a six-layer MFCC model under spatial-only backprop" },
-          { value: <>0</>, label: "Extra parameters. One more input tap per layer" },
+          ["96.09%", "Raw-audio Speech Commands, 16,000 samples per clip, with a 31.9k-parameter six-layer RQF"],
+          ["83.56%", "Path-X (16,384 steps) with a minimal forward-only RQF: no gating, normalisation or bidirectionality"],
+          ["+15.2", "points of prospective advantage for a six-layer MFCC model under spatial-only backprop"],
         ]}
       />
 

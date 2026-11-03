@@ -6,6 +6,8 @@ export interface Paper {
   /** Full venue name for the post header, and whether it is a conference or a journal. */
   venueFull: string;
   venueKind: "Conference" | "Journal";
+  /** Venue as it appears in a citation. */
+  citeVenue: string;
   /** Publication date, ISO. */
   published: string;
   year: number;
@@ -28,6 +30,7 @@ export const PAPERS: Paper[] = [
     venue: "NeurIPS",
     venueFull: "NeurIPS 2026",
     venueKind: "Conference",
+    citeVenue: "Advances in Neural Information Processing Systems (NeurIPS)",
     published: "2026-11-03",
     year: 2026,
     authors: ["Shivang Rawat", "Mirko Morello", "Flaviano Morone", "David J. Heeger"],
@@ -47,6 +50,7 @@ export const PAPERS: Paper[] = [
     venue: "NeurIPS · Foundation Models for the Brain and Body",
     venueFull: "NeurIPS 2026 Workshop: Foundation Models for the Brain and Body",
     venueKind: "Conference",
+    citeVenue: "NeurIPS Workshop on Foundation Models for the Brain and Body",
     published: "2026-11-03",
     year: 2026,
     authors: ["Mirko Morello", "Shivang Rawat", "David J. Heeger"],
@@ -65,6 +69,7 @@ export const PAPERS: Paper[] = [
     venue: "PNAS · Foundations",
     venueFull: "PNAS (Proceedings of the National Academy of Sciences)",
     venueKind: "Journal",
+    citeVenue: "Proceedings of the National Academy of Sciences",
     published: "2019-10-21",
     year: 2019,
     authors: ["David J. Heeger", "Wayne E. Mackey"],

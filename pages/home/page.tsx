@@ -9,8 +9,8 @@ export default function Home() {
     <main className="home">
       <section className="index-hero">
         <div className="glow" aria-hidden="true"><span /></div>
-        <h1>Telepath Research</h1>
-        <p>Brains predict how the world is about to change, using circuits made of rhythms. Our research builds that idea into machine learning. Here are the papers, explained.</p>
+        <h1>Intelligence that evolves</h1>
+        <p>We are building the first biologically plausible intelligence: one that learns continuously through experience and adapts locally as it operates, the way brains do. Our research is how we get there. Here are the papers, explained.</p>
       </section>
       <section className="posts" aria-label="Papers">
         {PAPERS.map((p) => (

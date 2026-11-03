@@ -9,10 +9,9 @@ export default function App() {
       <header className="site-header">
         <a href="/research" className="brand" aria-label="Telepath Research">
           <Logo />
-          Telepath
+          Telepath Research
         </a>
         <nav className="nav" aria-label="Main">
-          <a href="/research">Research</a>
           <a href="https://telepath.com" data-native>Company</a>
         </nav>
       </header>

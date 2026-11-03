@@ -1,5 +1,6 @@
 import { Article, Callout, Eq, M, Section, Tldr } from "@/components/article/blocks";
 import { paperOf } from "@/content/papers";
+import { Fig } from "@/components/post/post";
 import { OrganicsCarouselFigure } from "@/components/figures/organics-carousel";
 import { OrganicsLab } from "@/components/widgets/organics-lab";
 
@@ -33,7 +34,9 @@ export default function Page() {
         <p>Machine learning met the same problem in recurrent networks and solved it with gates. The LSTM decides at every step what to let in and what to forget. ORGaNICs ask what a gated recurrent circuit looks like when it is built from neurons, and what it explains.</p>
       </Section>
 
-      <OrganicsCarouselFigure />
+      <Fig caption="Each piston is a neuron tuned to one direction; its height is the response y. A target flashes, the bump it leaves is held, slides round the ring while the eyes move, then is cleared. Click the platter to set your own target.">
+        <OrganicsCarouselFigure bare />
+      </Fig>
 
       <Section id="circuit" n={2} title="The circuit">
         <p>Each neuron’s response <M>{"y_j"}</M> is a leaky integrator with two inputs, each multiplied by its own modulator:</p>
@@ -62,7 +65,6 @@ export default function Page() {
       <Section id="move" n={4} title="Manipulating">
         <p>Now add a second recurrent weight matrix shaped like a <strong>derivative</strong>: each neuron is driven by the difference between its neighbours. Gate it with its own modulator. While that modulator is on, the stored bump slides across the population as a <strong>travelling wave</strong>; when it switches off, the bump stops in its new place.</p>
         <p>That is exactly what the brain needs in the double-step saccade task. Two targets flash; you look at the first. Because the brain codes locations relative to the eyes, the plan for the second saccade is now wrong by exactly the first movement. ORGaNICs fix it by running the derivative weights for as long, and as hard, as the corollary discharge of the eye movement says.</p>
-        <p>Play with the circuit below. Every frame is a step of the equation above, solved in the eigenbasis of its weights.</p>
       </Section>
 
       <OrganicsLab />

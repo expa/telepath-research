@@ -1,10 +1,8 @@
-import { Article, Callout, Eq, M, Section, Stats, Tldr } from "@/components/article/blocks";
+import { Article, Callout, Eq, M, Section, Tldr } from "@/components/article/blocks";
+import { Facts, Fig } from "@/components/post/post";
 import { paperOf } from "@/content/papers";
 import { ReedBankFigure } from "@/components/figures/reed-bank";
-import { FilterLab } from "@/components/widgets/filter-lab";
-import { PredictLab } from "@/components/widgets/predict-lab";
 import { ParamScatter, PairedBars, type Bench } from "@/components/widgets/charts";
-import { Encoder3DLazy } from "@/components/widgets/lazy";
 import { BENCHES } from "@/content/benchmarks";
 
 const paper = paperOf("self-supervised-rqf");
@@ -37,33 +35,22 @@ export default function Page() {
         <p>We asked the opposite question. If an encoder’s dynamics already match the statistics of the signal, if every unit is a tuned oscillator, how small can it be and still compete, without scale and without masking?</p>
       </Section>
 
-      <ReedBankFigure />
+      <Fig caption="Sixteen reeds, each tuned to one frequency from 1 to 40 Hz, the way a layer of filters tiles the EEG bands. Each reed’s swing is its filter’s true gain at the input frequency. Drag across it to change the input frequency.">
+        <ReedBankFigure bare />
+      </Fig>
 
       <Section id="filter" n={2} title="A filter that oscillates">
         <p>The building block is the <strong>Recursive Quadrature Filter</strong>, introduced in our companion paper on prospective coding. It is a single complex number <M>{"y(t)"}</M> that follows its input <M>{"z(t)"}</M> while rotating at a preferred rate:</p>
         <Eq tex={String.raw`\tau\,\dot y = -y + \gamma\, z + (1-\gamma)(1 + i\omega\tau)\, y`} note="τ is a fixed base time constant; ω (phase-prior frequency) and γ (bandwidth) are learned." />
         <p>Read it as a tug of war. The <M>{"\\gamma z"}</M> term pulls the state toward the input. The <M>{"(1-\\gamma)(1+i\\omega\\tau)y"}</M> term is the filter’s own guess of where its state is heading: the current state, rotated forward by one time constant. Collect terms and it collapses to a one-line linear system,</p>
         <Eq tex={String.raw`\dot y = \lambda y + \alpha z,\qquad \alpha = \tfrac{\gamma}{\tau},\quad \omega_0 = (1-\gamma)\,\omega,\quad \lambda = -\alpha + i\omega_0`} />
-        <p>which is a <strong>band-pass filter</strong> with unit gain at <M>{"\\omega_0"}</M> and a half-power bandwidth of <M>{"2\\alpha"}</M>. Its real and imaginary parts are an in-phase and quadrature pair, so <M>{"|y|"}</M> tracks the amplitude of its band whatever the phase. Try it:</p>
+        <p>which is a <strong>band-pass filter</strong> with unit gain at <M>{"\\omega_0"}</M> and a half-power bandwidth of <M>{"2\\alpha"}</M>. Its real and imaginary parts are an in-phase and quadrature pair, so <M>{"|y|"}</M> tracks the amplitude of its band whatever the phase. Smaller γ means a longer memory and a sharper peak; larger γ trades selectivity for speed. The <a href="/research/prospective-coding/detailed#rqf">prospective-coding walkthrough</a> lets you tune one.</p>
       </Section>
-
-      <FilterLab initialHz={10} initialGamma={0.12} show3d={false} />
-      <p className="widget-caption">
-        <b>Everything here is computed from the equation above.</b> Smaller γ means a longer memory (τ/γ), a sharper peak and a slower spiral into the origin. Larger γ trades selectivity for speed. The same object is, in signal-processing terms, one pole of a diagonal state-space model, which is why it trains with the same parallel scans as S4, S5 and Mamba.
-      </p>
 
       <Section id="encoder" n={3} title="The encoder">
-        <p>An encoder stacks <strong>four layers of 64 filters</strong>. Between layers, a complex mixing matrix <M>{"W^{(l)}"}</M> and a split-ReLU (applied to the real and imaginary parts separately) combine the filters of one layer into the drive of the next. The initial ceiling of the filter frequencies halves from layer to layer, so early layers listen to fast rhythms and later ones to slow envelopes.</p>
+        <p>An encoder stacks <strong>four layers of 64 filters</strong>. Between layers, a complex mixing matrix <M>{"W^{(l)}"}</M> and a split-ReLU (applied to the real and imaginary parts separately) combine the filters of one layer into the drive of the next. The initial ceiling of the filter frequencies halves from layer to layer, so early layers listen to fast rhythms and later ones to slow envelopes. The encoder itself has 33.7k parameters; with its pooler and readout the whole system is 110k.</p>
         <p>Each layer is also driven <em>prospectively</em>: by a first-order look-ahead of its input, <M>{"z + \\tau\\dot z"}</M>, which compensates for the lag every integrating layer adds. It costs no parameters and is the subject of the companion paper.</p>
       </Section>
-
-      <div className="widget" style={{ marginTop: 40 }}>
-        <div className="widget-head"><span><b>Inside the encoder</b> · d4/64 RQF stack</span><span className="mono">illustrative, untrained weights</span></div>
-        <Encoder3DLazy />
-      </div>
-      <p className="widget-caption">
-        <b>A real RQF stack running in your browser</b> on a synthetic EEG-like probe at 128 Hz. Each bar is one filter’s magnitude |y|. Watch the front deck flicker with alpha and beta while the back deck, tuned an octave lower per layer, moves with the slow envelope. The trained encoder has 33.7k parameters; with its pooler and readout the whole system is 110k.
-      </p>
 
       <Section id="objective" n={4} title="Learning by predicting">
         <p>Because each filter already carries a model of how its oscillation continues, predicting the future is a natural thing to ask of the encoder. So that is the only thing we ask of it during pretraining. No labels, no masking.</p>
@@ -77,8 +64,6 @@ export default function Page() {
         <p>The gradient of this loss reaches every filter’s <M>{"\\omega"}</M> and <M>{"\\gamma"}</M>, so pretraining moves the filters themselves toward the rhythms that make the future predictable.</p>
       </Section>
 
-      <PredictLab />
-
       <Section id="channels" n={5} title="From one channel to a scalp">
         <p>A scalp EEG has 16 to 64 electrodes; an intracranial recording can have hundreds. Rather than learn a model for every montage, we run <strong>one shared encoder on each channel separately</strong>. During pretraining it never learns which electrode it is listening to, or where it sits.</p>
         <p>Space enters only downstream. The per-channel window summaries take two routes that are concatenated: one fuses channels with bases built from the <strong>electrode coordinates</strong>, the other takes their mean, standard deviation and maximum. The result is pooled over windows and passed to a small task head.</p>
@@ -89,12 +74,11 @@ export default function Page() {
         <p>We tested four benchmarks across scalp and intracranial recordings, with patient-disjoint or chronological splits, model selection on validation only, and the test set touched once.</p>
       </Section>
 
-      <Stats
+      <Facts
         items={[
-          { value: <>0.925</>, label: "TUAB abnormal-EEG AUROC on 100 s segments, with 110k parameters (SAMBA: 0.905 with 1.0M)" },
-          { value: <>0.882</>, label: "BrainTreebank sentence-onset AUROC with the encoder frozen, 2.9 points above the best published" },
-          { value: <>0.822</>, label: "ISRUC sleep-staging balanced accuracy, above every comparison model incl. one 308× larger" },
-          { value: <><em>+4.9</em> pts</>, label: "Gain from pretraining when only 1% of TUAB labels are available" },
+          ["0.925", "TUAB abnormal-EEG AUROC on 100 s segments, with 110k parameters (SAMBA: 0.905 with 1.0M)"],
+          ["0.882", "BrainTreebank sentence-onset AUROC with the encoder frozen, 2.9 points above the best published"],
+          ["0.822", "ISRUC sleep-staging balanced accuracy, above every comparison model including one 308× larger"],
         ]}
       />
 

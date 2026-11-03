@@ -78,17 +78,3 @@ export function Callout({ label, children }: { label: string; children: React.Re
     </div>
   );
 }
-
-export function Stats({ items }: { items: { value: React.ReactNode; label: string }[] }) {
-  return (
-    <div className="stats">
-      {items.map((s) => (
-        <div className="stat" key={s.label}>
-          <b>{s.value}</b>
-          <span>{s.label}</span>
-        </div>
-      ))}
-    </div>
-  );
-}
-

@@ -24,7 +24,7 @@ export function Article({ paper, sections, children }: { paper: Paper; sections:
       paper={paper}
       title={<h1 className="long">{paper.title}</h1>}
       dek={<p className="post-dek">{paper.summary}</p>}
-      links={<a href={`/research/${paper.slug}`}>Short version</a>}
+      back={<a className="post-back" href={`/research/${paper.slug}`}><span aria-hidden="true">←</span> Back to the post</a>}
       sections={sections}
     >
       <article className="article">

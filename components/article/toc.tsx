@@ -7,17 +7,18 @@ const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(
 
 /** Jump links. Without `sections`, it lists the h2s of the page's `.post-body`. */
 export function Toc({ sections: given, label = "Contents" }: { sections?: Section[]; label?: string }) {
-  const { lenis } = usePage();
+  const { lenis, element } = usePage();
   const [found, setFound] = useState<Section[]>([]);
   const sections = given ?? found;
   const [active, setActive] = useState("");
 
   useEffect(() => {
-    if (given) return;
-    const hs = [...document.querySelectorAll<HTMLHeadingElement>(".post-body h2")];
+    if (given || !element) return;
+    // this page only: during a transition the outgoing page is still mounted
+    const hs = [...element.querySelectorAll<HTMLHeadingElement>(".post-body h2")];
     hs.forEach((h) => (h.id ||= slug(h.textContent ?? "")));
     setFound(hs.map((h) => ({ id: h.id, label: h.textContent ?? "" })));
-  }, [given]);
+  }, [given, element]);
 
   useEffect(() => {
     const seen = new IntersectionObserver(
@@ -28,14 +29,14 @@ export function Toc({ sections: given, label = "Contents" }: { sections?: Sectio
       { rootMargin: "-80px 0px -60% 0px" },
     );
     sections.forEach((s) => {
-      const el = document.getElementById(s.id);
+      const el = element?.querySelector(`#${CSS.escape(s.id)}`);
       if (el) seen.observe(el);
     });
     return () => seen.disconnect();
-  }, [sections]);
+  }, [sections, element]);
 
   const jump = (e: React.MouseEvent, id: string) => {
-    const el = document.getElementById(id);
+    const el = element?.querySelector<HTMLElement>(`#${CSS.escape(id)}`);
     if (!el) return;
     e.preventDefault();
     if (lenis) lenis.scrollTo(el, { offset: -88 });

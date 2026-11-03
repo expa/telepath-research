@@ -109,7 +109,7 @@ const REEDS = reeds();
 const FRONT = front();
 const knobAt = (hz: number) => knob(KNOB[0], KNOB[1], 0, 8, P, -Math.PI * 0.8 + (Math.log(hz / F_LO) / Math.log(F_HI / F_LO)) * Math.PI * 1.6);
 
-export function ReedBankFigure() {
+export function ReedBankFigure({ bare = false }: { bare?: boolean } = {}) {
   const { anchor, say } = useReadout<SVGSVGElement>();
   const groups = useRef<(SVGGElement | null)[]>([]);
   const flags = useRef<(SVGGElement | null)[]>([]);
@@ -176,18 +176,18 @@ export function ReedBankFigure() {
   };
 
   return (
-    <div className="anatomy-wrap iso" data-theme="light">
+    <div className={bare ? "anatomy-wrap bare iso" : "anatomy-wrap iso"} data-theme="light">
       <Plate
         fig="Fig 1"
         title="A bank of tuned reeds"
         hint="Drag across, or ← → to tune the input"
         readout={readoutOf(10, FREQS.findIndex((f) => f > 9) - 1)}
-        keys={[
+        keys={bare ? [] : [
           { mark: "raised", label: "One reed = one RQF" },
           { mark: "lit", label: "The reed that answers loudest" },
           { mark: "flat", label: "Index scale, one mark per reed" },
         ]}
-        caption="Sixteen steel reeds on a common comb, each tuned to one frequency from 1 to 40 Hz with the same quality factor, the way an RQF layer tiles the EEG bands. The coil shakes the comb at the input frequency. Each reed’s swing is the true gain |H| of its filter at that frequency, and its timing is the true phase. Motion is slowed so you can follow it."
+        caption={bare ? undefined : "Sixteen steel reeds on a common comb, each tuned to one frequency from 1 to 40 Hz with the same quality factor, the way an RQF layer tiles the EEG bands. The coil shakes the comb at the input frequency. Each reed’s swing is the true gain |H| of its filter at that frequency, and its timing is the true phase. Motion is slowed so you can follow it."}
       >
         <div className="iso-stage" tabIndex={0} onKeyDown={onKey} aria-label="Reed bank; use arrow keys to change the input frequency" style={{ touchAction: "pan-y", cursor: "ew-resize" }}>
           <svg

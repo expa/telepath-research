@@ -31,6 +31,7 @@ export function ArticleHero({ paper }: { paper: Paper }) {
           ))}
         </div>
         <div className="actions">
+          <Link className="btn ghost" href={`/research/${paper.slug}`}>Short version</Link>
           <a className="btn" href={paper.pdf} target="_blank" rel="noreferrer">Read the paper (PDF)</a>
           {paper.code ? (
             <a className="btn ghost" href={paper.code} target="_blank" rel="noreferrer">
@@ -63,7 +64,7 @@ export function Article({ paper, sections, children }: { paper: Paper; sections:
         </div>
         <div className="next-paper">
           <span className="eyebrow">Next paper</span>
-          <Link href={`/research/${next.slug}`}>
+          <Link href={`/research/${next.slug}/detailed`}>
             <b>{next.title}</b>
           </Link>
         </div>
@@ -76,7 +77,6 @@ export function Section({ id, n, title, children }: { id: string; n: number; tit
   return (
     <section className="prose" aria-labelledby={id}>
       <h2 id={id}>
-        <span className="section-num">{String(n).padStart(2, "0")}</span>
         {title}
       </h2>
       {children}
@@ -119,14 +119,3 @@ export function Stats({ items }: { items: { value: React.ReactNode; label: strin
   );
 }
 
-export function PaperFigure({ src, alt, width, height, caption, narrow }: { src: string; alt: string; width: number; height: number; caption: React.ReactNode; narrow?: boolean }) {
-  return (
-    <figure className={narrow ? "paper-fig narrow" : "paper-fig"}>
-      <div className="frame">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={src} alt={alt} width={width} height={height} loading="lazy" />
-      </div>
-      <figcaption>{caption}</figcaption>
-    </figure>
-  );
-}

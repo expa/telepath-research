@@ -115,7 +115,7 @@ const SCRIPT: { phase: Phase; secs: number; say: string }[] = [
 ];
 const readoutOf = (word: string, angle: number | null) => `${word} · ${angle === null ? "empty" : `remembers ${angle}°`}`;
 
-export function OrganicsCarouselFigure() {
+export function OrganicsCarouselFigure({ bare = false }: { bare?: boolean } = {}) {
   const { anchor, say } = useReadout<SVGSVGElement>();
   const pistons = useRef<(SVGGElement | null)[]>([]);
   const needle = useRef<SVGGElement>(null);
@@ -189,18 +189,18 @@ export function OrganicsCarouselFigure() {
   };
 
   return (
-    <div className="anatomy-wrap iso" data-theme="light">
+    <div className={bare ? "anatomy-wrap bare iso" : "anatomy-wrap iso"} data-theme="light">
       <Plate
         fig="Fig 1"
         title="A memory you can turn"
         hint="Click a direction on the platter to flash a target"
         readout={readoutOf("present", null)}
-        keys={[
+        keys={bare ? [] : [
           { mark: "raised", label: "36 neurons, one per 10° of direction" },
           { mark: "lit", label: "The remembered direction" },
           { mark: "flat", label: "Modulator dials: a, b, shift" },
         ]}
-        caption="Each piston is one neuron of an ORGaNICs circuit; its height is the neuron’s response y. The three dials on the hub are the modulators: b opens the input, a turns the recurrent drive down (reset), and the third gates derivative-shaped recurrent weights. A target flashes, the bump of activity it leaves is held with no input at all, then slides round the ring while the shift dial is up, and is wiped when a rises. The heights come from the circuit’s equation, at half speed."
+        caption={bare ? undefined : "Each piston is one neuron of an ORGaNICs circuit; its height is the neuron’s response y. The three dials on the hub are the modulators: b opens the input, a turns the recurrent drive down (reset), and the third gates derivative-shaped recurrent weights. A target flashes, the bump of activity it leaves is held with no input at all, then slides round the ring while the shift dial is up, and is wiped when a rises. The heights come from the circuit’s equation, at half speed."}
       >
         <div className="iso-stage">
           <svg ref={anchor} className="iso-svg" viewBox={`0 0 ${WIDTH} ${HEIGHT}`} role="img" aria-label="An isometric turntable with 36 pistons on a ring and three dials on a central hub. Piston heights show a bump of neural activity that is held, moved and cleared." onPointerDown={pick} style={{ cursor: "crosshair" }}>

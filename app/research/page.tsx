@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { PAPERS } from "@/content/papers";
 
-export const metadata: Metadata = { title: "Research", description: "Interactive explainers for Telepath’s papers." };
+export const metadata: Metadata = { title: "Research", description: "Telepath’s research, explained." };
 
-// Loops recorded from each paper's live anatomy figure.
+// Loops recorded from each paper's live figure.
 const ART: Record<string, string> = { "prospective-coding": "cascade", "self-supervised-rqf": "reed", organics: "carousel" };
 
 export default function ResearchIndex() {
@@ -12,24 +12,25 @@ export default function ResearchIndex() {
     <main>
       <section className="index-hero">
         <div className="glow" aria-hidden="true"><span /></div>
-        <span className="eyebrow">Telepath Research · NeurIPS 2026</span>
         <h1>Intelligence that keeps time</h1>
-        <p>Brains predict how the world is about to change, with circuits made of rhythms. Our papers build that idea into machine learning. Each one has an interactive walkthrough here.</p>
+        <p>Brains predict how the world is about to change, using circuits made of rhythms. Our research builds that idea into machine learning. Here are the papers, explained.</p>
       </section>
-      <section className="papers" aria-label="Papers">
+      <section className="posts" aria-label="Papers">
         {PAPERS.map((p) => (
-          <Link key={p.slug} href={`/research/${p.slug}`} className="paper-card">
-            <div className="card-art">
-              <video src={`/video/${ART[p.slug]}.mp4`} poster={`/cards/${ART[p.slug]}.jpg`} autoPlay muted loop playsInline aria-hidden="true" />
+          <article key={p.slug} className="post-row">
+            <Link href={`/research/${p.slug}`} className="post-row-art" tabIndex={-1} aria-hidden="true">
+              <video src={`/video/${ART[p.slug]}.mp4`} poster={`/cards/${ART[p.slug]}.jpg`} autoPlay muted loop playsInline />
+            </Link>
+            <div>
+              <p className="post-meta">{p.venue} {p.year}</p>
+              <h2><Link href={`/research/${p.slug}`}>{p.headline}</Link></h2>
+              <p>{p.dek}</p>
+              <p className="post-row-links">
+                <Link href={`/research/${p.slug}`}>Read</Link>
+                <Link href={`/research/${p.slug}/detailed`}>Detailed walkthrough</Link>
+              </p>
             </div>
-            <div className="card-body">
-              <span className="eyebrow">{p.venue} · {p.year}</span>
-              <h2>{p.title}</h2>
-              <p>{p.hook}</p>
-              <div className="chips">{p.tags.map((t) => <span className="chip" key={t}>{t}</span>)}</div>
-              <span className="more">Explore the paper →</span>
-            </div>
-          </Link>
+          </article>
         ))}
       </section>
     </main>

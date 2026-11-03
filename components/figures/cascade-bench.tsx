@@ -13,6 +13,7 @@ const TAU = 0.02;
 const HZ = 4;
 const H = 0.001;
 const SLOW = 0.18; // shown at 0.18× real time
+const plainOf = (pros: boolean) => (pros ? "with look-ahead · the back layer keeps up" : `without look-ahead · the back layer runs ${Math.round(cascadeLag(LAYERS, HZ, TAU) * 1000)} ms late`);
 const readoutOf = (pros: boolean) =>
   pros ? `prospective · layer 6 lag 0 ms` : `instantaneous · layer 6 lag ${Math.round(cascadeLag(LAYERS, HZ, TAU) * 1000)} ms`;
 
@@ -118,7 +119,7 @@ const STATIC = staticArt();
 const ROWS_ART = Array.from({ length: ROWS }, (_, r) => ({ row: row(r), car: carriage(r), ghost: r > 0 ? ghost(r) : "" }));
 const ORDER = Array.from({ length: ROWS }, (_, r) => ROWS - 1 - r); // back rows first
 
-export function CascadeBenchFigure() {
+export function CascadeBenchFigure({ bare = false }: { bare?: boolean } = {}) {
   const { anchor, say } = useReadout<SVGSVGElement>();
   const [pros, setPros] = useState(false);
   const cars = useRef<(SVGGElement | null)[]>([]);
@@ -128,8 +129,8 @@ export function CascadeBenchFigure() {
 
   useEffect(() => {
     live.current.pros = pros;
-    say(readoutOf(pros));
-  }, [pros, say]);
+    say(bare ? plainOf(pros) : readoutOf(pros));
+  }, [pros, say, bare]);
 
   useEffect(() => {
     const svg = anchor.current!;
@@ -158,18 +159,18 @@ export function CascadeBenchFigure() {
   }, [anchor]);
 
   return (
-    <div className="anatomy-wrap iso" data-theme="light">
+    <div className={bare ? "anatomy-wrap bare iso" : "anatomy-wrap iso"} data-theme="light">
       <Plate
         fig="Fig 1"
         title="Six followers on a bench"
         hint="Click the bench, or use the switch below"
-        readout={readoutOf(false)}
-        keys={[
+        readout={bare ? plainOf(false) : readoutOf(false)}
+        keys={bare ? [] : [
           { mark: "raised", label: "Front rail: the input" },
           { mark: "lit", label: "Top layer" },
           { mark: "dotted", label: "Where the input is now" },
         ]}
-        caption="Each rail is one layer. Its carriage follows the carriage in front of it through a damper, the way a leaky integrator follows its input, so every rail adds a little lag. The dotted index on each ruler shows where the input is right now. Flip the switch to drive every layer with the look-ahead z + τż, and the six carriages fall into line. The motion is the paper’s own update rule, τ = 20 ms, a 4 Hz input, shown at 0.18× speed."
+        caption={bare ? undefined : "Each rail is one layer. Its carriage follows the carriage in front of it through a damper, the way a leaky integrator follows its input, so every rail adds a little lag. The dotted index on each ruler shows where the input is right now. Flip the switch to drive every layer with the look-ahead z + τż, and the six carriages fall into line. The motion is the paper’s own update rule, τ = 20 ms, a 4 Hz input, shown at 0.18× speed."}
       >
         <div className="iso-stage">
           <svg ref={anchor} className="iso-svg" viewBox={`0 0 ${WIDTH} ${HEIGHT}`} role="img" aria-label="An isometric bench with seven stepped rails. The front carriage is driven back and forth; each carriage behind follows the one in front with a delay." onClick={() => setPros((p) => !p)} style={{ cursor: "pointer" }}>
@@ -185,8 +186,8 @@ export function CascadeBenchFigure() {
           </svg>
           <div className="figure-buttons">
             <div className="seg" role="group" aria-label="Bottom-up input">
-              <button type="button" aria-pressed={!pros} onClick={() => setPros(false)}>Instantaneous input</button>
-              <button type="button" aria-pressed={pros} onClick={() => setPros(true)}>Prospective input</button>
+              <button type="button" aria-pressed={!pros} onClick={() => setPros(false)}>{bare ? "Without look-ahead" : "Instantaneous input"}</button>
+              <button type="button" aria-pressed={pros} onClick={() => setPros(true)}>{bare ? "With look-ahead" : "Prospective input"}</button>
             </div>
           </div>
         </div>

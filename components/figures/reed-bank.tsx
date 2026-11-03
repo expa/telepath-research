@@ -199,15 +199,15 @@ export function ReedBankFigure({ bare = false }: { bare?: boolean } = {}) {
             onPointerDown={(e) => setFrom(e.clientX)}
             onPointerMove={(e) => e.buttons && setFrom(e.clientX)}
           >
-            <g dangerouslySetInnerHTML={{ __html: BACK }} />
+            <g suppressHydrationWarning dangerouslySetInnerHTML={{ __html: BACK }} />
             {REEDS.map((r, i) => (
               <g key={i} ref={(el) => { groups.current[i] = el; }}>
-                <g dangerouslySetInnerHTML={{ __html: r.reed }} />
-                <g ref={(el) => { flags.current[i] = el; }} dangerouslySetInnerHTML={{ __html: r.flag }} />
+                <g suppressHydrationWarning dangerouslySetInnerHTML={{ __html: r.reed }} />
+                <g ref={(el) => { flags.current[i] = el; }} suppressHydrationWarning dangerouslySetInnerHTML={{ __html: r.flag }} />
               </g>
             ))}
-            <g dangerouslySetInnerHTML={{ __html: FRONT }} />
-            <g ref={knobRef} dangerouslySetInnerHTML={{ __html: knobAt(10) }} />
+            <g suppressHydrationWarning dangerouslySetInnerHTML={{ __html: FRONT }} />
+            <g ref={knobRef} suppressHydrationWarning dangerouslySetInnerHTML={{ __html: knobAt(10) }} />
           </svg>
         </div>
       </Plate>

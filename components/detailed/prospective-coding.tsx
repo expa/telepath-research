@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { Article, Callout, Eq, M, Section, Stats, Tldr } from "@/components/article/blocks";
 import { paperOf } from "@/content/papers";
 import { FilterLab } from "@/components/widgets/filter-lab";
@@ -7,7 +6,6 @@ import { PairedBars } from "@/components/widgets/charts";
 import { CascadeBenchFigure } from "@/components/figures/cascade-bench";
 
 const paper = paperOf("prospective-coding");
-export const metadata: Metadata = { title: "Prospective coding, in detail", description: paper.summary };
 
 const SECTIONS = [
   { id: "tradeoff", label: "Memory versus reactivity" },

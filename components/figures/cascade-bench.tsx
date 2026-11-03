@@ -174,15 +174,15 @@ export function CascadeBenchFigure({ bare = false }: { bare?: boolean } = {}) {
       >
         <div className="iso-stage">
           <svg ref={anchor} className="iso-svg" viewBox={`0 0 ${WIDTH} ${HEIGHT}`} role="img" aria-label="An isometric bench with seven stepped rails. The front carriage is driven back and forth; each carriage behind follows the one in front with a delay." onClick={() => setPros((p) => !p)} style={{ cursor: "pointer" }}>
-            <g dangerouslySetInnerHTML={{ __html: STATIC }} />
+            <g suppressHydrationWarning dangerouslySetInnerHTML={{ __html: STATIC }} />
             {ORDER.map((r) => (
               <g key={r}>
-                <g dangerouslySetInnerHTML={{ __html: ROWS_ART[r].row }} />
-                {r > 0 ? <g ref={(el) => { ghosts.current[r] = el; }} dangerouslySetInnerHTML={{ __html: ROWS_ART[r].ghost }} /> : <g ref={rod} />}
-                <g ref={(el) => { cars.current[r] = el; }} dangerouslySetInnerHTML={{ __html: ROWS_ART[r].car }} />
+                <g suppressHydrationWarning dangerouslySetInnerHTML={{ __html: ROWS_ART[r].row }} />
+                {r > 0 ? <g ref={(el) => { ghosts.current[r] = el; }} suppressHydrationWarning dangerouslySetInnerHTML={{ __html: ROWS_ART[r].ghost }} /> : <g ref={rod} />}
+                <g ref={(el) => { cars.current[r] = el; }} suppressHydrationWarning dangerouslySetInnerHTML={{ __html: ROWS_ART[r].car }} />
               </g>
             ))}
-            <g dangerouslySetInnerHTML={{ __html: lever(pros) }} />
+            <g suppressHydrationWarning dangerouslySetInnerHTML={{ __html: lever(pros) }} />
           </svg>
           <div className="figure-buttons">
             <div className="seg" role="group" aria-label="Bottom-up input">

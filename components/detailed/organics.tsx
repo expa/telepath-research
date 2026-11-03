@@ -1,11 +1,9 @@
-import type { Metadata } from "next";
 import { Article, Callout, Eq, M, Section, Tldr } from "@/components/article/blocks";
 import { paperOf } from "@/content/papers";
 import { OrganicsCarouselFigure } from "@/components/figures/organics-carousel";
 import { OrganicsLab } from "@/components/widgets/organics-lab";
 
 const paper = paperOf("organics");
-export const metadata: Metadata = { title: "ORGaNICs, in detail", description: paper.summary };
 
 const SECTIONS = [
   { id: "beyond", label: "Memory is not a still picture" },

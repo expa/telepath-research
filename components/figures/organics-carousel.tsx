@@ -98,7 +98,7 @@ const SLEEVES = Array.from({ length: N }, (_, j) => sleeve(j));
 function Unit({ j, refs }: { j: number; refs: React.RefObject<(SVGGElement | null)[]> }) {
   return (
     <g>
-      <g dangerouslySetInnerHTML={{ __html: SLEEVES[j] }} />
+      <g suppressHydrationWarning dangerouslySetInnerHTML={{ __html: SLEEVES[j] }} />
       <g ref={(el) => { refs.current[j] = el; }} />
     </g>
   );
@@ -204,10 +204,10 @@ export function OrganicsCarouselFigure({ bare = false }: { bare?: boolean } = {}
       >
         <div className="iso-stage">
           <svg ref={anchor} className="iso-svg" viewBox={`0 0 ${WIDTH} ${HEIGHT}`} role="img" aria-label="An isometric turntable with 36 pistons on a ring and three dials on a central hub. Piston heights show a bump of neural activity that is held, moved and cleared." onPointerDown={pick} style={{ cursor: "crosshair" }}>
-            <g dangerouslySetInnerHTML={{ __html: STATIC }} />
+            <g suppressHydrationWarning dangerouslySetInnerHTML={{ __html: STATIC }} />
             <g ref={arm} />
             {BEHIND.map((j) => <Unit key={j} j={j} refs={pistons} />)}
-            <g dangerouslySetInnerHTML={{ __html: HUB }} />
+            <g suppressHydrationWarning dangerouslySetInnerHTML={{ __html: HUB }} />
             <g ref={needle} />
             {INFRONT.map((j) => <Unit key={j} j={j} refs={pistons} />)}
           </svg>

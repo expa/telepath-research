@@ -1,8 +1,24 @@
 "use client";
 import { useEffect, useState } from "react";
+import { usePage } from "modulato";
 
-export function Toc({ sections }: { sections: { id: string; label: string }[] }) {
+type Section = { id: string; label: string };
+const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+
+/** Jump links. Without `sections`, it lists the h2s of the page's `.post-body`. */
+export function Toc({ sections: given, label = "Contents" }: { sections?: Section[]; label?: string }) {
+  const { lenis } = usePage();
+  const [found, setFound] = useState<Section[]>([]);
+  const sections = given ?? found;
   const [active, setActive] = useState("");
+
+  useEffect(() => {
+    if (given) return;
+    const hs = [...document.querySelectorAll<HTMLHeadingElement>(".post-body h2")];
+    hs.forEach((h) => (h.id ||= slug(h.textContent ?? "")));
+    setFound(hs.map((h) => ({ id: h.id, label: h.textContent ?? "" })));
+  }, [given]);
+
   useEffect(() => {
     const seen = new IntersectionObserver(
       (entries) => {
@@ -17,13 +33,24 @@ export function Toc({ sections }: { sections: { id: string; label: string }[] })
     });
     return () => seen.disconnect();
   }, [sections]);
+
+  const jump = (e: React.MouseEvent, id: string) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    e.preventDefault();
+    if (lenis) lenis.scrollTo(el, { offset: -88 });
+    else el.scrollIntoView({ behavior: "smooth" });
+    history.replaceState(history.state, "", `#${id}`);
+  };
+
+  if (!sections.length) return null;
   return (
-    <nav className="toc" aria-label="Contents">
-      <span className="eyebrow">Contents</span>
+    <nav className="toc" aria-label={label}>
+      <span className="eyebrow">{label}</span>
       <ol>
         {sections.map((s) => (
           <li key={s.id}>
-            <a href={`#${s.id}`} data-active={active === s.id ? "" : undefined}>
+            <a href={`#${s.id}`} onClick={(e) => jump(e, s.id)} data-active={active === s.id ? "" : undefined}>
               {s.label}
             </a>
           </li>

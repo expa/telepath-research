@@ -1,11 +1,9 @@
-import type { Metadata } from "next";
 import { Facts, Fig, Post } from "@/components/post/post";
 import { SizeCircles } from "@/components/post/metaphors";
 import { ReedBankFigure } from "@/components/figures/reed-bank";
 import { paperOf } from "@/content/papers";
 
 const paper = paperOf("self-supervised-rqf");
-export const metadata: Metadata = { title: paper.headline, description: paper.dek };
 
 export default function Page() {
   return (

@@ -1,11 +1,9 @@
-import type { Metadata } from "next";
 import { Facts, Fig, Post } from "@/components/post/post";
 import { LagWaves } from "@/components/post/metaphors";
 import { CascadeBenchFigure } from "@/components/figures/cascade-bench";
 import { paperOf } from "@/content/papers";
 
 const paper = paperOf("prospective-coding");
-export const metadata: Metadata = { title: paper.headline, description: paper.dek };
 
 export default function Page() {
   return (

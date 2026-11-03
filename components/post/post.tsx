@@ -1,6 +1,9 @@
-import Link from "next/link";
+import { Shared } from "modulato";
 import type { Paper } from "@/content/papers";
 import { PAPERS } from "@/content/papers";
+import { Toc } from "@/components/article/toc";
+
+export const dateOf = (iso: string) => new Date(`${iso}T12:00:00Z`).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
 
 /** A short, plain-language post: no cards, no counters, just text and figures on the page. */
 export function Post({ paper, children }: { paper: Paper; children: React.ReactNode }) {
@@ -8,14 +11,24 @@ export function Post({ paper, children }: { paper: Paper; children: React.ReactN
   const next = PAPERS[(i + 1) % PAPERS.length];
   return (
     <main className="post">
+      <aside className="post-rail">
+        <div className="post-rail-inner">
+          <dl className="post-details">
+            <div><dt>Published</dt><dd><time dateTime={paper.published}>{dateOf(paper.published)}</time></dd></div>
+            <div><dt>Authors</dt>{paper.authors.map((a) => <dd key={a}>{a}</dd>)}</div>
+            <div><dt>{paper.venueKind}</dt><dd>{paper.venueFull}</dd></div>
+          </dl>
+          <Toc />
+        </div>
+      </aside>
       <header className="post-head">
         <div className="glow" aria-hidden="true"><span /></div>
-        <p className="post-meta">{paper.venue} {paper.year} · {paper.authors.join(", ")}</p>
-        <h1>{paper.headline}</h1>
+        <Shared id={`title:${paper.slug}`}><h1>{paper.headline}</h1></Shared>
         <p className="post-dek">{paper.dek}</p>
         <p className="post-links">
-          <a href={paper.pdf} target="_blank" rel="noreferrer">Read the paper</a>
-          <Link href={`/research/${paper.slug}/detailed`}>Detailed walkthrough</Link>
+          <a href={paper.pdf} download data-native>Download the full paper (PDF)</a>
+          <a href={paper.pdf} target="_blank" rel="noreferrer" data-native>Read it online</a>
+          <a href={`/research/${paper.slug}/detailed`}>Detailed walkthrough</a>
           {paper.code ? <a href={paper.code} target="_blank" rel="noreferrer">Code</a> : null}
         </p>
       </header>
@@ -23,10 +36,10 @@ export function Post({ paper, children }: { paper: Paper; children: React.ReactN
         {children}
         <footer className="post-foot">
           <p>
-            Want the equations and every experiment? Read the <Link href={`/research/${paper.slug}/detailed`}>detailed walkthrough</Link> or the <a href={paper.pdf} target="_blank" rel="noreferrer">paper</a>, “{paper.title}”.
+            Want the equations and every experiment? Read the <a href={`/research/${paper.slug}/detailed`}>detailed walkthrough</a> or <a href={paper.pdf} download data-native>download the full paper</a>, “{paper.title}” (PDF).
           </p>
           <p className="post-next">
-            Next: <Link href={`/research/${next.slug}`}>{next.headline} →</Link>
+            Next: <a href={`/research/${next.slug}`}>{next.headline} →</a>
           </p>
         </footer>
       </article>

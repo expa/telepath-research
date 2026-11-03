@@ -3,6 +3,11 @@ export interface Paper {
   short: string;
   title: string;
   venue: string;
+  /** Full venue name for the post header, and whether it is a conference or a journal. */
+  venueFull: string;
+  venueKind: "Conference" | "Journal";
+  /** Publication date, ISO. */
+  published: string;
   year: number;
   authors: string[];
   summary: string;
@@ -21,6 +26,9 @@ export const PAPERS: Paper[] = [
     short: "Prospective coding",
     title: "Prospective Coding Improves Learning in Deep Continuous-Time Recurrent Networks",
     venue: "NeurIPS",
+    venueFull: "NeurIPS 2026",
+    venueKind: "Conference",
+    published: "2026-11-03",
     year: 2026,
     authors: ["Shivang Rawat", "Mirko Morello", "Flaviano Morone", "David J. Heeger"],
     summary:
@@ -37,6 +45,9 @@ export const PAPERS: Paper[] = [
     short: "Self-supervised RQFs",
     title: "Self-Supervised Learning with Recursive Quadrature Filters for Neural Time Series",
     venue: "NeurIPS · Foundation Models for the Brain and Body",
+    venueFull: "NeurIPS 2026 Workshop: Foundation Models for the Brain and Body",
+    venueKind: "Conference",
+    published: "2026-11-03",
     year: 2026,
     authors: ["Mirko Morello", "Shivang Rawat", "David J. Heeger"],
     summary:
@@ -52,6 +63,9 @@ export const PAPERS: Paper[] = [
     short: "ORGaNICs",
     title: "Oscillatory Recurrent Gated Neural Integrator Circuits (ORGaNICs), a Unifying Theoretical Framework for Neural Dynamics",
     venue: "PNAS · Foundations",
+    venueFull: "PNAS (Proceedings of the National Academy of Sciences)",
+    venueKind: "Journal",
+    published: "2019-10-21",
     year: 2019,
     authors: ["David J. Heeger", "Wayne E. Mackey"],
     summary:

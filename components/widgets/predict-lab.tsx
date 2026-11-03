@@ -99,7 +99,7 @@ export function PredictLab() {
               return (
                 <g key={w} onPointerDown={() => setJ(w)} style={{ cursor: "pointer" }}>
                   <rect x={sx(w * WIN * FS) + 1} y={6} width={ww - 2} height={118} rx={4} fill={isSrc ? "#2a211b0f" : isT ? "var(--accent-soft)" : "transparent"} stroke={isSrc ? "var(--ink)" : isT ? "var(--accent)" : "#f0e6dc"} strokeWidth={isSrc || isT ? 1.2 : 1} />
-                  <rect x={sx(w * WIN * FS) + ww * 0.2} y={Math.min(by(0), by(sims[w]))} width={ww * 0.6} height={Math.abs(by(sims[w]) - by(0))} rx={1.5} fill={isSrc ? "#2a211b" : isT ? "var(--accent)" : "#d9cbbf"} />
+                  <rect x={sx(w * WIN * FS) + ww * 0.2} y={+Math.min(by(0), by(sims[w])).toFixed(2)} width={ww * 0.6} height={+Math.abs(by(sims[w]) - by(0)).toFixed(2)} rx={1.5} fill={isSrc ? "#2a211b" : isT ? "var(--accent)" : "#d9cbbf"} />
                 </g>
               );
             })}

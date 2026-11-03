@@ -1,10 +1,8 @@
-import type { Metadata } from "next";
 import { Fig, Post } from "@/components/post/post";
 import { OrganicsCarouselFigure } from "@/components/figures/organics-carousel";
 import { paperOf } from "@/content/papers";
 
 const paper = paperOf("organics");
-export const metadata: Metadata = { title: paper.headline, description: paper.dek };
 
 export default function Page() {
   return (

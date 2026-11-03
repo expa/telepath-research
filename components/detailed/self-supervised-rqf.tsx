@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { Article, Callout, Eq, M, Section, Stats, Tldr } from "@/components/article/blocks";
 import { paperOf } from "@/content/papers";
 import { ReedBankFigure } from "@/components/figures/reed-bank";
@@ -9,7 +8,6 @@ import { Encoder3DLazy } from "@/components/widgets/lazy";
 import { BENCHES } from "@/content/benchmarks";
 
 const paper = paperOf("self-supervised-rqf");
-export const metadata: Metadata = { title: "Self-supervised RQFs, in detail", description: paper.summary };
 
 const SECTIONS = [
   { id: "why", label: "Brains run on rhythms" },

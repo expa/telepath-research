@@ -1,5 +1,4 @@
 import katex from "katex";
-import Link from "next/link";
 import type { Paper } from "@/content/papers";
 import { PAPERS } from "@/content/papers";
 import { Toc } from "./toc";
@@ -31,8 +30,8 @@ export function ArticleHero({ paper }: { paper: Paper }) {
           ))}
         </div>
         <div className="actions">
-          <Link className="btn ghost" href={`/research/${paper.slug}`}>Short version</Link>
-          <a className="btn" href={paper.pdf} target="_blank" rel="noreferrer">Read the paper (PDF)</a>
+          <a className="btn ghost" href={`/research/${paper.slug}`}>Short version</a>
+          <a className="btn" href={paper.pdf} target="_blank" rel="noreferrer" data-native>Read the paper (PDF)</a>
           {paper.code ? (
             <a className="btn ghost" href={paper.code} target="_blank" rel="noreferrer">
               {paper.code.includes("github") ? "Code" : "Simulation code"}
@@ -64,9 +63,9 @@ export function Article({ paper, sections, children }: { paper: Paper; sections:
         </div>
         <div className="next-paper">
           <span className="eyebrow">Next paper</span>
-          <Link href={`/research/${next.slug}/detailed`}>
+          <a href={`/research/${next.slug}/detailed`}>
             <b>{next.title}</b>
-          </Link>
+          </a>
         </div>
       </article>
     </main>

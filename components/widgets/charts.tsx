@@ -105,8 +105,8 @@ export function PairedBars({ title, unit, groups, a, b, lo, hi, caption }: { tit
               const d = g.b - g.a;
               return (
                 <g key={g.label}>
-                  <rect x={x + gw * 0.18} y={sy(g.a)} width={bw} height={sy(lo) - sy(g.a)} rx={3} fill="#d9cbbf" />
-                  <rect x={x + gw * 0.18 + bw + 4} y={sy(g.b)} width={bw} height={sy(lo) - sy(g.b)} rx={3} fill="var(--accent)" />
+                  <rect x={x + gw * 0.18} y={+sy(g.a).toFixed(2)} width={bw} height={+(sy(lo) - sy(g.a)).toFixed(2)} rx={3} fill="#d9cbbf" />
+                  <rect x={x + gw * 0.18 + bw + 4} y={+sy(g.b).toFixed(2)} width={bw} height={+(sy(lo) - sy(g.b)).toFixed(2)} rx={3} fill="var(--accent)" />
                   <text x={x + gw * 0.18 + bw + 4 + bw / 2} y={sy(g.b) - 6} textAnchor="middle" style={{ fill: d >= 0 ? "var(--deep)" : "var(--muted)", fontSize: 11 }}>
                     {d >= 0 ? "+" : ""}{d.toFixed(2)}
                   </text>

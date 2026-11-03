@@ -155,8 +155,8 @@ export function GradientDepth() {
               const x = P + i * bw;
               return (
                 <g key={i}>
-                  <rect x={x + bw * 0.16} y={sy(v(gnp, k))} width={bw * 0.32} height={sy(lo) - sy(v(gnp, k))} fill="#d9cbbf" rx={2} />
-                  <rect x={x + bw * 0.52} y={sy(v(gp, k))} width={bw * 0.32} height={sy(lo) - sy(v(gp, k))} fill="var(--accent)" rx={2} />
+                  <rect x={x + bw * 0.16} y={+sy(v(gnp, k)).toFixed(2)} width={bw * 0.32} height={+(sy(lo) - sy(v(gnp, k))).toFixed(2)} fill="#d9cbbf" rx={2} />
+                  <rect x={x + bw * 0.52} y={+sy(v(gp, k)).toFixed(2)} width={bw * 0.32} height={+(sy(lo) - sy(v(gp, k))).toFixed(2)} fill="var(--accent)" rx={2} />
                   <text x={x + bw / 2} y={Hh - 8} textAnchor="middle">layer {i + 1}</text>
                 </g>
               );

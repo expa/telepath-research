@@ -1,11 +1,11 @@
 "use client";
-import dynamic from "next/dynamic";
+import { ClientOnly } from "./lazy";
 import { useMemo, useState } from "react";
 import { alphaOf, gain, impulse, omega0Of, qOf, type Rqf } from "@/lib/rqf";
 import { lin, logSample, logScale, pathOf, sample } from "@/lib/plot";
 import { Slider } from "./slider";
 
-const Helix3D = dynamic(() => import("./helix3d"), { ssr: false, loading: () => <div className="canvas3d" /> });
+const Helix3D = ClientOnly(() => import("./helix3d"));
 
 const TAU = 0.01; // 10 ms base time constant
 const TWO_PI = Math.PI * 2;

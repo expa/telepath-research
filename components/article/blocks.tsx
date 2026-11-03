@@ -1,7 +1,7 @@
 import katex from "katex";
 import type { Paper } from "@/content/papers";
 import { PAPERS } from "@/content/papers";
-import { Toc } from "./toc";
+import { PaperLayout } from "@/components/post/post";
 
 /** Display or inline TeX, rendered on the server. */
 export function Eq({ tex, note, inline = false }: { tex: string; note?: React.ReactNode; inline?: boolean }) {
@@ -16,44 +16,21 @@ export function Eq({ tex, note, inline = false }: { tex: string; note?: React.Re
 }
 export const M = ({ children }: { children: string }) => <Eq tex={children} inline />;
 
-export function ArticleHero({ paper }: { paper: Paper }) {
-  return (
-    <section className="article-hero">
-      <div className="glow" aria-hidden="true"><span /></div>
-      <div className="article-hero-inner">
-        <span className="eyebrow">{paper.venue} · {paper.year}</span>
-        <h1>{paper.title}</h1>
-        <p className="dek">{paper.summary}</p>
-        <div className="byline">
-          {paper.authors.map((a) => (
-            <strong key={a}>{a}</strong>
-          ))}
-        </div>
-        <div className="actions">
-          <a className="btn ghost" href={`/research/${paper.slug}`}>Short version</a>
-          <a className="btn" href={paper.pdf} target="_blank" rel="noreferrer" data-native>Read the paper (PDF)</a>
-          {paper.code ? (
-            <a className="btn ghost" href={paper.code} target="_blank" rel="noreferrer">
-              {paper.code.includes("github") ? "Code" : "Simulation code"}
-            </a>
-          ) : null}
-        </div>
-      </div>
-    </section>
-  );
-}
-
 export function Article({ paper, sections, children }: { paper: Paper; sections: { id: string; label: string }[]; children: React.ReactNode }) {
   const i = PAPERS.findIndex((p) => p.slug === paper.slug);
   const next = PAPERS[(i + 1) % PAPERS.length];
   return (
-    <main>
-      <ArticleHero paper={paper} />
+    <PaperLayout
+      paper={paper}
+      title={<h1 className="long">{paper.title}</h1>}
+      dek={<p className="post-dek">{paper.summary}</p>}
+      links={<a href={`/research/${paper.slug}`}>Short version</a>}
+      sections={sections}
+    >
       <article className="article">
-        <Toc sections={sections} />
         {children}
         <div className="cite">
-          <span className="eyebrow">Cite</span>
+          <p className="cite-label">Cite</p>
           <pre>{`@article{${paper.authors[0].split(" ").pop()!.toLowerCase()}${paper.year},
   title   = {${paper.title}},
   author  = {${paper.authors.join(" and ")}},
@@ -61,14 +38,11 @@ export function Article({ paper, sections, children }: { paper: Paper; sections:
   year    = {${paper.year}}
 }`}</pre>
         </div>
-        <div className="next-paper">
-          <span className="eyebrow">Next paper</span>
-          <a href={`/research/${next.slug}/detailed`}>
-            <b>{next.title}</b>
-          </a>
-        </div>
+        <p className="post-next next-paper">
+          Next: <a href={`/research/${next.slug}/detailed`}>{next.title} →</a>
+        </p>
       </article>
-    </main>
+    </PaperLayout>
   );
 }
 

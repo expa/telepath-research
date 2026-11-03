@@ -25,10 +25,6 @@ export default function Home() {
               <p className="post-meta">{p.venue} {p.year}</p>
               <Shared id={`title:${p.slug}`}><h2><a href={`/research/${p.slug}`}>{p.headline}</a></h2></Shared>
               <Shared id={`dek:${p.slug}`}><p className="post-row-dek">{p.dek}</p></Shared>
-              <p className="post-row-links">
-                <a href={`/research/${p.slug}`}>Read</a>
-                <a href={`/research/${p.slug}/detailed`}>Detailed walkthrough</a>
-              </p>
             </div>
           </article>
         ))}

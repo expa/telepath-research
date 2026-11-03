@@ -30,7 +30,7 @@ export function Article({ paper, sections, children }: { paper: Paper; sections:
     >
       <article className="article">
         {children}
-        <PaperFoot paper={paper} other={{ href: `/research/${paper.slug}`, title: "Short version", sub: "The plain-language post, no equations" }} next={{ href: `/research/${next.slug}/detailed`, title: next.title }}>
+        <PaperFoot paper={paper} other={{ href: `/research/${paper.slug}`, title: "Blog post", sub: "The plain-language post, no equations" }} next={{ href: `/research/${next.slug}/detailed`, title: next.title }}>
           <Cite paper={paper} />
         </PaperFoot>
       </article>

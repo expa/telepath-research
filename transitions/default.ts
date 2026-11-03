@@ -17,6 +17,9 @@ export default transition({
   async run({ from, to }) {
     const d = matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 1;
     const a = parts(from.element), b = parts(to.element);
+    // Leaving a detailed walkthrough for a lighter page reads as going back: slide the other way.
+    const detailed = (id: string) => id.endsWith("/detailed");
+    const dir = detailed(from.route.id) && !detailed(to.route.id) ? -1 : 1;
     // the outgoing page lies on top; its opaque background would hide the incoming content as it fades in
     const fm = from.element.querySelector("main");
     if (fm) fm.style.background = "transparent";
@@ -30,8 +33,8 @@ export default transition({
       );
     run(a.rail, [0, 0], [1, 0], 360, 120, "ease");
     run(b.rail, [0, 0], [0, 1], 360, 120, "ease");
-    run(a.content, [0, -SLIDE], [1, 0], 300, 0, OUT);
-    run(b.content, [SLIDE, 0], [0, 1], 460, 240, IN);
+    run(a.content, [0, -SLIDE * dir], [1, 0], 300, 0, OUT);
+    run(b.content, [SLIDE * dir, 0], [0, 1], 460, 240, IN);
     await Promise.all(all.map((an) => an.finished)).catch(() => {});
     // Drop the incoming page's fills so it keeps no leftover transform (it would break position: sticky/fixed inside).
     // Leave the outgoing page's alone: cancelling them would flash it back to full opacity for a frame before it unmounts.

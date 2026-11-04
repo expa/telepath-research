@@ -593,7 +593,7 @@ main { background: var(--paper); }
 
 .landing-form.is-open:focus-within { background-color: rgb(255 255 255 / .55); }
 
-@media (prefers-reduced-motion: no-preference) { .post-wordmark { animation: wordmark-reveal 600ms ease-out 300ms both; } }
+@media (prefers-reduced-motion: no-preference) { .post-brand:not(.is-settled) .post-wordmark { animation: wordmark-reveal 600ms ease-out 300ms both; } }
 
 /* Balanced wrapping for the homepage text. */
 .landing h1, .landing-paper h3, .landing-paper-dek { text-wrap: balance; }

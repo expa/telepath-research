@@ -1,5 +1,6 @@
 import { Logo } from "@/components/v2/article/logo";
-import { Shared } from "modulato";
+import { Shared, useNavigation } from "modulato";
+import { useRef } from "react";
 import type { Paper } from "@/content/papers";
 import { PAPERS } from "@/content/papers";
 import { Toc } from "@/components/v2/article/toc";
@@ -10,11 +11,13 @@ type Section = { id: string; label: string };
 
 /** Shared page frame for posts and detailed walkthroughs: side rail, left-aligned header, one text column. */
 export function PaperLayout({ paper, back, title, dek, links, sections, children }: { paper: Paper; back?: React.ReactNode; title: React.ReactNode; dek?: React.ReactNode; links?: React.ReactNode; sections?: Section[]; children: React.ReactNode }) {
+  // Arriving from another research page, the logo was already on screen in this spot: show it at rest, no entrance.
+  const settled = useRef(useNavigation().from?.id.startsWith("research/") ?? false).current;
   return (
     <main className="post">
       {/* page-level, not inside the header: the header's container-type would trap the fixed glow */}
       <div className="glow" aria-hidden="true"><span /></div>
-      <a className="brand post-brand" href="/" aria-label="Telepath home"><Logo /><span className="post-wordmark">Telepath</span></a>
+      <a className={settled ? "brand post-brand is-settled" : "brand post-brand"} href="/" aria-label="Telepath home"><Logo settled={settled} /><span className="post-wordmark">Telepath</span></a>
       <aside className="post-rail">
         <div className="post-rail-inner">
           <dl className="post-details">

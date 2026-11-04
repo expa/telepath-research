@@ -1,10 +1,13 @@
 import { useEffect } from "react";
-import { PageOutlet } from "modulato";
+import { PageOutlet, useNavigation, useRoute } from "modulato";
 import { Logo } from "@/components/article/logo";
 import "./styles/globals.css";
 
 // The shell persists across navigation; pages swap inside <PageOutlet/>.
 export default function App() {
+  // The homepage is the company landing: full-bleed, no research chrome.
+  const route = useRoute(), nav = useNavigation();
+  const landing = (nav.to ?? route).id === "home";
   // Cmd+↑ / Cmd+↓ jump to the top / bottom of any page (smooth scroll otherwise swallows the native shortcut).
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -19,20 +22,20 @@ export default function App() {
   }, []);
   return (
     <>
-      <header className="site-header">
-        <a href="/" className="brand" aria-label="Telepath Research">
+      {landing ? null : <header className="site-header">
+        <a href="/research" className="brand" aria-label="Telepath Research">
           <Logo />
           Telepath Research
         </a>
         <nav className="nav" aria-label="Main">
-          <a href="https://telepath.com" data-native>Company</a>
+          <a href="/">Company</a>
         </nav>
-      </header>
+      </header>}
       <PageOutlet />
-      <footer className="site-footer">
+      {landing ? null : <footer className="site-footer">
         <span>© {new Date().getFullYear()} Telepath</span>
         <span>Intelligence that evolves.</span>
-      </footer>
+      </footer>}
     </>
   );
 }

@@ -119,15 +119,19 @@ function Home() {
   // Touch screens can't hover to open the signup, so there it stays open.
   const [noHover, setNoHover] = useState(false);
   useEffect(() => setNoHover(matchMedia("(hover: none)").matches), []);
-  // On touch screens the signup waits off-screen until the visitor starts scrolling.
+  // On touch screens the signup sits off-screen at the top of the page and slides up once the visitor scrolls,
+  // unless it's in use (focused or holding an email).
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
-    if (!noHover || scrolled) return;
-    const onScroll = () => { if (scrollY > 40) setScrolled(true); };
+    if (!noHover) return;
+    const onScroll = () => {
+      const form = glass.current, inUse = !!form && (form.contains(document.activeElement) || !!form.querySelector("input")?.value);
+      setScrolled(scrollY > 40 || inUse);
+    };
     onScroll();
     addEventListener("scroll", onScroll, { passive: true });
     return () => removeEventListener("scroll", onScroll);
-  }, [noHover, scrolled]);
+  }, [noHover]);
   const signupOpen = hoverOpen || noHover;
   const openSignup = () => {
     setSignupOpen(true);

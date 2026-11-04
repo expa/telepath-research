@@ -365,3 +365,8 @@ main { background: var(--paper); }
 .post-back span { display: inline-block; transition: transform 0.2s var(--ease); }
 .post-back:hover { color: var(--ink); }
 .post-back:hover span { transform: translateX(-3px); }
+
+/* Detailed walkthrough: darker gray glow so it reads apart from the blog post */
+.post:has(.article) .post-head .glow::before { background: radial-gradient(closest-side, #6b6b6b, transparent); }
+.post:has(.article) .post-head .glow::after { background: radial-gradient(closest-side, #4a4a4a, transparent); }
+.post:has(.article) .post-head .glow span { background: radial-gradient(closest-side, #2a2a2a, transparent); }

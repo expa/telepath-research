@@ -393,13 +393,9 @@ main { background: var(--paper); }
 .landing-form input::placeholder { color: #fff; }
 .landing-form button { position: relative; font-weight: 600; color: var(--accent); cursor: pointer; }
 .landing-form button::before { content: ""; position: absolute; z-index: -1; inset: 4px 5px 5px auto; width: 52px; border-radius: 150px; background: #fff; opacity: .8; box-shadow: inset 0 1px 2px #fff; }
-/* Liquid glass: motion is driven by springs in pages/home/page.tsx; CSS only draws the glint. */
+/* Liquid glass: pill and Join motion are driven by springs in pages/home/page.tsx; CSS only draws the glint. */
 .landing-form::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: var(--glint, 0);
   background: radial-gradient(160px 80px at var(--mx, 50%) var(--my, 50%), #ffffff38, #fff0 70%); }
-.landing-form button { transition: transform .35s cubic-bezier(.25, 1, .5, 1); }
-.landing-form button:hover { transform: scale(1.05); }
-.landing-form button:active { transform: scale(.94); transition-duration: .15s; }
-@media (prefers-reduced-motion: reduce) { .landing-form button { transition: none; transform: none; } }
 .landing-form:focus-within { outline: 2px solid #ffffff80; outline-offset: 2px; }
 .landing-form button:disabled { opacity: .6; cursor: progress; }
 .landing-thanks, .landing-error { margin: 0; font-size: 1rem; }

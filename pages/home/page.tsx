@@ -28,9 +28,11 @@ function liquidGlass(el: HTMLFormElement | null) {
   if (!el || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   // ponytail: one shared stiffness/damping; per-property tuning if some motion feels off.
   const K = 260, C = 26; // gently underdamped: a soft settle, no snap
-  const keys = ["s", "sx", "sy", "dx", "dy", "mx", "my", "glint"] as const;
+  const keys = ["s", "sx", "sy", "dx", "dy", "mx", "my", "glint", "b"] as const;
   type Key = (typeof keys)[number];
-  const rest: Record<Key, number> = { s: 1, sx: 1, sy: 1, dx: 0, dy: 0, mx: 50, my: 50, glint: 0 };
+  const rest: Record<Key, number> = { s: 1, sx: 1, sy: 1, dx: 0, dy: 0, mx: 50, my: 50, glint: 0, b: 1 };
+  const button = el.querySelector("button")!;
+  let pressed = false;
   const at = { ...rest }, to = { ...rest }, v = Object.fromEntries(keys.map((k) => [k, 0])) as Record<Key, number>;
   let raf = 0, last = 0;
   const tick = (t: number) => {
@@ -47,6 +49,7 @@ function liquidGlass(el: HTMLFormElement | null) {
     el.style.setProperty("--mx", `${at.mx}%`);
     el.style.setProperty("--my", `${at.my}%`);
     el.style.setProperty("--glint", `${at.glint}`);
+    button.style.transform = `scale(${at.b})`;
     raf = moving ? requestAnimationFrame(tick) : 0;
   };
   const go = (next: Partial<Record<Key, number>>) => {
@@ -56,11 +59,12 @@ function liquidGlass(el: HTMLFormElement | null) {
   const move = (e: PointerEvent) => {
     const r = el.getBoundingClientRect();
     const x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
-    go({ s: 1.035, glint: 1, mx: x * 100, my: y * 100, dx: (x - 0.5) * 6, dy: (y - 0.5) * 3 });
+    const onButton = button.contains(e.target as Node);
+    go({ s: 1.035, glint: 1, mx: x * 100, my: y * 100, dx: (x - 0.5) * 6, dy: (y - 0.5) * 3, b: onButton ? (pressed ? 0.94 : 1.06) : 1 });
   };
-  const leave = () => go({ s: 1, sx: 1, sy: 1, dx: 0, dy: 0, glint: 0 });
-  const down = () => go({ sx: 1.02, sy: 0.95 });
-  const up = () => go({ sx: 1, sy: 1 });
+  const leave = () => { pressed = false; go({ s: 1, sx: 1, sy: 1, dx: 0, dy: 0, glint: 0, b: 1 }); };
+  const down = (e: Event) => { pressed = true; go({ sx: 1.02, sy: 0.95, ...(button.contains(e.target as Node) && { b: 0.94 }) }); };
+  const up = (e: Event) => { pressed = false; go({ sx: 1, sy: 1, b: button.contains(e.target as Node) ? 1.06 : 1 }); };
   const on: [string, EventListener][] = [["pointermove", move as EventListener], ["pointerleave", leave], ["pointerdown", down], ["pointerup", up], ["pointercancel", up]];
   on.forEach(([n, f]) => el.addEventListener(n, f));
   return () => { cancelAnimationFrame(raf); on.forEach(([n, f]) => el.removeEventListener(n, f)); };

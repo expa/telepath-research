@@ -573,10 +573,7 @@ main { background: var(--paper); }
 .landing-form { transition: width 460ms cubic-bezier(.22, 1.15, .36, 1), height 460ms cubic-bezier(.22, 1.15, .36, 1), background-color 460ms ease, box-shadow 460ms ease, backdrop-filter 460ms ease, -webkit-backdrop-filter 460ms ease, outline-color 220ms ease; }
 .landing-form.is-open { background: #fff9; border-color: #ffffffa0; box-shadow: inset 0 -2px 11px #ffffff70; }
 .landing-form.is-open input, .landing-form.is-open .landing-placeholder { color: #31251e; }
-.landing-signup::before { content: ""; position: absolute; z-index: -1; inset-inline: -20px; bottom: -24px; height: 210px; pointer-events: none; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); mask-image: radial-gradient(ellipse 440px 210px at 50% 100%, #000 0%, #000b 40%, transparent 100%); background: radial-gradient(ellipse 440px 210px at 50% 100%, #17110dcc 0%, #17110d80 40%, transparent 100%); opacity: 0; transition: opacity 550ms cubic-bezier(.22, 1, .36, 1); }
-.landing-signup:has(.landing-form.is-open)::before { opacity: 1; }
-@media (max-width: 700px) { .landing-signup::before { bottom: -16px; } }
-@media (prefers-reduced-motion: reduce) { .landing-form, .landing-signup::before { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .landing-form { transition: none; } }
 
 /* Match the article header's proportions so shared text never rewraps in flight. */
 .landing-paper-copy { container-type: inline-size; --tile-title-size: min(30px, 100cqi / 12); }

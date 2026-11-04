@@ -20,45 +20,68 @@ async function backgroundOnly(): Promise<string> {
 }
 
 /**
- * Logo intro. One path, p = 0 → 1: a disc at the bottom spot rises, grows (22 → 88px) and tilts back
- * about x so its visible height stays near 22–26px. All three discs play that path from the same start,
- * top first, and each stops at its own p (top 1, middle 1/3, bottom 0). Scaling is from each disc's center.
- * Driven per frame in JS: CSS custom-property animations don't repaint transforms reliably in every browser.
+ * Logo intro, as storyboarded from the side (camera looking at the discs face-on):
+ * 1. a disc pops into view far away at the bottom spot (snappy, like a bubble);
+ * 2. it floats toward the camera and up, growing as it comes closer;
+ * 3. it slows, drifting back from the camera to its resting depth while tipping back about x,
+ *    which from the front reads as the flattened ellipse of the mark.
+ * Depth and height follow one curved (Bezier) path, so the motion arcs rather than going straight.
+ * The three discs play this in turn, top first, each tuned to end on its own resting spot.
+ * Driven per frame in JS: CSS custom-property animations don't repaint transforms reliably everywhere.
  */
 function riseDiscs(root: HTMLDivElement | null) {
   if (!root) return;
   const els = [...root.children] as HTMLElement[];
-  const FULL = 88;
-  // Size and rise follow `move`; the tilt follows `turn` on a slower curve, so each disc swells and lifts
-  // first and then settles back into its angle. The tilt targets the same path: acos(visible height / size).
-  const pose = (move: number, turn: number, appear: number) => {
-    const size = 22 + 66 * move, rise = 91 * move - 34.5 * move * move;
-    const tilt = Math.acos((22 + 4 * turn) / (22 + 66 * turn));
-    return `translateY(${-rise}px) rotateX(${tilt}rad) scale(${(size / FULL) * (0.4 + 0.6 * appear)})`;
+  const P = 600; // perspective on .landing-discs, px; its vanishing point sits on the bottom spot
+  const START = 16; // apparent size when a disc first pops in, far away, px
+  // size: real diameter at rest; rise: resting height above the bottom spot; tilt: resting angle (visible height ≈ size·cos tilt)
+  const discs = [
+    { size: 88, rise: 56.5, tilt: 72, delay: 0 },
+    { size: 44, rise: 26.5, tilt: 60, delay: 1100 },
+    { size: 22, rise: 0, tilt: 0, delay: 2200 },
+  ].map((d) => ({ ...d, far: P * (d.size / START - 1) })); // start this far back so every disc pops in at the same small size
+  const NEAR = 140; // how close the path's control point pulls toward the camera, px
+  const POP = 320, FLOAT = 1500, TURN = 1700, TURN_AT = 0.3; // ms; the tilt starts 30% into the float and finishes after it
+
+  // cubic-bezier easing (x1, y1, x2, y2), solved by bisection
+  const bezier = (x1: number, y1: number, x2: number, y2: number) => {
+    const f = (t: number, a: number, b: number) => 3 * a * t * (1 - t) ** 2 + 3 * b * t * t * (1 - t) + t ** 3;
+    return (x: number) => {
+      let lo = 0, hi = 1;
+      for (let i = 0; i < 24; i++) { const m = (lo + hi) / 2; if (f(m, x1, x2) < x) lo = m; else hi = m; }
+      return f((lo + hi) / 2, y1, y2);
+    };
   };
-  const plan = [
-    { end: 1, delay: 0, move: 900, turn: 1600 },
-    { end: 1 / 3, delay: 450, move: 700, turn: 1200 },
-    { end: 0, delay: 900, move: 0, turn: 0 },
-  ];
-  const inOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
-  const out = (t: number) => 1 - (1 - t) ** 4;
+  const float = bezier(0.3, 0, 0.15, 1); // eases in, then a long, slowing glide: floating up through water
+  const settle = bezier(0.45, 0, 0.2, 1);
+  const pop = (t: number) => { const c = 2.2; return 1 + (c + 1) * (t - 1) ** 3 + c * (t - 1) ** 2; }; // back-out: overshoots then settles
   const clamp = (t: number) => Math.min(1, Math.max(0, t));
-  const at = (t: number, d: number) => (d ? clamp(t / d) : 1);
+
+  els.forEach((el, i) => {
+    const d = discs[i];
+    Object.assign(el.style, { width: `${d.size}px`, height: `${d.size}px`, marginLeft: `${-d.size / 2}px`, marginTop: `${-d.size / 2}px` });
+  });
+
   const draw = (now: number) => {
     els.forEach((el, i) => {
-      const { end, delay, move, turn } = plan[i], t = now - delay;
-      const appear = out(clamp(t / 600));
-      el.style.opacity = `${appear}`;
-      el.style.transform = pose(end * out(at(t, move)), end * inOut(at(t, turn)), appear);
+      const d = discs[i], t = now - d.delay;
+      const u = float(clamp(t / FLOAT));
+      // quadratic Bezier in (depth, height): far & low → pulled near the camera, a little up → resting depth, full height
+      const z = (1 - u) ** 2 * -d.far + 2 * u * (1 - u) * NEAR;
+      const y = 2 * u * (1 - u) * d.rise * 0.25 + u * u * d.rise;
+      const tilt = d.tilt * settle(clamp((t - TURN_AT * FLOAT) / (TURN - TURN_AT * FLOAT)));
+      const s = t <= 0 ? 0 : pop(clamp(t / POP));
+      el.style.opacity = `${clamp(t / 120)}`;
+      el.style.transform = `translate3d(0, ${-y}px, ${z}px) rotateX(${tilt}deg) scale(${s})`;
     });
   };
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) return draw(1e9);
+  const end = discs[discs.length - 1].delay + Math.max(FLOAT, TURN);
   let raf = 0;
   const start = performance.now();
   const tick = (t: number) => {
     draw(t - start);
-    if (t - start < 3000) raf = requestAnimationFrame(tick);
+    if (t - start < end + 100) raf = requestAnimationFrame(tick);
   };
   draw(0);
   raf = requestAnimationFrame(tick);

@@ -1,5 +1,5 @@
-// The landing ↔ research hand-off: the landing logo becomes the header brand and the landing title
-// becomes the research page title. Clones of the landing pieces fly between the two layouts; played
+// The landing ↔ research hand-off: the landing logo becomes the header brand. Clones of the landing
+// logo pieces fly between the two layouts; played
 // forward (home → research) or reversed (research → home) by the two transitions.
 
 export const FLY = 850; // ms
@@ -34,7 +34,7 @@ function onto(clone: HTMLElement, from: DOMRect, to: DOMRect) {
 }
 const em = (cs: CSSStyleDeclaration) => `${(parseFloat(cs.letterSpacing) || 0) / parseFloat(cs.fontSize)}em`;
 
-export function landingFlight(landing: HTMLElement, header: HTMLElement, title: HTMLElement | null, t: { delay: number; duration: number; reverse?: boolean }) {
+export function landingFlight(landing: HTMLElement, header: HTMLElement, t: { delay: number; duration: number; reverse?: boolean }) {
   const anims: Animation[] = [], clones: HTMLElement[] = [], hidden: HTMLElement[] = [];
   const opts: KeyframeAnimationOptions = { duration: t.duration, delay: t.delay, easing: EASE, fill: "both", direction: t.reverse ? "reverse" : "normal" };
   const hide = (...els: HTMLElement[]) => els.forEach((el) => { el.style.visibility = "hidden"; hidden.push(el); });
@@ -68,33 +68,6 @@ export function landingFlight(landing: HTMLElement, header: HTMLElement, title: 
       ], opts));
     }
     hide(discs, word, brand);
-  }
-
-  // title: each landing line flies onto the matching line of the research title
-  const h1 = landing.querySelector<HTMLElement>("h1");
-  const lines = h1 ? [...h1.childNodes].filter((n) => n.nodeType === Node.TEXT_NODE && n.textContent!.trim()) : [];
-  const targets = title ? textRects(title) : [];
-  if (h1 && title && lines.length === targets.length) {
-    const a = getComputedStyle(h1), b = getComputedStyle(title);
-    lines.forEach((line, i) => {
-      const from = textRects(line)[0], to = targets[i];
-      const span = document.createElement("span");
-      span.textContent = line.textContent!.trim();
-      Object.assign(span.style, {
-        position: "fixed", left: `${from.left}px`, top: `${from.top}px`, zIndex: "60", pointerEvents: "none", whiteSpace: "nowrap",
-        transformOrigin: "0 0", fontFamily: a.fontFamily, fontSize: a.fontSize, fontWeight: a.fontWeight, letterSpacing: a.letterSpacing, lineHeight: "1",
-      });
-      document.body.appendChild(span);
-      const own = textRects(span)[0]; // line boxes and glyph boxes differ a little; line the glyphs up exactly
-      span.style.left = `${2 * from.left - own.left}px`;
-      span.style.top = `${2 * from.top - own.top}px`;
-      clones.push(span);
-      anims.push(span.animate([
-        { transform: "none", color: a.color, fontWeight: a.fontWeight, letterSpacing: em(a) },
-        { transform: onto(span, from, to), color: b.color, fontWeight: b.fontWeight, letterSpacing: em(b) },
-      ], opts));
-    });
-    hide(h1, title);
   }
 
   return {

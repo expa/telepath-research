@@ -115,7 +115,11 @@ const WARM = 700, GO_MAX = 2500; // ponytail: fixed warm-up guess from measuring
 function Home() {
   const bg = useRef<HTMLDivElement>(null);
   const glass = useRef<HTMLFormElement>(null);
-  const [signupOpen, setSignupOpen] = useState(false);
+  const [hoverOpen, setSignupOpen] = useState(false);
+  // Touch screens can't hover to open the signup, so there it stays open.
+  const [noHover, setNoHover] = useState(false);
+  useEffect(() => setNoHover(matchMedia("(hover: none)").matches), []);
+  const signupOpen = hoverOpen || noHover;
   const openSignup = () => {
     setSignupOpen(true);
     requestAnimationFrame(() => glass.current?.querySelector("input")?.focus());

@@ -150,11 +150,16 @@ const loadSdk = () => (sdk ??= new Promise((ok, fail) => {
   document.head.append(s);
 }));
 
-// Intro timeline (ms after mount): the scene fades in on the base orange as soon as it loads; the logo plays
-// centered on screen (discs, then wordmark); then it slides up into place while the copy un-blurs in, then the signup.
-const LOGO_AT = 500;
+// Intro timeline (ms after the scene has warmed up, see WARM): the logo plays centered on screen (discs, then
+// wordmark) while the scene fades in on the base orange; then it slides up into place while the copy un-blurs in,
+// then the signup.
+const LOGO_AT = 200;
 const WORD_AT = LOGO_AT + 1200;
 const REVEAL_AT = LOGO_AT + 1800;
+// Creating the WebGL scene blocks the main thread, and its first drawn frames stall the GPU, freezing anything
+// animating at the time. So the intro waits until the scene exists and has drawn a few (invisible) frames,
+// or at most this long after mount if the scene is slow or fails.
+const WARM = 700, GO_MAX = 2500; // ponytail: fixed warm-up guess from measuring (stall lands 0–700ms after creation); watch frame gaps if it varies more
 
 export default function Home() {
   const bg = useRef<HTMLDivElement>(null);
@@ -165,11 +170,20 @@ export default function Home() {
   // skip the intro, sit in the final layout, and load the rest once they land.
   const nav = useNavigation();
   const returning = useRef(nav.from?.id === "research").current;
+  const [go, setGo] = useState(false);
   const discs = useRef<HTMLDivElement>(null);
-  useLayoutEffect(() => riseDiscs(discs.current, LOGO_AT, returning), []); // layout effect: placed before the transition measures
+  const still = () => returning || matchMedia("(prefers-reduced-motion: reduce)").matches;
+  useLayoutEffect(() => { if (still()) riseDiscs(discs.current, 0, true); }, []); // layout effect: placed before the transition measures
+  useEffect(() => { if (go && !still()) return riseDiscs(discs.current, LOGO_AT); }, [go]);
   const logo = useRef<HTMLDivElement>(null);
   const [revealed, setRevealed] = useState(false);
   // Park the logo at the center of the screen until the reveal.
+  useLayoutEffect(() => {
+    if (!returning && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      const el = logo.current!, r = el.getBoundingClientRect();
+      el.style.setProperty("--to-center", `${innerHeight / 2 - (r.top + r.height / 2)}px`);
+    }
+  }, []);
   useLayoutEffect(() => {
     if (returning) {
       const show = () => setRevealed(true), t = setTimeout(show, 3000); // fallback if the transition never signals
@@ -177,25 +191,26 @@ export default function Home() {
       return () => { clearTimeout(t); removeEventListener(REVEAL_EVENT, show); };
     }
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return setRevealed(true);
-    const el = logo.current!, r = el.getBoundingClientRect();
-    el.style.setProperty("--to-center", `${innerHeight / 2 - (r.top + r.height / 2)}px`);
+    if (!go) return;
     const t = setTimeout(() => setRevealed(true), REVEAL_AT);
     return () => clearTimeout(t);
-  }, []);
+  }, [go]);
 
   useEffect(() => {
     let scene: Scene | undefined, gone = false;
+    const start = () => setGo(true), t = setTimeout(start, GO_MAX);
     Promise.all([loadSdk(), backgroundOnly()])
       .then(([us, filePath]) => us.addScene({ element: bg.current, filePath, dpi: 1.5, scale: 1, fps: 60, fixed: true }))
       .then((s) => {
         if (gone) return s.destroy();
         scene = s;
+        setTimeout(start, WARM);
         // The scene has its own 1s entrance (its nebula fades in over a paler gradient). Keep the canvas hidden
         // until that's done so only finished colors fade in over the base orange; otherwise it reads as a flash.
         setTimeout(() => bg.current?.classList.add("is-ready"), 1000);
       })
-      .catch(() => {}); // the CSS gradient underneath stands in
-    return () => { gone = true; scene?.destroy(); };
+      .catch(start); // the CSS gradient underneath stands in
+    return () => { gone = true; clearTimeout(t); scene?.destroy(); };
   }, []);
 
   async function join(e: React.FormEvent<HTMLFormElement>) {
@@ -218,7 +233,7 @@ export default function Home() {
       <div className="landing-content">
         <div className="landing-logo" ref={logo} aria-label="Telepath" role="img">
           <div className="landing-discs" ref={discs}><span /><span /><span /></div>
-          <b aria-hidden="true" style={{ animationDelay: `${WORD_AT}ms` }}>Telepath</b>
+          <b aria-hidden="true" style={{ animationDelay: `${WORD_AT}ms`, animationPlayState: go ? "running" : "paused" }}>Telepath</b>
         </div>
         <div className="landing-copy">
           <h1>Intelligence<br />that evolves</h1>

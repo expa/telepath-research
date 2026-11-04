@@ -110,7 +110,9 @@ const REVEAL_AT = LOGO_AT + 420;
 // Creating the WebGL scene blocks the main thread, and its first drawn frames stall the GPU, freezing anything
 // animating at the time. So the intro waits until the scene exists and has drawn a few (invisible) frames,
 // or at most this long after mount if the scene is slow or fails.
-const WARM = 700, GO_MAX = 2500; // ponytail: fixed warm-up guess from measuring (stall lands 0–700ms after creation); watch frame gaps if it varies more
+const WARM = 700, GO_MAX = 2500;
+// Back from another page: page transition (~0.8s) plus the copy and signup reveal (~1.5s) finish before the scene is created.
+const RETURN_SCENE_AT = 1600; // ponytail: fixed warm-up guess from measuring (stall lands 0–700ms after creation); watch frame gaps if it varies more
 
 function Home() {
   const bg = useRef<HTMLDivElement>(null);
@@ -171,9 +173,12 @@ function Home() {
       return;
     }
     let scene: Scene | undefined, gone = false;
-    let warm: ReturnType<typeof setTimeout>, ready: ReturnType<typeof setTimeout>;
+    let warm: ReturnType<typeof setTimeout>, ready: ReturnType<typeof setTimeout>, later: ReturnType<typeof setTimeout>;
     const start = () => { if (!gone) setGo(true); }, t = setTimeout(start, GO_MAX);
-    Promise.all([loadSdk(), backgroundOnly()])
+    // Arriving from another page, the page transition and the copy reveal are running: creating the scene now would
+    // freeze them mid-way. Let them finish first; the orange gradient underneath stands in until the scene fades in.
+    const afterArrival = returning ? new Promise<void>((ok) => { later = setTimeout(ok, RETURN_SCENE_AT); }) : Promise.resolve();
+    afterArrival.then(() => Promise.all([loadSdk(), backgroundOnly()]))
       .then(([us, filePath]) => gone ? undefined : us.addScene({ element: bg.current, filePath, dpi: 1.5, scale: 1, fps: 60, fixed: false }))
       .then((s) => {
         if (!s) return;
@@ -185,7 +190,7 @@ function Home() {
         ready = setTimeout(() => bg.current?.classList.add("is-ready"), WARM);
       })
       .catch(start); // the CSS gradient underneath stands in
-    return () => { gone = true; clearTimeout(t); clearTimeout(warm); clearTimeout(ready); scene?.destroy(); };
+    return () => { gone = true; clearTimeout(t); clearTimeout(warm); clearTimeout(ready); clearTimeout(later); scene?.destroy(); };
   }, []);
 
   async function join(e: React.FormEvent<HTMLFormElement>) {

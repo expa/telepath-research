@@ -166,10 +166,10 @@ export default function Home() {
   const glass = useRef<HTMLFormElement>(null);
   const [state, setState] = useState<"idle" | "sending" | "done" | "error">("idle");
   useEffect(() => liquidGlass(glass.current), [state === "done"]);
-  // Back from /research the logo and title fly in from the page we left (transitions/research__home-1.ts):
+  // Back from /research the logo and title fly in from the page we left (transitions/research-1__home-1.ts):
   // skip the intro, sit in the final layout, and load the rest once they land.
   const nav = useNavigation();
-  const returning = useRef(nav.from?.id === "research").current;
+  const returning = useRef(nav.from?.id === "research-1").current;
   const [go, setGo] = useState(false);
   const discs = useRef<HTMLDivElement>(null);
   const still = () => returning || matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -238,7 +238,7 @@ export default function Home() {
         <div className="landing-copy">
           <h1>Intelligence<br />that evolves</h1>
           <p>We are building the first, biologically-plausible intelligence that learns continuously through experience, adapting locally as it operates.</p>
-          <a className="landing-research" href="/research">Read our research →</a>
+          <a className="landing-research" href="/research-1">Read our research →</a>
         </div>
         <div className="landing-signup">
           {state === "done" ? (

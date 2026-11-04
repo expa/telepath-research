@@ -24,13 +24,13 @@ export function Article({ paper, sections, children }: { paper: Paper; sections:
     <PaperLayout
       paper={paper}
       title={<h1 className="long">{paper.title}</h1>}
-      back={<a className="post-back" href={`/research-2/${paper.slug}`}><span aria-hidden="true">←</span> {paper.headline}</a>}
+      back={<a className="post-back" href={`/research/${paper.slug}`}><span aria-hidden="true">←</span> {paper.headline}</a>}
       sections={sections}
     >
       <article className="article">
         <p className="prose article-lede">{paper.summary}</p>
         {children}
-        <PaperFoot paper={paper} other={{ href: `/research-2/${paper.slug}`, title: "Blog post", sub: "An overview of the breakthrough and the key ideas behind it" }} next={{ href: `/research-2/${next.slug}/detailed`, title: next.title }}>
+        <PaperFoot paper={paper} other={{ href: `/research/${paper.slug}`, title: "Blog post", sub: "An overview of the breakthrough and the key ideas behind it" }} next={{ href: `/research/${next.slug}/detailed`, title: next.title }}>
           <Cite paper={paper} />
         </PaperFoot>
       </article>

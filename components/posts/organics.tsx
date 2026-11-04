@@ -37,7 +37,7 @@ export default function Page() {
 
       <h2>Why it matters</h2>
       <p>
-        ORGaNICs explain several puzzling observations about working memory with one circuit, and they set the agenda for our machine-learning work: units that balance what they are told against what they expect, using rhythms to keep track of time. That idea led to the oscillator units in our <a href="/research/prospective-coding">look-ahead paper</a>, and from there to our <a href="/research/self-supervised-rqf">brain-signal encoder</a>.
+        ORGaNICs explain several puzzling observations about working memory with one circuit, and they set the agenda for our machine-learning work: units that balance what they are told against what they expect, using rhythms to keep track of time. That idea led to the oscillator units in our <a href="/research-1/prospective-coding">look-ahead paper</a>, and from there to our <a href="/research-1/self-supervised-rqf">brain-signal encoder</a>.
       </p>
     </Post>
   );

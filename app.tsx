@@ -12,7 +12,7 @@ export default function App() {
   // Chrome shows as soon as we head away from the landing, and stays (lifted out of flow) while heading
   // back to it, so the research → home transition can fade it out.
   const landing = route.id === "home-1" && id === "home-1", leaving = nav.to?.id === "home-1";
-  const v2 = [route.id, id].some(value => value === "home" || value.startsWith("research-2"));
+  const v2 = [route.id, id].some(value => value === "home" || value.startsWith("research/"));
   const research = id.startsWith("research");
   // Cmd+↑ / Cmd+↓ jump to the top / bottom of any page (smooth scroll otherwise swallows the native shortcut).
   useEffect(() => {
@@ -29,12 +29,12 @@ export default function App() {
   return (
     <>
       {landing || v2 ? null : <header className={leaving ? "site-header is-leaving" : "site-header"}>
-        <a href="/research" className="brand" aria-label="Telepath">
+        <a href="/research-1" className="brand" aria-label="Telepath">
           <Logo />
           Telepath
         </a>
         <nav className="nav" aria-label="Main">
-          <a href="/research" aria-current={research ? "page" : undefined}>Research</a>
+          <a href="/research-1" aria-current={research ? "page" : undefined}>Research</a>
           <a href="/">Company</a>
         </nav>
       </header>}

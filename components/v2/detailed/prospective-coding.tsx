@@ -132,7 +132,7 @@ export default function Page() {
           <li><strong>An input-side correction.</strong> Driving each layer with where its input is going, rather than where it is, removes a depth-dependent lag at the cost of one tap. It applies to any diagonal SSM.</li>
         </ul>
         <Callout label="A note on scope">The cortical theory motivates the design. The claims are machine-learning claims under standard BPTT; spatial-only backprop is a diagnostic, and it still uses transposed forward weights, so we don’t claim the full training procedure is biologically plausible.</Callout>
-        <p>The RQF is also the substrate for our self-supervised EEG encoder, and its lineage runs back to <a href="/research-2/organics/detailed">ORGaNICs</a>, a circuit theory of how cortex holds and manipulates information over time.</p>
+        <p>The RQF is also the substrate for our self-supervised EEG encoder, and its lineage runs back to <a href="/research/organics/detailed">ORGaNICs</a>, a circuit theory of how cortex holds and manipulates information over time.</p>
       </Section>
     </Article>
   );

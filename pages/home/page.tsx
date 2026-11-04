@@ -127,7 +127,7 @@ function Home() {
   // Back from /research the logo and title fly in from the page we left (transitions/research__home.ts):
   // skip the intro, sit in the final layout, and load the rest once they land.
   const nav = useNavigation();
-  const flyingBack = useRef(nav.from?.id === "research-2").current;
+  const flyingBack = useRef(nav.from?.id === "research").current;
   const returning = useRef(Boolean(nav.from)).current;
   const [go, setGo] = useState(false);
   const discs = useRef<HTMLDivElement>(null);

@@ -54,7 +54,7 @@ export default function Page() {
 
       <h2>Why it matters</h2>
       <p>
-        Deep networks built from realistic, slow neurons have always struggled to learn. This shows that a single principle the brain seems to use, responding to where things are going rather than where they are, removes much of that difficulty. It gives us small, interpretable models that learn long, hard tasks, and it’s the foundation for our <a href="/research-2/self-supervised-rqf">brain-signal encoder</a>.
+        Deep networks built from realistic, slow neurons have always struggled to learn. This shows that a single principle the brain seems to use, responding to where things are going rather than where they are, removes much of that difficulty. It gives us small, interpretable models that learn long, hard tasks, and it’s the foundation for our <a href="/research/self-supervised-rqf">brain-signal encoder</a>.
       </p>
     </Post>
   );

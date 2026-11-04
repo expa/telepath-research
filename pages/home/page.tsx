@@ -165,6 +165,7 @@ export default function Home() {
         </div>
         <h1>Intelligence<br />that evolves</h1>
         <p>We are building the first, biologically-plausible intelligence that learns continuously through experience, adapting locally as it operates.</p>
+        <a className="landing-research" href="/research">Read our research →</a>
         {state === "done" ? (
           <p className="landing-thanks" role="status">You’re on the list.</p>
         ) : (
@@ -174,7 +175,6 @@ export default function Home() {
           </form>
         )}
         {state === "error" ? <p className="landing-error" role="alert">Something went wrong. Try again.</p> : null}
-        <a className="landing-research" href="/research">Read our research →</a>
       </div>
     </main>
   );

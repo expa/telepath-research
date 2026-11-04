@@ -38,11 +38,11 @@ function riseDiscs(root: HTMLDivElement | null, at: number) {
   // the 600px perspective so the visible ellipses match the mark (top ≈ 0.30 of its width, middle ≈ 0.5)
   const discs = [
     { size: 88, rise: 56.5, tilt: 67, delay: 0 },
-    { size: 44, rise: 26.5, tilt: 57.5, delay: 600 },
-    { size: 22, rise: 0, tilt: 0, delay: 1200 },
+    { size: 44, rise: 26.5, tilt: 57.5, delay: 420 },
+    { size: 22, rise: 0, tilt: 0, delay: 840 },
   ].map((d) => ({ ...d, far: P * (d.size / START - 1) })); // start this far back so every disc pops in at the same small size
   const NEAR = 140; // how close the path's control point pulls toward the camera, px
-  const POP = 230, FLOAT = 950, TURN = 1050, TURN_AT = 0.1; // ms; the tilt starts 10% into the float and finishes after it
+  const POP = 200, FLOAT = 700, TURN = 780, TURN_AT = 0.1; // ms; the tilt starts 10% into the float and finishes after it
 
   // cubic-bezier easing (x1, y1, x2, y2), solved by bisection
   const bezier = (x1: number, y1: number, x2: number, y2: number) => {
@@ -151,8 +151,8 @@ const loadSdk = () => (sdk ??= new Promise((ok, fail) => {
 // Intro timeline (ms after mount): the scene fades in on the base orange as soon as it loads; the logo plays
 // centered on screen (discs, then wordmark); then it slides up into place while the copy un-blurs in, then the signup.
 const LOGO_AT = 500;
-const WORD_AT = LOGO_AT + 1700;
-const REVEAL_AT = LOGO_AT + 2500;
+const WORD_AT = LOGO_AT + 1200;
+const REVEAL_AT = LOGO_AT + 1800;
 
 export default function Home() {
   const bg = useRef<HTMLDivElement>(null);

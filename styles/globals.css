@@ -79,14 +79,17 @@ img, video { max-width: 100%; display: block; }
 .nav a:hover { color: var(--accent); }
 
 /* ---------- Glow (Telepath-style blurred field) ---------- */
+@property --glow-1 { syntax: "<color>"; inherits: true; initial-value: #ffb36b; }
+@property --glow-2 { syntax: "<color>"; inherits: true; initial-value: #ff7a2e; }
+@property --glow-3 { syntax: "<color>"; inherits: true; initial-value: #c8361a; }
 .glow { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
 .glow::before, .glow::after, .glow span {
   content: ""; position: absolute; border-radius: 50%; filter: blur(70px); opacity: 0.85;
   animation: drift 22s var(--ease) infinite alternate;
 }
-.glow::before { width: 60vmax; height: 46vmax; left: -12vmax; top: -18vmax; background: radial-gradient(closest-side, #ffb36b, transparent); }
-.glow::after { width: 52vmax; height: 40vmax; right: -14vmax; top: -6vmax; background: radial-gradient(closest-side, #ff7a2e, transparent); animation-duration: 28s; }
-.glow span { width: 38vmax; height: 30vmax; left: 30%; top: 10%; background: radial-gradient(closest-side, #c8361a, transparent); opacity: 0.55; animation-duration: 34s; }
+.glow::before { width: 60vmax; height: 46vmax; left: -12vmax; top: -18vmax; background: radial-gradient(closest-side, var(--glow-1), transparent); }
+.glow::after { width: 52vmax; height: 40vmax; right: -14vmax; top: -6vmax; background: radial-gradient(closest-side, var(--glow-2), transparent); animation-duration: 28s; }
+.glow span { width: 38vmax; height: 30vmax; left: 30%; top: 10%; background: radial-gradient(closest-side, var(--glow-3), transparent); opacity: 0.55; animation-duration: 34s; }
 @keyframes drift { to { transform: translate3d(6vmax, 4vmax, 0) scale(1.12); } }
 @media (prefers-reduced-motion: reduce) { .glow::before, .glow::after, .glow span { animation: none; } }
 
@@ -365,3 +368,6 @@ main { background: var(--paper); }
 .post-back span { display: inline-block; transition: transform 0.2s var(--ease); }
 .post-back:hover { color: var(--ink); }
 .post-back:hover span { transform: translateX(-3px); }
+
+/* Detailed walkthrough: darker gray glow so it reads apart from the blog post (page transition morphs the colors) */
+.post:has(.article) .post-head .glow { --glow-1: #6b6b6b; --glow-2: #4a4a4a; --glow-3: #2a2a2a; }

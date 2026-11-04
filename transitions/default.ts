@@ -9,8 +9,8 @@ function parts(page: HTMLElement) {
   const main = page.querySelector("main");
   if (!main?.classList.contains("post")) return { rail: [] as Element[], content: main ? [main] : [page] };
   const kids = [...main.children];
-  // The header's glow stays put (see glowMorph); its text slides with the rest of the content.
-  const content = kids.flatMap((k) => k.classList.contains("post-rail") ? [] : k.classList.contains("post-head") ? [...k.children].filter((c) => !c.classList.contains("glow")) : [k]);
+  // The glow stays put (see glowMorph); everything else slides.
+  const content = kids.filter((k) => !k.classList.contains("post-rail") && !k.classList.contains("glow"));
   return { rail: kids.filter((k) => k.classList.contains("post-rail")), content };
 }
 
@@ -18,7 +18,7 @@ const GLOW = ["--glow-1", "--glow-2", "--glow-3"];
 
 /** Post ↔ walkthrough: one header glow that morphs its colors (orange ↔ gray) instead of two crossfading. */
 function glowMorph(from: HTMLElement, to: HTMLElement, duration: number): Animation[] {
-  const a = from.querySelector<HTMLElement>(".post-head .glow"), b = to.querySelector<HTMLElement>(".post-head .glow");
+  const a = from.querySelector<HTMLElement>(".post > .glow"), b = to.querySelector<HTMLElement>(".post > .glow");
   if (!a || !b) return [];
   // keep the drift where it was so the blobs don't jump back to their start
   const drifts = (el: HTMLElement) => el.getAnimations({ subtree: true }).filter((an) => (an as CSSAnimation).animationName === "drift");

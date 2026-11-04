@@ -11,6 +11,8 @@ type Section = { id: string; label: string };
 export function PaperLayout({ paper, back, title, dek, links, sections, children }: { paper: Paper; back?: React.ReactNode; title: React.ReactNode; dek?: React.ReactNode; links?: React.ReactNode; sections?: Section[]; children: React.ReactNode }) {
   return (
     <main className="post">
+      {/* page-level, not inside the header: the header's container-type would trap the fixed glow */}
+      <div className="glow" aria-hidden="true"><span /></div>
       <aside className="post-rail">
         <div className="post-rail-inner">
           <dl className="post-details">
@@ -22,7 +24,6 @@ export function PaperLayout({ paper, back, title, dek, links, sections, children
         </div>
       </aside>
       <header className="post-head">
-        <div className="glow" aria-hidden="true"><span /></div>
         {back}
         {title}
         {dek}

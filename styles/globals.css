@@ -380,8 +380,21 @@ main { background: var(--paper); }
 
 /* ---------- Landing (copy of telepath.com) ---------- */
 .landing { position: relative; min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: clip; color: #fff; text-align: center;
-  background: radial-gradient(60% 50% at 70% 85%, #a8320c, transparent 70%), radial-gradient(80% 60% at 30% 20%, #ffb36b, transparent 70%), #ff9a52; }
-.landing-bg { position: absolute; inset: 0; z-index: 0; }
+  background: #fb975f; } /* the scene's average color, so its fade-in is gentle */
+.landing-bg { position: absolute; inset: 0; z-index: 0; opacity: 0; transition: opacity 1.4s ease; }
+.landing-bg.is-ready { opacity: 1; }
+/* Intro: logo parked at screen center (--to-center, set in JS) slides up into place on .revealed,
+   then the copy un-blurs in line by line, then the signup rises in. */
+.landing-logo { transform: translateY(var(--to-center, 0px)); transition: transform 1.1s cubic-bezier(.65, 0, .25, 1); }
+.landing.revealed .landing-logo { transform: none; }
+.landing-copy > * { opacity: 0; filter: blur(10px); transition: opacity .9s ease, filter .9s ease; }
+.landing.revealed .landing-copy > * { opacity: 1; filter: blur(0); }
+.landing.revealed .landing-copy > :nth-child(1) { transition-delay: .3s; }
+.landing.revealed .landing-copy > :nth-child(2) { transition-delay: .5s; }
+.landing.revealed .landing-copy > :nth-child(3) { transition-delay: .7s; }
+.landing-signup { opacity: 0; transform: translateY(20px); transition: opacity .8s ease, transform 1s cubic-bezier(.22, 1, .36, 1); }
+.landing.revealed .landing-signup { opacity: 1; transform: none; transition-delay: 1s; }
+@media (prefers-reduced-motion: reduce) { .landing-bg, .landing-logo, .landing-copy > *, .landing-signup { transition: none; } }
 .landing-content { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 56px; width: 100%; max-width: 1200px; padding: 10vh 20px 48px; }
 /* Three blocks: logo, copy (title, pitch, research link), signup. Tight inside each, roomy between. */
 .landing-copy { display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; }
@@ -403,7 +416,7 @@ main { background: var(--paper); }
 .landing-form:focus-within { outline: 2px solid #ffffff80; outline-offset: 2px; }
 .landing-form button:disabled { opacity: .6; cursor: progress; }
 .landing-thanks, .landing-error { margin: 0; font-size: 1rem; }
-.landing-research { font-size: 14px; color: #fffc; text-decoration: none; }
+.landing-research { font-size: 1rem; line-height: 1.2; font-weight: 600; color: #fffc; text-decoration: none; }
 .landing-research:hover { color: #fff; }
 @media (max-width: 809.98px) { .landing-copy p { max-width: 80%; } }
 
@@ -416,6 +429,6 @@ main { background: var(--paper); }
 .landing-discs span:nth-child(1) { z-index: 1; }
 .landing-discs span:nth-child(2) { z-index: 2; }
 .landing-discs span:nth-child(3) { z-index: 3; }
-.landing-logo b { margin-top: 14px; font-size: 26px; font-weight: 500; line-height: 1; letter-spacing: -0.03em; animation: disc-appear .9s cubic-bezier(.22, 1, .36, 1) 3s both; }
+.landing-logo b { margin-top: 14px; font-size: 26px; font-weight: 500; line-height: 1; letter-spacing: -0.03em; animation: disc-appear .9s cubic-bezier(.22, 1, .36, 1) both; } /* delay set inline from WORD_AT */
 @keyframes disc-appear { from { opacity: 0; scale: .4; } }
 @media (prefers-reduced-motion: reduce) { .landing-logo b { animation: none; } }

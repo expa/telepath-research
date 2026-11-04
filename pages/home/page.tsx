@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 // Copy of telepath.com: the full-screen Unicorn Studio glow, with a coded logo, the pitch and a waitlist form on top.
 const SCENE = "https://storage.googleapis.com/unicornstudio-production/embeds/CbHFIFV3Ha4q38DuFzTP";
@@ -29,19 +29,20 @@ async function backgroundOnly(): Promise<string> {
  * The three discs play this in turn, top first, each tuned to end on its own resting spot.
  * Driven per frame in JS: CSS custom-property animations don't repaint transforms reliably everywhere.
  */
-function riseDiscs(root: HTMLDivElement | null) {
+function riseDiscs(root: HTMLDivElement | null, at: number) {
   if (!root) return;
   const els = [...root.children] as HTMLElement[];
   const P = 600; // perspective on .landing-discs, px; its vanishing point sits on the bottom spot
   const START = 16; // apparent size when a disc first pops in, far away, px
-  // size: real diameter at rest; rise: resting height above the bottom spot; tilt: resting angle (visible height ≈ size·cos tilt)
+  // size: real diameter at rest; rise: resting height above the bottom spot; tilt: resting angle, solved through
+  // the 600px perspective so the visible ellipses match the mark (top ≈ 0.30 of its width, middle ≈ 0.5)
   const discs = [
-    { size: 88, rise: 56.5, tilt: 72, delay: 0 },
-    { size: 44, rise: 26.5, tilt: 60, delay: 1100 },
-    { size: 22, rise: 0, tilt: 0, delay: 2200 },
+    { size: 88, rise: 56.5, tilt: 67, delay: 0 },
+    { size: 44, rise: 26.5, tilt: 57.5, delay: 700 },
+    { size: 22, rise: 0, tilt: 0, delay: 1400 },
   ].map((d) => ({ ...d, far: P * (d.size / START - 1) })); // start this far back so every disc pops in at the same small size
   const NEAR = 140; // how close the path's control point pulls toward the camera, px
-  const POP = 320, FLOAT = 1500, TURN = 1700, TURN_AT = 0.3; // ms; the tilt starts 30% into the float and finishes after it
+  const POP = 260, FLOAT = 1100, TURN = 1250, TURN_AT = 0.3; // ms; the tilt starts 30% into the float and finishes after it
 
   // cubic-bezier easing (x1, y1, x2, y2), solved by bisection
   const bezier = (x1: number, y1: number, x2: number, y2: number) => {
@@ -78,7 +79,7 @@ function riseDiscs(root: HTMLDivElement | null) {
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) return draw(1e9);
   const end = discs[discs.length - 1].delay + Math.max(FLOAT, TURN);
   let raf = 0;
-  const start = performance.now();
+  const start = performance.now() + at;
   const tick = (t: number) => {
     draw(t - start);
     if (t - start < end + 100) raf = requestAnimationFrame(tick);
@@ -147,19 +148,39 @@ const loadSdk = () => (sdk ??= new Promise((ok, fail) => {
   document.head.append(s);
 }));
 
+// Intro timeline (ms after mount): the scene fades in on the base orange as soon as it loads; the logo plays
+// centered on screen (discs, then wordmark); then it slides up into place while the copy un-blurs in, then the signup.
+const LOGO_AT = 500;
+const WORD_AT = LOGO_AT + 2000;
+const REVEAL_AT = LOGO_AT + 2900;
+
 export default function Home() {
   const bg = useRef<HTMLDivElement>(null);
   const glass = useRef<HTMLFormElement>(null);
   const [state, setState] = useState<"idle" | "sending" | "done" | "error">("idle");
   useEffect(() => liquidGlass(glass.current), [state === "done"]);
   const discs = useRef<HTMLDivElement>(null);
-  useEffect(() => riseDiscs(discs.current), []);
+  useEffect(() => riseDiscs(discs.current, LOGO_AT), []);
+  const logo = useRef<HTMLDivElement>(null);
+  const [revealed, setRevealed] = useState(false);
+  // Park the logo at the center of the screen until the reveal.
+  useLayoutEffect(() => {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return setRevealed(true);
+    const el = logo.current!, r = el.getBoundingClientRect();
+    el.style.setProperty("--to-center", `${innerHeight / 2 - (r.top + r.height / 2)}px`);
+    const t = setTimeout(() => setRevealed(true), REVEAL_AT);
+    return () => clearTimeout(t);
+  }, []);
 
   useEffect(() => {
     let scene: Scene | undefined, gone = false;
     Promise.all([loadSdk(), backgroundOnly()])
       .then(([us, filePath]) => us.addScene({ element: bg.current, filePath, dpi: 1.5, scale: 1, fps: 60, fixed: true }))
-      .then((s) => (gone ? s.destroy() : (scene = s)))
+      .then((s) => {
+        if (gone) return s.destroy();
+        scene = s;
+        bg.current?.classList.add("is-ready"); // fade the scene in over the base orange
+      })
       .catch(() => {}); // the CSS gradient underneath stands in
     return () => { gone = true; scene?.destroy(); };
   }, []);
@@ -179,12 +200,12 @@ export default function Home() {
   }
 
   return (
-    <main className="landing">
+    <main className={revealed ? "landing revealed" : "landing"}>
       <div className="landing-bg" ref={bg} aria-hidden="true" />
       <div className="landing-content">
-        <div className="landing-logo" aria-label="Telepath" role="img">
+        <div className="landing-logo" ref={logo} aria-label="Telepath" role="img">
           <div className="landing-discs" ref={discs}><span /><span /><span /></div>
-          <b aria-hidden="true">Telepath</b>
+          <b aria-hidden="true" style={{ animationDelay: `${WORD_AT}ms` }}>Telepath</b>
         </div>
         <div className="landing-copy">
           <h1>Intelligence<br />that evolves</h1>

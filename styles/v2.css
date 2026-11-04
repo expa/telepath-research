@@ -538,6 +538,9 @@ main { background: var(--paper); }
 }
 @keyframes topfade-in { from { opacity: 0; } }
 @media (max-width: 700px) { .post-topfade { --fade-h: 100px; } }
+/* Touch devices (iOS Safari): masked backdrop-filter layers over the scrolling page starve its tile painting,
+   so content scrolled into view right after opening a post stayed blank for seconds. The color fade alone stays. */
+@media (hover: none) { .post-topfade span { display: none; } }
 .post-brand { position: fixed; top: 40px; left: clamp(20px, 4vw, 40px); z-index: 3; font-size: 24px; line-height: 1; letter-spacing: -0.03em; gap: 14px; height: calc(82px * 32 / 88); }
 .post-brand svg { width: 32px; height: 32px; }
 @media (max-width: 700px) { .post-head { padding-top: 116px; } .post-body { font-size: 17px; } .post-body > p:first-child { font-size: 19px; } }

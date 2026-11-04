@@ -13,12 +13,13 @@ function fly(pair: SharedPair, delay: number, duration: number) {
   const s = parseFloat(getComputedStyle(to).fontSize) / parseFloat(getComputedStyle(from).fontSize);
   const clone = from.cloneNode(true) as HTMLElement;
   clone.removeAttribute("data-shared");
+  clone.removeAttribute("class"); // page styles (some !important, sized to the old column) would override the copied font below
   clone.querySelectorAll("a").forEach((el) => Object.assign(el.style, { color: "inherit", textDecoration: "none" }));
   const cs = getComputedStyle(from);
   Object.assign(clone.style, {
     position: "fixed", margin: "0", zIndex: "50", pointerEvents: "none", transformOrigin: "0 0",
     top: `${a.top}px`, left: `${a.left}px`, width: `${a.width}px`, maxWidth: "none",
-    font: cs.font, letterSpacing: cs.letterSpacing, color: cs.color, textAlign: cs.textAlign, textWrap: cs.textWrap,
+    font: cs.font, fontSize: cs.fontSize, lineHeight: cs.lineHeight, letterSpacing: cs.letterSpacing, color: cs.color, textAlign: cs.textAlign, textWrap: cs.textWrap,
   });
   document.body.appendChild(clone);
   from.style.visibility = "hidden";

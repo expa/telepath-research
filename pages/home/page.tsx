@@ -7,10 +7,9 @@ import { PAPERS } from "@/content/papers";
 // Each paper's live figure, running on its own idle loop.
 const ART: Record<string, (p: { bare?: boolean }) => React.JSX.Element> = { "prospective-coding": CascadeBenchFigure, "self-supervised-rqf": ReedBankFigure, organics: OrganicsCarouselFigure };
 
-/** `grid`: the hero sits on the same two-column keylines as the rows below (used by /v2). */
-export default function Home({ grid = false }: { grid?: boolean }) {
+export default function Home() {
   return (
-    <main className={grid ? "home grid" : "home"}>
+    <main className="home grid">
       <section className="index-hero">
         <div className="glow" aria-hidden="true"><span /></div>
         <div className="hero-grid">

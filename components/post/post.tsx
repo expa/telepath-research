@@ -8,7 +8,7 @@ export const dateOf = (iso: string) => new Date(`${iso}T12:00:00Z`).toLocaleDate
 type Section = { id: string; label: string };
 
 /** Shared page frame for posts and detailed walkthroughs: side rail, left-aligned header, one text column. */
-export function PaperLayout({ paper, back, title, dek, links, sections, children }: { paper: Paper; back?: React.ReactNode; title: React.ReactNode; dek: React.ReactNode; links?: React.ReactNode; sections?: Section[]; children: React.ReactNode }) {
+export function PaperLayout({ paper, back, title, dek, links, sections, children }: { paper: Paper; back?: React.ReactNode; title: React.ReactNode; dek?: React.ReactNode; links?: React.ReactNode; sections?: Section[]; children: React.ReactNode }) {
   return (
     <main className="post">
       <aside className="post-rail">

@@ -393,17 +393,13 @@ main { background: var(--paper); }
 .landing-form input::placeholder { color: #fff; }
 .landing-form button { position: relative; font-weight: 600; color: var(--accent); cursor: pointer; }
 .landing-form button::before { content: ""; position: absolute; z-index: -1; inset: 4px 5px 5px auto; width: 52px; border-radius: 150px; background: #fff; opacity: .8; box-shadow: inset 0 1px 2px #fff; }
-.landing-form { --s: 1; --sx: 1; --sy: 1; --dx: 0px; --dy: 0px; --glint: 0; transform: translate(var(--dx), var(--dy)) scale(calc(var(--s) * var(--sx)), calc(var(--s) * var(--sy)));
-  transition: transform .55s cubic-bezier(.34, 1.56, .64, 1), box-shadow .3s ease; }
-/* Liquid glass: a specular glint follows the pointer, the pill swells on hover, leans toward the pointer and squishes when pressed. */
-.landing-form::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: var(--glint); transition: opacity .3s ease;
+/* Liquid glass: motion is driven by springs in pages/home/page.tsx; CSS only draws the glint. */
+.landing-form::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: var(--glint, 0);
   background: radial-gradient(120px 60px at var(--mx, 50%) var(--my, 50%), #ffffffb3, #fff0 70%); }
-.landing-form:hover { --s: 1.04; --glint: 1; }
-.landing-form:active { --sx: 1.025; --sy: .94; transition-duration: .18s; }
-.landing-form button { transition: transform .45s cubic-bezier(.34, 1.56, .64, 1); }
-.landing-form button:hover { transform: scale(1.08); }
-.landing-form button:active { transform: scale(.9); transition-duration: .12s; }
-@media (prefers-reduced-motion: reduce) { .landing-form, .landing-form button { transition: none; transform: none; } }
+.landing-form button { transition: transform .35s cubic-bezier(.25, 1, .5, 1); }
+.landing-form button:hover { transform: scale(1.05); }
+.landing-form button:active { transform: scale(.94); transition-duration: .15s; }
+@media (prefers-reduced-motion: reduce) { .landing-form button { transition: none; transform: none; } }
 .landing-form:focus-within { outline: 2px solid #ffffff80; outline-offset: 2px; }
 .landing-form button:disabled { opacity: .6; cursor: progress; }
 .landing-thanks, .landing-error { margin: 0; font-size: 1rem; }

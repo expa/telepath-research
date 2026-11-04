@@ -19,6 +19,53 @@ async function backgroundOnly(): Promise<string> {
   return id;
 }
 
+/**
+ * Liquid-glass pill: every property is a spring chasing a target, so pointer moves, hover and press
+ * retarget mid-flight instead of restarting an animation. Swells on hover, leans and glints toward
+ * the pointer, squishes on press.
+ */
+function liquidGlass(el: HTMLFormElement | null) {
+  if (!el || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  // ponytail: one shared stiffness/damping; per-property tuning if some motion feels off.
+  const K = 260, C = 26; // gently underdamped: a soft settle, no snap
+  const keys = ["s", "sx", "sy", "dx", "dy", "mx", "my", "glint"] as const;
+  type Key = (typeof keys)[number];
+  const rest: Record<Key, number> = { s: 1, sx: 1, sy: 1, dx: 0, dy: 0, mx: 50, my: 50, glint: 0 };
+  const at = { ...rest }, to = { ...rest }, v = Object.fromEntries(keys.map((k) => [k, 0])) as Record<Key, number>;
+  let raf = 0, last = 0;
+  const tick = (t: number) => {
+    const dt = Math.min((t - last) / 1000, 1 / 30);
+    last = t;
+    let moving = false;
+    for (const k of keys) {
+      v[k] += (K * (to[k] - at[k]) - C * v[k]) * dt;
+      at[k] += v[k] * dt;
+      if (Math.abs(to[k] - at[k]) > 1e-4 || Math.abs(v[k]) > 1e-3) moving = true;
+      else { at[k] = to[k]; v[k] = 0; }
+    }
+    el.style.transform = `translate(${at.dx}px, ${at.dy}px) scale(${at.s * at.sx}, ${at.s * at.sy})`;
+    el.style.setProperty("--mx", `${at.mx}%`);
+    el.style.setProperty("--my", `${at.my}%`);
+    el.style.setProperty("--glint", `${at.glint}`);
+    raf = moving ? requestAnimationFrame(tick) : 0;
+  };
+  const go = (next: Partial<Record<Key, number>>) => {
+    Object.assign(to, next);
+    if (!raf) { last = performance.now(); raf = requestAnimationFrame(tick); }
+  };
+  const move = (e: PointerEvent) => {
+    const r = el.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+    go({ s: 1.035, glint: 1, mx: x * 100, my: y * 100, dx: (x - 0.5) * 6, dy: (y - 0.5) * 3 });
+  };
+  const leave = () => go({ s: 1, sx: 1, sy: 1, dx: 0, dy: 0, glint: 0 });
+  const down = () => go({ sx: 1.02, sy: 0.95 });
+  const up = () => go({ sx: 1, sy: 1 });
+  const on: [string, EventListener][] = [["pointermove", move as EventListener], ["pointerleave", leave], ["pointerdown", down], ["pointerup", up], ["pointercancel", up]];
+  on.forEach(([n, f]) => el.addEventListener(n, f));
+  return () => { cancelAnimationFrame(raf); on.forEach(([n, f]) => el.removeEventListener(n, f)); };
+}
+
 let sdk: Promise<US> | undefined;
 const loadSdk = () => (sdk ??= new Promise((ok, fail) => {
   const s = Object.assign(document.createElement("script"), { src: SDK, async: true });
@@ -29,7 +76,9 @@ const loadSdk = () => (sdk ??= new Promise((ok, fail) => {
 
 export default function Home() {
   const bg = useRef<HTMLDivElement>(null);
+  const glass = useRef<HTMLFormElement>(null);
   const [state, setState] = useState<"idle" | "sending" | "done" | "error">("idle");
+  useEffect(() => liquidGlass(glass.current), [state === "done"]);
 
   useEffect(() => {
     let scene: Scene | undefined, gone = false;
@@ -39,20 +88,6 @@ export default function Home() {
       .catch(() => {}); // the CSS gradient underneath stands in
     return () => { gone = true; scene?.destroy(); };
   }, []);
-
-  // Glass follows the pointer: glint position, plus a few px of lean toward it.
-  function lean(e: React.PointerEvent<HTMLFormElement>) {
-    const el = e.currentTarget, r = el.getBoundingClientRect();
-    const x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
-    el.style.setProperty("--mx", `${x * 100}%`);
-    el.style.setProperty("--my", `${y * 100}%`);
-    el.style.setProperty("--dx", `${(x - 0.5) * 8}px`);
-    el.style.setProperty("--dy", `${(y - 0.5) * 4}px`);
-  }
-  function unlean(e: React.PointerEvent<HTMLFormElement>) {
-    e.currentTarget.style.setProperty("--dx", "0px");
-    e.currentTarget.style.setProperty("--dy", "0px");
-  }
 
   async function join(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -81,7 +116,7 @@ export default function Home() {
         {state === "done" ? (
           <p className="landing-thanks" role="status">You’re on the list.</p>
         ) : (
-          <form className="landing-form" onSubmit={join} onPointerMove={lean} onPointerLeave={unlean}>
+          <form className="landing-form" onSubmit={join} ref={glass}>
             <input type="email" name="email" required placeholder="Enter your email" aria-label="Email" autoComplete="email" />
             <button type="submit" disabled={state === "sending"}>Join</button>
           </form>

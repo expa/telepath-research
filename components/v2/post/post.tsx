@@ -14,7 +14,7 @@ export function PaperLayout({ paper, back, title, dek, links, sections, children
     <main className="post">
       {/* page-level, not inside the header: the header's container-type would trap the fixed glow */}
       <div className="glow" aria-hidden="true"><span /></div>
-      <a className="brand post-brand" href="/home-2" aria-label="Telepath home"><Logo /><span className="post-wordmark">Telepath</span></a>
+      <a className="brand post-brand" href="/" aria-label="Telepath home"><Logo /><span className="post-wordmark">Telepath</span></a>
       <aside className="post-rail">
         <div className="post-rail-inner">
           <dl className="post-details">

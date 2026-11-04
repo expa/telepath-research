@@ -35,7 +35,7 @@ function glowMorph(from: HTMLElement, to: HTMLElement, duration: number): Animat
 export default transition({
   async run(context) {
     const { from, to } = context;
-    if ([from.route.id, to.route.id].some(id => id === "home-2" || id.startsWith("research-2"))) return v2Transition.run(context);
+    if ([from.route.id, to.route.id].some(id => id === "home" || id.startsWith("research-2"))) return v2Transition.run(context);
     const d = matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 1;
     const a = parts(from.element), b = parts(to.element);
     // Leaving a detailed walkthrough for a lighter page reads as going back: slide the other way.

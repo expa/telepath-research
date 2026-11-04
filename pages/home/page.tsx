@@ -1,4 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useNavigation } from "modulato";
+import { REVEAL_EVENT } from "@/lib/landing-flight";
 
 // Copy of telepath.com: the full-screen Unicorn Studio glow, with a coded logo, the pitch and a waitlist form on top.
 const SCENE = "https://storage.googleapis.com/unicornstudio-production/embeds/CbHFIFV3Ha4q38DuFzTP";
@@ -29,7 +31,7 @@ async function backgroundOnly(): Promise<string> {
  * The three discs play this in turn, top first, each tuned to end on its own resting spot.
  * Driven per frame in JS: CSS custom-property animations don't repaint transforms reliably everywhere.
  */
-function riseDiscs(root: HTMLDivElement | null, at: number) {
+function riseDiscs(root: HTMLDivElement | null, at: number, skip = false) {
   if (!root) return;
   const els = [...root.children] as HTMLElement[];
   const P = 600; // perspective on .landing-discs, px; its vanishing point sits on the bottom spot
@@ -76,7 +78,7 @@ function riseDiscs(root: HTMLDivElement | null, at: number) {
       el.style.transform = `translate3d(0, ${-y}px, ${z}px) rotateX(${tilt}deg) scale(${s})`;
     });
   };
-  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return draw(1e9);
+  if (skip || matchMedia("(prefers-reduced-motion: reduce)").matches) return draw(1e9);
   const end = discs[discs.length - 1].delay + Math.max(FLOAT, TURN);
   let raf = 0;
   const start = performance.now() + at;
@@ -159,12 +161,21 @@ export default function Home() {
   const glass = useRef<HTMLFormElement>(null);
   const [state, setState] = useState<"idle" | "sending" | "done" | "error">("idle");
   useEffect(() => liquidGlass(glass.current), [state === "done"]);
+  // Back from /research the logo and title fly in from the page we left (transitions/research__home.ts):
+  // skip the intro, sit in the final layout, and load the rest once they land.
+  const nav = useNavigation();
+  const returning = useRef(nav.from?.id === "research").current;
   const discs = useRef<HTMLDivElement>(null);
-  useEffect(() => riseDiscs(discs.current, LOGO_AT), []);
+  useLayoutEffect(() => riseDiscs(discs.current, LOGO_AT, returning), []); // layout effect: placed before the transition measures
   const logo = useRef<HTMLDivElement>(null);
   const [revealed, setRevealed] = useState(false);
   // Park the logo at the center of the screen until the reveal.
   useLayoutEffect(() => {
+    if (returning) {
+      const show = () => setRevealed(true), t = setTimeout(show, 3000); // fallback if the transition never signals
+      addEventListener(REVEAL_EVENT, show, { once: true });
+      return () => { clearTimeout(t); removeEventListener(REVEAL_EVENT, show); };
+    }
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return setRevealed(true);
     const el = logo.current!, r = el.getBoundingClientRect();
     el.style.setProperty("--to-center", `${innerHeight / 2 - (r.top + r.height / 2)}px`);
@@ -202,7 +213,7 @@ export default function Home() {
   }
 
   return (
-    <main className={revealed ? "landing revealed" : "landing"}>
+    <main className={`landing${revealed ? " revealed" : ""}${returning ? " returning" : ""}`}>
       <div className="landing-bg" ref={bg} aria-hidden="true" />
       <div className="landing-content">
         <div className="landing-logo" ref={logo} aria-label="Telepath" role="img">

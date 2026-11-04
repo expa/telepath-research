@@ -397,6 +397,12 @@ html:has(.landing), html:has(.landing) body { background: #fb975f; }
 .landing.revealed .landing-copy > :nth-child(1) { transition-delay: .3s; }
 .landing.revealed .landing-copy > :nth-child(2) { transition-delay: .5s; }
 .landing.revealed .landing-copy > :nth-child(3) { transition-delay: .7s; }
+/* back from /research: the logo and title arrive by flight (lib/landing-flight.ts); only the rest loads in */
+.landing.returning .landing-logo b { animation: none; }
+.landing.returning .landing-copy > h1 { opacity: 1; filter: none; transition: none; }
+.landing.returning.revealed .landing-copy > :nth-child(2) { transition-delay: 0s; }
+.landing.returning.revealed .landing-copy > :nth-child(3) { transition-delay: .15s; }
+.landing.returning.revealed .landing-signup { transition-delay: .35s; }
 .landing-signup { opacity: 0; transform: translateY(20px); transition: opacity .8s ease, transform 1s cubic-bezier(.22, 1, .36, 1); }
 .landing.revealed .landing-signup { opacity: 1; transform: none; transition-delay: 1s; }
 @media (prefers-reduced-motion: reduce) { .landing-bg, .landing-logo, .landing-copy > *, .landing-signup { transition: none; } }

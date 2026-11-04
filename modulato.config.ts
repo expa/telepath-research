@@ -6,7 +6,7 @@ export default defineConfig({
     link: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400..700&display=swap" },
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=IBM+Plex+Mono:wght@400;500&family=Instrument+Sans:wght@400..700&display=swap" },
       // telepath.com's black icon, unconditionally: a prefers-color-scheme: dark
       // variant (white glyph) got picked in light tab bars and drawn on a black backplate.
       { rel: "icon", type: "image/png", href: "/favicon.png" },

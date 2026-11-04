@@ -1,4 +1,5 @@
 import { transition } from "modulato";
+import v2Transition from "@/lib/v2-transition";
 
 const SLIDE = 48; // px
 const OUT = "cubic-bezier(0.4, 0, 1, 1)";
@@ -32,7 +33,9 @@ function glowMorph(from: HTMLElement, to: HTMLElement, duration: number): Animat
 
 /** Page → page: the sidebar stays put and crossfades to the new page's details; the old content slides out left, the new slides in from the right. */
 export default transition({
-  async run({ from, to }) {
+  async run(context) {
+    const { from, to } = context;
+    if ([from.route.id, to.route.id].some(id => id === "home-2" || id.startsWith("research-2"))) return v2Transition.run(context);
     const d = matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 1;
     const a = parts(from.element), b = parts(to.element);
     // Leaving a detailed walkthrough for a lighter page reads as going back: slide the other way.

@@ -1,7 +1,8 @@
 @import "katex/dist/katex.min.css";
 @import "../components/iso/iso.css";
+@scope (:root) to (.experience-v2) {
 
-:root {
+:scope {
   --paper: #fbf7f2;
   --paper-2: #f5ede4;
   --cream: #ffefde;
@@ -445,3 +446,4 @@ html:has(.landing), html:has(.landing) body { background: #fb975f; }
 .landing-logo b { margin-top: 14px; font-size: 26px; font-weight: 500; line-height: 1; letter-spacing: -0.03em; animation: disc-appear .9s cubic-bezier(.22, 1, .36, 1) both; } /* delay set inline from WORD_AT */
 @keyframes disc-appear { from { opacity: 0; scale: .4; } }
 @media (prefers-reduced-motion: reduce) { .landing-logo b { animation: none; } }
+}

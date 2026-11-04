@@ -72,11 +72,14 @@ img, video { max-width: 100%; display: block; }
   -webkit-backdrop-filter: saturate(1.4) blur(14px);
   border-bottom: 1px solid color-mix(in srgb, var(--rule) 70%, transparent);
 }
+.site-header.is-leaving { position: fixed; left: 0; right: 0; }
 .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 500; letter-spacing: -0.01em; }
 .brand svg { width: 22px; height: 22px; }
 .nav { display: flex; gap: 22px; font-size: 14px; color: var(--ink-2); }
 .nav a { text-decoration: none; transition: color 0.2s; }
-.nav a:hover { color: var(--accent); }
+.nav a:hover, .nav a[aria-current] { color: var(--accent); }
+.nav a[aria-current] { position: relative; }
+.nav a[aria-current]::after { content: ""; position: absolute; left: 50%; bottom: -8px; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: currentColor; }
 
 /* ---------- Glow (Telepath-style blurred field) ---------- */
 @property --glow-1 { syntax: "<color>"; inherits: true; initial-value: #ffb36b; }
@@ -377,3 +380,66 @@ main { background: var(--paper); }
 
 /* Detailed walkthrough: darker gray glow so it reads apart from the blog post (page transition morphs the colors) */
 .post:has(.article) > .glow { --glow-1: #6b6b6b; --glow-2: #4a4a4a; --glow-3: #2a2a2a; }
+
+/* ---------- Landing (copy of telepath.com) ---------- */
+.landing { position: relative; min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: clip; color: #fff; text-align: center;
+  background: #fb975f; } /* the scene's average color, so its fade-in is gentle */
+.landing-bg { position: absolute; inset: 0; z-index: 0; opacity: 0; transition: opacity 3s ease; }
+/* Same orange behind the page while it's hidden for fonts, so the first paint is never the cream body. */
+html:has(.landing), html:has(.landing) body { background: #fb975f; }
+.landing-bg.is-ready { opacity: 1; }
+/* Intro: logo parked at screen center (--to-center, set in JS) slides up into place on .revealed,
+   then the copy un-blurs in line by line, then the signup rises in. */
+.landing-logo { transform: translateY(var(--to-center, 0px)); transition: transform 1.1s cubic-bezier(.65, 0, .25, 1); }
+.landing.revealed .landing-logo { transform: none; }
+.landing-copy > * { opacity: 0; filter: blur(10px); transition: opacity .9s ease, filter .9s ease; }
+.landing.revealed .landing-copy > * { opacity: 1; filter: blur(0); }
+.landing.revealed .landing-copy > :nth-child(1) { transition-delay: .3s; }
+.landing.revealed .landing-copy > :nth-child(2) { transition-delay: .5s; }
+.landing.revealed .landing-copy > :nth-child(3) { transition-delay: .7s; }
+/* back from /research: the logo and title arrive by flight (lib/landing-flight.ts); only the rest loads in */
+.landing.returning .landing-logo b { animation: none; }
+.landing.returning .landing-copy > h1 { opacity: 1; filter: none; transition: none; }
+.landing.returning.revealed .landing-copy > :nth-child(2) { transition-delay: 0s; }
+.landing.returning.revealed .landing-copy > :nth-child(3) { transition-delay: .15s; }
+.landing.returning.revealed .landing-signup { transition-delay: .35s; }
+.landing-signup { opacity: 0; transform: translateY(20px); transition: opacity .8s ease, transform 1s cubic-bezier(.22, 1, .36, 1); }
+.landing.revealed .landing-signup { opacity: 1; transform: none; transition-delay: 1s; }
+@media (prefers-reduced-motion: reduce) { .landing-bg, .landing-logo, .landing-copy > *, .landing-signup { transition: none; } }
+.landing-content { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 56px; width: 100%; max-width: 1200px; padding: 10vh 20px 48px; }
+/* Three blocks: logo, copy (title, pitch, research link), signup. Tight inside each, roomy between. */
+.landing-copy { display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; }
+.landing-signup { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.landing-label { font-size: 13px; line-height: 1; color: #ffffffb3; }
+.landing h1 { margin: 0; max-width: 520px; font-size: 3rem; line-height: 1; letter-spacing: -0.05em; font-weight: 400; }
+.landing-copy p { margin: 0; max-width: 30%; font-size: 1rem; line-height: 1.2; }
+.landing-form { position: relative; display: flex; width: 300px; border: 1px solid #ffffff4d; border-radius: 1000px; overflow: clip;
+  background: radial-gradient(63% 50% at 50% -12.1%, #fff 0%, #ffffffa6 26%, #fff0 100%); -webkit-backdrop-filter: blur(100px); backdrop-filter: blur(100px); mix-blend-mode: color-dodge;
+  box-shadow: 0 .6px 1.1px -.6px #ffffff17, 0 2.3px 4.1px -1.2px #ffffff1a, 0 10px 18px -1.75px #ffffff29, inset 0 -2px 11px #ffffffba; }
+.landing-form input, .landing-form button { appearance: none; border: 0; outline: none; background: none; font: inherit; font-size: 16px; line-height: 1; padding: 15px; }
+.landing-form input { flex: 1; min-width: 0; padding-left: 22px; color: var(--cream); }
+.landing-form input::placeholder { color: #fff; }
+.landing-form button { position: relative; display: grid; place-items: center; width: 48px; padding: 0; color: var(--accent); cursor: pointer; }
+.landing-form button::before { content: ""; position: absolute; z-index: -1; inset: 5px; border-radius: 50%; background: #fff; opacity: .8; box-shadow: inset 0 1px 2px #fff; }
+/* Liquid glass: pill and Join motion are driven by springs in pages/home/page.tsx; CSS only draws the glint. */
+.landing-form::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: var(--glint, 0);
+  background: radial-gradient(160px 80px at var(--mx, 50%) var(--my, 50%), #ffffff38, #fff0 70%); }
+.landing-form:focus-within { outline: 2px solid #ffffff80; outline-offset: 2px; }
+.landing-form button:disabled { opacity: .6; cursor: progress; }
+.landing-thanks, .landing-error { margin: 0; font-size: 1rem; }
+.landing-research { font-size: 1rem; line-height: 1.2; font-weight: 600; color: #fffc; text-decoration: none; }
+.landing-research:hover { color: #fff; }
+@media (max-width: 809.98px) { .landing-copy p { max-width: 80%; } }
+
+/* Logo: three discs, sized, posed and animated per frame by riseDiscs() in pages/home/page.tsx.
+   Each disc is centered on the bottom spot; JS moves it in 3D (perspective below) to its resting place. */
+.landing-logo { display: grid; justify-items: center; margin-bottom: 2vh; }
+.landing-discs { position: relative; width: 88px; height: 82px; perspective: 600px; perspective-origin: 50% calc(100% - 11px); }
+.landing-discs span { position: absolute; left: 50%; top: calc(100% - 11px); width: 22px; height: 22px; border-radius: 50%; opacity: 0; will-change: transform, opacity;
+  background: radial-gradient(70% 70% at 40% 30%, #fff8ec, #ffe4c2 55%, #ffd2a1); box-shadow: inset 0 -4px 12px #f7b77a80, 0 6px 18px #c8541433; }
+.landing-discs span:nth-child(1) { z-index: 1; }
+.landing-discs span:nth-child(2) { z-index: 2; }
+.landing-discs span:nth-child(3) { z-index: 3; }
+.landing-logo b { margin-top: 14px; font-size: 26px; font-weight: 500; line-height: 1; letter-spacing: -0.03em; animation: disc-appear .9s cubic-bezier(.22, 1, .36, 1) both; } /* delay set inline from WORD_AT */
+@keyframes disc-appear { from { opacity: 0; scale: .4; } }
+@media (prefers-reduced-motion: reduce) { .landing-logo b { animation: none; } }

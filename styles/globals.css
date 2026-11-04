@@ -403,25 +403,15 @@ main { background: var(--paper); }
 .landing-research:hover { color: #fff; }
 @media (max-width: 809.98px) { .landing-content > p { max-width: 80%; } }
 
-/* Logo: three discs on one path. --p (0 → 1) runs a disc from the bottom spot upward, growing and tilting back
-   as it rises; all three play that same path, from the same start, and each one stops at its own --p:
-   top at 1, middle at 1/3, bottom at 0. Top goes first. */
-@property --p { syntax: "<number>"; inherits: false; initial-value: 0; }
+/* Logo: three discs, posed and animated per frame by riseDiscs() in pages/home/page.tsx.
+   Each is a full-size (88px) disc centered on the bottom spot; JS lifts, tilts and scales it from its center. */
 .landing-logo { display: grid; justify-items: center; margin-bottom: 8vh; }
 .landing-discs { position: relative; width: 88px; height: 82px; perspective: 900px; }
-.landing-discs span {
-  /* size 22 → 88; rise 0 → 56.5px (eased so the middle sits at 26.5); visible height 22 → 26, so tilt = acos(height / size) */
-  --size: calc(22px + 66px * var(--p));
-  position: absolute; left: 50%; top: calc(100% - 11px); width: var(--size); height: var(--size); border-radius: 50%;
-  translate: -50% calc(-50% - (91px * var(--p) - 34.5px * var(--p) * var(--p)));
-  transform: rotateX(acos(calc((22 + 4 * var(--p)) / (22 + 66 * var(--p)))));
-  background: radial-gradient(70% 70% at 40% 30%, #fff8ec, #ffe4c2 55%, #ffd2a1); box-shadow: inset 0 -3px 8px #f7b77a80, 0 6px 18px #c8541433;
-  animation: disc-appear .6s cubic-bezier(.22, 1, .36, 1) var(--delay) both, disc-rise var(--dur) cubic-bezier(.45, 0, .2, 1) var(--delay) both;
-}
-.landing-discs span:nth-child(1) { --p: 1; --dur: 1.5s; --delay: 0ms; z-index: 1; }
-.landing-discs span:nth-child(2) { --p: .3333; --dur: 1.1s; --delay: 220ms; z-index: 2; }
-.landing-discs span:nth-child(3) { --p: 0; --dur: 1ms; --delay: 440ms; z-index: 3; }
-.landing-logo b { margin-top: 14px; font-size: 26px; font-weight: 500; line-height: 1; letter-spacing: -0.03em; animation: disc-appear .9s cubic-bezier(.22, 1, .36, 1) .9s both; }
+.landing-discs span { position: absolute; left: 0; top: calc(100% - 55px); width: 88px; height: 88px; border-radius: 50%; opacity: 0; will-change: transform, opacity;
+  background: radial-gradient(70% 70% at 40% 30%, #fff8ec, #ffe4c2 55%, #ffd2a1); box-shadow: inset 0 -12px 32px #f7b77a80, 0 24px 60px #c8541433; }
+.landing-discs span:nth-child(1) { z-index: 1; }
+.landing-discs span:nth-child(2) { z-index: 2; }
+.landing-discs span:nth-child(3) { z-index: 3; }
+.landing-logo b { margin-top: 14px; font-size: 26px; font-weight: 500; line-height: 1; letter-spacing: -0.03em; animation: disc-appear .9s cubic-bezier(.22, 1, .36, 1) 1.3s both; }
 @keyframes disc-appear { from { opacity: 0; scale: .4; } }
-@keyframes disc-rise { from { --p: 0; } }
-@media (prefers-reduced-motion: reduce) { .landing-discs span, .landing-logo b { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .landing-logo b { animation: none; } }

@@ -20,6 +20,52 @@ async function backgroundOnly(): Promise<string> {
 }
 
 /**
+ * Logo intro. One path, p = 0 → 1: a disc at the bottom spot rises, grows (22 → 88px) and tilts back
+ * about x so its visible height stays near 22–26px. All three discs play that path from the same start,
+ * top first, and each stops at its own p (top 1, middle 1/3, bottom 0). Scaling is from each disc's center.
+ * Driven per frame in JS: CSS custom-property animations don't repaint transforms reliably in every browser.
+ */
+function riseDiscs(root: HTMLDivElement | null) {
+  if (!root) return;
+  const els = [...root.children] as HTMLElement[];
+  const FULL = 88;
+  // Size and rise follow `move`; the tilt follows `turn` on a slower curve, so each disc swells and lifts
+  // first and then settles back into its angle. The tilt targets the same path: acos(visible height / size).
+  const pose = (move: number, turn: number, appear: number) => {
+    const size = 22 + 66 * move, rise = 91 * move - 34.5 * move * move;
+    const tilt = Math.acos((22 + 4 * turn) / (22 + 66 * turn));
+    return `translateY(${-rise}px) rotateX(${tilt}rad) scale(${(size / FULL) * (0.4 + 0.6 * appear)})`;
+  };
+  const plan = [
+    { end: 1, delay: 0, move: 900, turn: 1600 },
+    { end: 1 / 3, delay: 450, move: 700, turn: 1200 },
+    { end: 0, delay: 900, move: 0, turn: 0 },
+  ];
+  const inOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
+  const out = (t: number) => 1 - (1 - t) ** 4;
+  const clamp = (t: number) => Math.min(1, Math.max(0, t));
+  const at = (t: number, d: number) => (d ? clamp(t / d) : 1);
+  const draw = (now: number) => {
+    els.forEach((el, i) => {
+      const { end, delay, move, turn } = plan[i], t = now - delay;
+      const appear = out(clamp(t / 600));
+      el.style.opacity = `${appear}`;
+      el.style.transform = pose(end * out(at(t, move)), end * inOut(at(t, turn)), appear);
+    });
+  };
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return draw(1e9);
+  let raf = 0;
+  const start = performance.now();
+  const tick = (t: number) => {
+    draw(t - start);
+    if (t - start < 3000) raf = requestAnimationFrame(tick);
+  };
+  draw(0);
+  raf = requestAnimationFrame(tick);
+  return () => cancelAnimationFrame(raf);
+}
+
+/**
  * Liquid-glass pill: every property is a spring chasing a target, so pointer moves, hover and press
  * retarget mid-flight instead of restarting an animation. Swells on hover, leans and glints toward
  * the pointer, squishes on press.
@@ -83,6 +129,8 @@ export default function Home() {
   const glass = useRef<HTMLFormElement>(null);
   const [state, setState] = useState<"idle" | "sending" | "done" | "error">("idle");
   useEffect(() => liquidGlass(glass.current), [state === "done"]);
+  const discs = useRef<HTMLDivElement>(null);
+  useEffect(() => riseDiscs(discs.current), []);
 
   useEffect(() => {
     let scene: Scene | undefined, gone = false;
@@ -112,7 +160,7 @@ export default function Home() {
       <div className="landing-bg" ref={bg} aria-hidden="true" />
       <div className="landing-content">
         <div className="landing-logo" aria-label="Telepath" role="img">
-          <div className="landing-discs"><span /><span /><span /></div>
+          <div className="landing-discs" ref={discs}><span /><span /><span /></div>
           <b aria-hidden="true">Telepath</b>
         </div>
         <h1>Intelligence<br />that evolves</h1>

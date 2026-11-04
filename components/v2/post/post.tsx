@@ -17,6 +17,8 @@ export function PaperLayout({ paper, back, title, dek, links, sections, children
     <main className="post">
       {/* page-level, not inside the header: the header's container-type would trap the fixed glow */}
       <div className="glow" aria-hidden="true"><span /></div>
+      {/* fixed band behind the logo: text scrolling under it blurs and fades out progressively */}
+      <div className="post-topfade" aria-hidden="true"><span /><span /><span /></div>
       <a className={settled ? "brand post-brand is-settled" : "brand post-brand"} href="/" aria-label="Telepath home"><Logo settled={settled} /><span className="post-wordmark">Telepath</span></a>
       <aside className="post-rail">
         <div className="post-rail-inner">
@@ -33,7 +35,7 @@ export function PaperLayout({ paper, back, title, dek, links, sections, children
         {title}
         {dek}
         <p className="post-links">
-          <a className="primary" href={paper.pdf} target="_blank" rel="noreferrer" data-native>Read the full paper</a>
+          <a className="primary" href={paper.pdf} target="_blank" rel="noreferrer" data-native>Full paper</a>
           {links}
           {paper.code ? <a href={paper.code} target="_blank" rel="noreferrer">Code</a> : null}
         </p>

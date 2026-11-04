@@ -525,6 +525,19 @@ main { background: var(--paper); }
 }
 
 /* A quiet article lockup, sharing the homepage logo transition. */
+/* Behind the fixed logo: a progressive blur (three stacked bands, stronger toward the top) under a fade to the page color.
+   Fades in over the first scroll so the header glow isn't washed out at rest. */
+.post-topfade { --fade-h: 128px; position: fixed; z-index: 2; inset: 0 0 auto; height: var(--fade-h); pointer-events: none; }
+.post-topfade span, .post-topfade::after { position: absolute; inset: 0; }
+.post-topfade span:nth-child(1) { backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); mask-image: linear-gradient(to bottom, #000 0%, #000 60%, transparent 100%); }
+.post-topfade span:nth-child(2) { backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); mask-image: linear-gradient(to bottom, #000 0%, #000 35%, transparent 70%); }
+.post-topfade span:nth-child(3) { backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); mask-image: linear-gradient(to bottom, #000 0%, transparent 40%); }
+.post-topfade::after { content: ""; background: linear-gradient(to bottom, var(--paper) 0%, color-mix(in srgb, var(--paper) 85%, transparent) 35%, color-mix(in srgb, var(--paper) 40%, transparent) 70%, transparent 100%); }
+@supports (animation-timeline: scroll()) {
+  .post-topfade { animation: topfade-in linear both; animation-timeline: scroll(root); animation-range: 0 120px; }
+}
+@keyframes topfade-in { from { opacity: 0; } }
+@media (max-width: 700px) { .post-topfade { --fade-h: 100px; } }
 .post-brand { position: fixed; top: 40px; left: clamp(20px, 4vw, 40px); z-index: 3; font-size: 24px; line-height: 1; letter-spacing: -0.03em; gap: 14px; height: calc(82px * 32 / 88); }
 .post-brand svg { width: 32px; height: 32px; }
 @media (max-width: 700px) { .post-head { padding-top: 116px; } .post-body { font-size: 17px; } .post-body > p:first-child { font-size: 19px; } }

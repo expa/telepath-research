@@ -9,8 +9,8 @@ function parts(page: HTMLElement) {
   const main = page.querySelector("main");
   if (!main?.classList.contains("post")) return { rail: [] as Element[], content: main ? [main] : [page] };
   const kids = [...main.children];
-  // The glow stays put (see glowMorph); everything else slides.
-  const content = kids.filter((k) => !k.classList.contains("post-rail") && !k.classList.contains("glow"));
+  // The glow stays put (see glowMorph) and so does the fixed logo, which every post page shares; everything else slides.
+  const content = kids.filter((k) => !k.classList.contains("post-rail") && !k.classList.contains("glow") && !k.classList.contains("post-brand"));
   return { rail: kids.filter((k) => k.classList.contains("post-rail")), content };
 }
 

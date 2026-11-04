@@ -1,13 +1,23 @@
 import { useEffect, useRef, useState } from "react";
 
-// Copy of telepath.com: a full-screen Unicorn Studio scene (glow, logo, wordmark) with the pitch and a waitlist form on top.
-const SCENE = "CbHFIFV3Ha4q38DuFzTP";
+// Copy of telepath.com: the full-screen Unicorn Studio glow, with a coded logo, the pitch and a waitlist form on top.
+const SCENE = "https://storage.googleapis.com/unicornstudio-production/embeds/CbHFIFV3Ha4q38DuFzTP";
 const SDK = "https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v2.0.5/dist/unicornStudio.umd.js";
 const WAITLIST = "32473"; // getwaitlist.com waitlist, same one the Framer site posts to
 
 type Scene = { destroy(): void };
 type US = { addScene(o: object): Promise<Scene> };
 declare global { interface Window { UnicornStudio?: US } }
+
+/** The scene minus its baked-in logo (3D model layers) and wordmark (image layer); we draw those in the DOM. */
+async function backgroundOnly(): Promise<string> {
+  const id = "telepath-scene";
+  if (document.getElementById(id)) return id;
+  const json = await (await fetch(SCENE)).json();
+  json.history = json.history.filter((l: { layerType: string }) => l.layerType !== "model" && l.layerType !== "image");
+  document.head.append(Object.assign(document.createElement("script"), { type: "application/json", id, text: JSON.stringify(json) }));
+  return id;
+}
 
 let sdk: Promise<US> | undefined;
 const loadSdk = () => (sdk ??= new Promise((ok, fail) => {
@@ -23,12 +33,26 @@ export default function Home() {
 
   useEffect(() => {
     let scene: Scene | undefined, gone = false;
-    loadSdk()
-      .then((us) => us.addScene({ element: bg.current, projectId: SCENE, dpi: 1.5, scale: 1, fps: 60, fixed: true }))
+    Promise.all([loadSdk(), backgroundOnly()])
+      .then(([us, filePath]) => us.addScene({ element: bg.current, filePath, dpi: 1.5, scale: 1, fps: 60, fixed: true }))
       .then((s) => (gone ? s.destroy() : (scene = s)))
       .catch(() => {}); // the CSS gradient underneath stands in
     return () => { gone = true; scene?.destroy(); };
   }, []);
+
+  // Glass follows the pointer: glint position, plus a few px of lean toward it.
+  function lean(e: React.PointerEvent<HTMLFormElement>) {
+    const el = e.currentTarget, r = el.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+    el.style.setProperty("--mx", `${x * 100}%`);
+    el.style.setProperty("--my", `${y * 100}%`);
+    el.style.setProperty("--dx", `${(x - 0.5) * 8}px`);
+    el.style.setProperty("--dy", `${(y - 0.5) * 4}px`);
+  }
+  function unlean(e: React.PointerEvent<HTMLFormElement>) {
+    e.currentTarget.style.setProperty("--dx", "0px");
+    e.currentTarget.style.setProperty("--dy", "0px");
+  }
 
   async function join(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -48,12 +72,16 @@ export default function Home() {
     <main className="landing">
       <div className="landing-bg" ref={bg} aria-hidden="true" />
       <div className="landing-content">
+        <div className="landing-logo" aria-label="Telepath" role="img">
+          <span /><span /><span />
+          <b aria-hidden="true">Telepath</b>
+        </div>
         <h1>Intelligence<br />that evolves</h1>
         <p>We are building the first, biologically-plausible intelligence that learns continuously through experience, adapting locally as it operates.</p>
         {state === "done" ? (
           <p className="landing-thanks" role="status">You’re on the list.</p>
         ) : (
-          <form className="landing-form" onSubmit={join}>
+          <form className="landing-form" onSubmit={join} onPointerMove={lean} onPointerLeave={unlean}>
             <input type="email" name="email" required placeholder="Enter your email" aria-label="Email" autoComplete="email" />
             <button type="submit" disabled={state === "sending"}>Join</button>
           </form>

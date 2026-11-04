@@ -382,7 +382,7 @@ main { background: var(--paper); }
 .landing { position: relative; min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: clip; color: #fff; text-align: center;
   background: radial-gradient(60% 50% at 70% 85%, #a8320c, transparent 70%), radial-gradient(80% 60% at 30% 20%, #ffb36b, transparent 70%), #ff9a52; }
 .landing-bg { position: absolute; inset: 0; z-index: 0; }
-.landing-content { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 32px; width: 100%; max-width: 1200px; padding: 20vh 20px 48px; }
+.landing-content { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 32px; width: 100%; max-width: 1200px; padding: 10vh 20px 48px; }
 .landing h1 { margin: 0; max-width: 520px; font-size: 3rem; line-height: 1; letter-spacing: -0.05em; font-weight: 400; }
 .landing-content > p { margin: 0 0 16px; max-width: 30%; font-size: 1rem; line-height: 1.2; }
 .landing-form { position: relative; display: flex; width: 300px; border: 1px solid #ffffff4d; border-radius: 1000px; overflow: clip;
@@ -393,9 +393,32 @@ main { background: var(--paper); }
 .landing-form input::placeholder { color: #fff; }
 .landing-form button { position: relative; font-weight: 600; color: var(--accent); cursor: pointer; }
 .landing-form button::before { content: ""; position: absolute; z-index: -1; inset: 4px 5px 5px auto; width: 52px; border-radius: 150px; background: #fff; opacity: .8; box-shadow: inset 0 1px 2px #fff; }
+.landing-form { --s: 1; --sx: 1; --sy: 1; --dx: 0px; --dy: 0px; --glint: 0; transform: translate(var(--dx), var(--dy)) scale(calc(var(--s) * var(--sx)), calc(var(--s) * var(--sy)));
+  transition: transform .55s cubic-bezier(.34, 1.56, .64, 1), box-shadow .3s ease; }
+/* Liquid glass: a specular glint follows the pointer, the pill swells on hover, leans toward the pointer and squishes when pressed. */
+.landing-form::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: var(--glint); transition: opacity .3s ease;
+  background: radial-gradient(120px 60px at var(--mx, 50%) var(--my, 50%), #ffffffb3, #fff0 70%); }
+.landing-form:hover { --s: 1.04; --glint: 1; }
+.landing-form:active { --sx: 1.025; --sy: .94; transition-duration: .18s; }
+.landing-form button { transition: transform .45s cubic-bezier(.34, 1.56, .64, 1); }
+.landing-form button:hover { transform: scale(1.08); }
+.landing-form button:active { transform: scale(.9); transition-duration: .12s; }
+@media (prefers-reduced-motion: reduce) { .landing-form, .landing-form button { transition: none; transform: none; } }
 .landing-form:focus-within { outline: 2px solid #ffffff80; outline-offset: 2px; }
 .landing-form button:disabled { opacity: .6; cursor: progress; }
 .landing-thanks, .landing-error { margin: 0; font-size: 1rem; }
 .landing-research { font-size: 14px; color: #fffc; text-decoration: none; }
 .landing-research:hover { color: #fff; }
 @media (max-width: 809.98px) { .landing-content > p { max-width: 80%; } }
+
+/* Logo: three discs tilted back in perspective (a funnel seen from the front), then the wordmark. Each slides down into place on load. */
+.landing-logo { display: grid; justify-items: center; margin-bottom: 8vh; perspective: 900px; }
+.landing-logo span { display: block; border-radius: 50%; background: radial-gradient(70% 70% at 40% 30%, #fff8ec, #ffe4c2 55%, #ffd2a1); box-shadow: inset 0 -3px 8px #f7b77a80, 0 6px 18px #c8541433;
+  transform: rotateX(var(--tilt)); animation: disc-in .9s var(--ease) both; animation-delay: calc(var(--i) * 120ms); }
+/* Height shown = diameter × cos(tilt): 86→26, 44→22, 22→22, like the original mark. */
+.landing-logo span:nth-child(1) { --i: 0; --tilt: 70deg; width: 88px; height: 88px; margin-bottom: -26px; }
+.landing-logo span:nth-child(2) { --i: 1; --tilt: 60deg; width: 44px; height: 44px; margin-bottom: -6px; }
+.landing-logo span:nth-child(3) { --i: 2; --tilt: 0deg; width: 22px; height: 22px; }
+.landing-logo b { margin-top: 14px; font-size: 26px; font-weight: 500; line-height: 1; letter-spacing: -0.03em; animation: disc-in .9s var(--ease) 360ms both; }
+@keyframes disc-in { from { opacity: 0; translate: 0 -28px; } }
+@media (prefers-reduced-motion: reduce) { .landing-logo span, .landing-logo b { animation: none; } }

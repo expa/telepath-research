@@ -553,6 +553,7 @@ main { background: var(--paper); }
 }
 
 .landing-form { padding-left: 18px; }
+.landing-form.is-open { padding-left: 24px; }
 .landing-form .landing-subscribe-trigger, .landing-form input, .landing-form .landing-placeholder { font-size: 14px; font-weight: 500; white-space: nowrap; }
 @media (max-width: 700px) { .landing-form input, .landing-form .landing-placeholder { font-size: 16px; } } /* iOS zooms into inputs under 16px */
 .landing-form:not(.is-open) button[type="submit"] { right: 0; }

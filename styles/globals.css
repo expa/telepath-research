@@ -237,7 +237,7 @@ input[type="range"]:focus-visible { outline: 2px solid var(--accent); outline-of
 /* ---------- Short posts: text on the page, no cards ---------- */
 .post { --col: 700px; position: relative; display: flex; flex-direction: column; }
 .post-head { position: relative; overflow: hidden; padding: clamp(64px, 10vw, 120px) clamp(20px, 5vw, 40px) clamp(32px, 5vw, 56px); }
-.post > .glow { opacity: 0.28; --glow-h: min(640px, 100vh); --glow-peek: 160px; inset: 0 0 auto; height: var(--glow-h); }
+.post > .glow { opacity: 0.28; --glow-h: min(640px, 100vh); --glow-peek: 300px; inset: 0 0 auto; height: var(--glow-h); }
 /* As you scroll, the glow rides up with the header until only its soft bottom edge peeks out behind the nav, then stays there. */
 @supports (animation-timeline: scroll()) {
   .post > .glow { position: fixed; animation: glow-tuck linear both; animation-timeline: scroll(root); animation-range: 0 calc(var(--glow-h) - var(--glow-peek)); }

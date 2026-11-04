@@ -186,18 +186,29 @@ export default function Home() {
           <div className="landing-discs" ref={discs}><span /><span /><span /></div>
           <b aria-hidden="true">Telepath</b>
         </div>
-        <h1>Intelligence<br />that evolves</h1>
-        <p>We are building the first, biologically-plausible intelligence that learns continuously through experience, adapting locally as it operates.</p>
-        <a className="landing-research" href="/research">Read our research →</a>
-        {state === "done" ? (
-          <p className="landing-thanks" role="status">You’re on the list.</p>
-        ) : (
-          <form className="landing-form" onSubmit={join} ref={glass}>
-            <input type="email" name="email" required placeholder="Enter your email" aria-label="Email" autoComplete="email" />
-            <button type="submit" disabled={state === "sending"}>Join</button>
-          </form>
-        )}
-        {state === "error" ? <p className="landing-error" role="alert">Something went wrong. Try again.</p> : null}
+        <div className="landing-copy">
+          <h1>Intelligence<br />that evolves</h1>
+          <p>We are building the first, biologically-plausible intelligence that learns continuously through experience, adapting locally as it operates.</p>
+          <a className="landing-research" href="/research">Read our research →</a>
+        </div>
+        <div className="landing-signup">
+          {state === "done" ? (
+            <p className="landing-thanks" role="status">You’re on the list.</p>
+          ) : (
+            <>
+              <label className="landing-label" htmlFor="landing-email">Subscribe for updates</label>
+              <form className="landing-form" onSubmit={join} ref={glass}>
+                <input id="landing-email" type="email" name="email" required placeholder="Enter your email" autoComplete="email" />
+                <button type="submit" disabled={state === "sending"} aria-label="Subscribe">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M12 19V5M5.5 11.5 12 5l6.5 6.5" />
+                  </svg>
+                </button>
+              </form>
+            </>
+          )}
+          {state === "error" ? <p className="landing-error" role="alert">Something went wrong. Try again.</p> : null}
+        </div>
       </div>
     </main>
   );

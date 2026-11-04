@@ -382,17 +382,21 @@ main { background: var(--paper); }
 .landing { position: relative; min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: clip; color: #fff; text-align: center;
   background: radial-gradient(60% 50% at 70% 85%, #a8320c, transparent 70%), radial-gradient(80% 60% at 30% 20%, #ffb36b, transparent 70%), #ff9a52; }
 .landing-bg { position: absolute; inset: 0; z-index: 0; }
-.landing-content { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 32px; width: 100%; max-width: 1200px; padding: 10vh 20px 48px; }
+.landing-content { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 56px; width: 100%; max-width: 1200px; padding: 10vh 20px 48px; }
+/* Three blocks: logo, copy (title, pitch, research link), signup. Tight inside each, roomy between. */
+.landing-copy { display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; }
+.landing-signup { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.landing-label { font-size: 13px; line-height: 1; color: #ffffffb3; }
 .landing h1 { margin: 0; max-width: 520px; font-size: 3rem; line-height: 1; letter-spacing: -0.05em; font-weight: 400; }
-.landing-content > p { margin: 0 0 16px; max-width: 30%; font-size: 1rem; line-height: 1.2; }
+.landing-copy p { margin: 0; max-width: 30%; font-size: 1rem; line-height: 1.2; }
 .landing-form { position: relative; display: flex; width: 300px; border: 1px solid #ffffff4d; border-radius: 1000px; overflow: clip;
   background: radial-gradient(63% 50% at 50% -12.1%, #fff 0%, #ffffffa6 26%, #fff0 100%); -webkit-backdrop-filter: blur(100px); backdrop-filter: blur(100px); mix-blend-mode: color-dodge;
   box-shadow: 0 .6px 1.1px -.6px #ffffff17, 0 2.3px 4.1px -1.2px #ffffff1a, 0 10px 18px -1.75px #ffffff29, inset 0 -2px 11px #ffffffba; }
 .landing-form input, .landing-form button { appearance: none; border: 0; outline: none; background: none; font: inherit; font-size: 16px; line-height: 1; padding: 15px; }
 .landing-form input { flex: 1; min-width: 0; padding-left: 22px; color: var(--cream); }
 .landing-form input::placeholder { color: #fff; }
-.landing-form button { position: relative; font-weight: 600; color: var(--accent); cursor: pointer; }
-.landing-form button::before { content: ""; position: absolute; z-index: -1; inset: 4px 5px 5px auto; width: 52px; border-radius: 150px; background: #fff; opacity: .8; box-shadow: inset 0 1px 2px #fff; }
+.landing-form button { position: relative; display: grid; place-items: center; width: 48px; padding: 0; color: var(--accent); cursor: pointer; }
+.landing-form button::before { content: ""; position: absolute; z-index: -1; inset: 5px; border-radius: 50%; background: #fff; opacity: .8; box-shadow: inset 0 1px 2px #fff; }
 /* Liquid glass: pill and Join motion are driven by springs in pages/home/page.tsx; CSS only draws the glint. */
 .landing-form::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: var(--glint, 0);
   background: radial-gradient(160px 80px at var(--mx, 50%) var(--my, 50%), #ffffff38, #fff0 70%); }
@@ -401,11 +405,11 @@ main { background: var(--paper); }
 .landing-thanks, .landing-error { margin: 0; font-size: 1rem; }
 .landing-research { font-size: 14px; color: #fffc; text-decoration: none; }
 .landing-research:hover { color: #fff; }
-@media (max-width: 809.98px) { .landing-content > p { max-width: 80%; } }
+@media (max-width: 809.98px) { .landing-copy p { max-width: 80%; } }
 
 /* Logo: three discs, sized, posed and animated per frame by riseDiscs() in pages/home/page.tsx.
    Each disc is centered on the bottom spot; JS moves it in 3D (perspective below) to its resting place. */
-.landing-logo { display: grid; justify-items: center; margin-bottom: 8vh; }
+.landing-logo { display: grid; justify-items: center; margin-bottom: 2vh; }
 .landing-discs { position: relative; width: 88px; height: 82px; perspective: 600px; perspective-origin: 50% calc(100% - 11px); }
 .landing-discs span { position: absolute; left: 50%; top: calc(100% - 11px); width: 22px; height: 22px; border-radius: 50%; opacity: 0; will-change: transform, opacity;
   background: radial-gradient(70% 70% at 40% 30%, #fff8ec, #ffe4c2 55%, #ffd2a1); box-shadow: inset 0 -4px 12px #f7b77a80, 0 6px 18px #c8541433; }

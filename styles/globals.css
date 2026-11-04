@@ -136,6 +136,7 @@ img, video { max-width: 100%; display: block; }
 .wide { max-width: var(--wide); margin: 44px auto; }
 .lead { font-size: 20px !important; line-height: 1.55; color: var(--ink) !important; }
 
+.article-lede { margin-bottom: 40px; color: var(--ink-2); text-wrap: pretty; }
 .tldr { max-width: var(--text); margin: 0 auto 56px; }
 .tldr h2 { margin: 0 0 10px; font-size: 14px; color: var(--muted); font-weight: 400; }
 .tldr ul { margin: 0; padding-left: 1.1em; }

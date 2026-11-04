@@ -237,7 +237,9 @@ input[type="range"]:focus-visible { outline: 2px solid var(--accent); outline-of
 /* ---------- Short posts: text on the page, no cards ---------- */
 .post { --col: 700px; position: relative; display: flex; flex-direction: column; }
 .post-head { position: relative; overflow: hidden; padding: clamp(64px, 10vw, 120px) clamp(20px, 5vw, 40px) clamp(32px, 5vw, 56px); }
-.post-head .glow { opacity: 0.28; }
+.post-head .glow { opacity: 0.28; position: fixed; inset: 0 0 auto; height: min(640px, 100vh); }
+/* the glow stays pinned under the site header as you scroll; the text scrolls over it */
+.post-rail, .post-body, .post > .article { position: relative; z-index: 1; }
 .post-head > *:not(.glow) { position: relative; z-index: 1; max-width: var(--col); margin-left: auto; margin-right: auto; }
 .post-meta { font-size: 14px; color: var(--muted); margin: 0; }
 .post-head h1 { font-size: clamp(34px, 5vw, 56px); line-height: 1.05; letter-spacing: -0.035em; font-weight: 500; margin: 0 auto 22px; text-wrap: balance; }

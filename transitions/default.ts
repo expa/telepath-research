@@ -9,7 +9,24 @@ function parts(page: HTMLElement) {
   const main = page.querySelector("main");
   if (!main?.classList.contains("post")) return { rail: [] as Element[], content: main ? [main] : [page] };
   const kids = [...main.children];
-  return { rail: kids.filter((k) => k.classList.contains("post-rail")), content: kids.filter((k) => !k.classList.contains("post-rail")) };
+  // The header's glow stays put (see glowMorph); its text slides with the rest of the content.
+  const content = kids.flatMap((k) => k.classList.contains("post-rail") ? [] : k.classList.contains("post-head") ? [...k.children].filter((c) => !c.classList.contains("glow")) : [k]);
+  return { rail: kids.filter((k) => k.classList.contains("post-rail")), content };
+}
+
+const GLOW = ["--glow-1", "--glow-2", "--glow-3"];
+
+/** Post ↔ walkthrough: one header glow that morphs its colors (orange ↔ gray) instead of two crossfading. */
+function glowMorph(from: HTMLElement, to: HTMLElement, duration: number): Animation[] {
+  const a = from.querySelector<HTMLElement>(".post-head .glow"), b = to.querySelector<HTMLElement>(".post-head .glow");
+  if (!a || !b) return [];
+  // keep the drift where it was so the blobs don't jump back to their start
+  const olds = a.getAnimations({ subtree: true });
+  b.getAnimations({ subtree: true }).forEach((an, i) => { if (olds[i]) an.currentTime = olds[i].currentTime; });
+  a.style.visibility = "hidden";
+  const was = getComputedStyle(a), now = getComputedStyle(b);
+  const frame = (cs: CSSStyleDeclaration) => Object.fromEntries(GLOW.map((p) => [p, cs.getPropertyValue(p).trim()]));
+  return [b.animate([frame(was), frame(now)], { duration, easing: "ease", fill: "both" })];
 }
 
 /** Page → page: the sidebar stays put and crossfades to the new page's details; the old content slides out left, the new slides in from the right. */
@@ -23,7 +40,7 @@ export default transition({
     // the outgoing page lies on top; its opaque background would hide the incoming content as it fades in
     const fm = from.element.querySelector("main");
     if (fm) fm.style.background = "transparent";
-    const all: Animation[] = [];
+    const all: Animation[] = glowMorph(from.element, to.element, 700 * d);
     const run = (els: Element[], x: [number, number], o: [number, number], duration: number, delay: number, easing: string) =>
       els.forEach((el) =>
         all.push(el.animate(

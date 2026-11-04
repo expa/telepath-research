@@ -320,7 +320,7 @@ main { background: var(--paper); }
 
 /* Title and summary wrap at the same em width on the index and the post, so the page transition can scale one into the other without re-wrapping. */
 .post-row h2, .post-head h1 { max-width: 12em !important; letter-spacing: -0.03em; line-height: 1.06; text-wrap: balance; }
-.post-row-dek, .post-head .post-dek { max-width: 27em !important; line-height: 1.5 !important; text-wrap: pretty; }
+.post-row-dek, .post-head .post-dek { max-width: 27em !important; line-height: 1.5 !important; text-wrap: wrap !important; }
 /* When the column is narrower than that em width, shrink the font instead of letting the column cut in, so the wrap still matches. */
 .post-row > div, .post-head { container-type: inline-size; }
 .post-row h2 { font-size: min(clamp(26px, 3vw, 36px), 100cqi / 12); }
@@ -342,7 +342,7 @@ main { background: var(--paper); }
 /* Home: one grid for the whole page. Hero title and post text share the left keyline, hero subtitle and figures the right. */
 .home.grid { --gutter: clamp(24px, 5vw, 64px); }
 .home.grid .index-hero { text-align: left; }
-.home.grid .hero-grid { max-width: calc(var(--wide) - 2 * clamp(20px, 5vw, 40px)); margin: 0 auto; display: grid; grid-template-columns: 1fr 1.1fr; gap: var(--gutter); align-items: end; }
+.home.grid .hero-grid { max-width: calc(var(--wide) - 2 * clamp(20px, 5vw, 40px)); margin: 0 auto; display: grid; grid-template-columns: 1fr 1.1fr; gap: var(--gutter); align-items: center; }
 .home.grid .index-hero h1 { margin: 0; max-width: 10ch; }
 .home.grid .index-hero p { margin: 0; max-width: 34em; }
 .home.grid .post-row { grid-template-columns: 1fr 1.1fr; gap: var(--gutter); }

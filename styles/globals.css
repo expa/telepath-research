@@ -76,7 +76,9 @@ img, video { max-width: 100%; display: block; }
 .brand svg { width: 22px; height: 22px; }
 .nav { display: flex; gap: 22px; font-size: 14px; color: var(--ink-2); }
 .nav a { text-decoration: none; transition: color 0.2s; }
-.nav a:hover { color: var(--accent); }
+.nav a:hover, .nav a[aria-current] { color: var(--accent); }
+.nav a[aria-current] { position: relative; }
+.nav a[aria-current]::after { content: ""; position: absolute; left: 50%; bottom: -8px; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: currentColor; }
 
 /* ---------- Glow (Telepath-style blurred field) ---------- */
 @property --glow-1 { syntax: "<color>"; inherits: true; initial-value: #ffb36b; }

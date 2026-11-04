@@ -7,7 +7,8 @@ import "./styles/globals.css";
 export default function App() {
   // The homepage is the company landing: full-bleed, no research chrome.
   const route = useRoute(), nav = useNavigation();
-  const landing = (nav.to ?? route).id === "home";
+  const id = (nav.to ?? route).id;
+  const landing = id === "home", research = id.startsWith("research");
   // Cmd+↑ / Cmd+↓ jump to the top / bottom of any page (smooth scroll otherwise swallows the native shortcut).
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -23,11 +24,12 @@ export default function App() {
   return (
     <>
       {landing ? null : <header className="site-header">
-        <a href="/research" className="brand" aria-label="Telepath Research">
+        <a href="/research" className="brand" aria-label="Telepath">
           <Logo />
-          Telepath Research
+          Telepath
         </a>
         <nav className="nav" aria-label="Main">
+          <a href="/research" aria-current={research ? "page" : undefined}>Research</a>
           <a href="/">Company</a>
         </nav>
       </header>}

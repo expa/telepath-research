@@ -333,7 +333,7 @@ main { background: var(--paper); }
 /* Detailed walkthroughs carry the paper's full title: smaller and wider than a post headline. */
 .post-head h1.long { font-size: clamp(30px, 4vw, 46px); max-width: 17em !important; }
 
-/* /v2: one grid for the whole page. Hero title and post text share the left keyline, hero subtitle and figures the right. */
+/* Home: one grid for the whole page. Hero title and post text share the left keyline, hero subtitle and figures the right. */
 .home.grid { --gutter: clamp(24px, 5vw, 64px); }
 .home.grid .index-hero { text-align: left; }
 .home.grid .hero-grid { max-width: calc(var(--wide) - 2 * clamp(20px, 5vw, 40px)); margin: 0 auto; display: grid; grid-template-columns: 1fr 1.1fr; gap: var(--gutter); align-items: end; }

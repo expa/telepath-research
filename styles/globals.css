@@ -237,8 +237,12 @@ input[type="range"]:focus-visible { outline: 2px solid var(--accent); outline-of
 /* ---------- Short posts: text on the page, no cards ---------- */
 .post { --col: 700px; position: relative; display: flex; flex-direction: column; }
 .post-head { position: relative; overflow: hidden; padding: clamp(64px, 10vw, 120px) clamp(20px, 5vw, 40px) clamp(32px, 5vw, 56px); }
-.post-head .glow { opacity: 0.28; position: fixed; inset: 0 0 auto; height: min(640px, 100vh); }
-/* the glow stays pinned under the site header as you scroll; the text scrolls over it */
+.post-head .glow { opacity: 0.28; }
+/* As you scroll, the glow rides up with the header until only its soft bottom edge peeks out behind the nav, then stays there. */
+@supports (animation-timeline: scroll()) {
+  .post-head .glow { --glow-h: min(640px, 100vh); --glow-peek: 160px; position: fixed; inset: 0 0 auto; height: var(--glow-h); animation: glow-tuck linear both; animation-timeline: scroll(root); animation-range: 0 calc(var(--glow-h) - var(--glow-peek)); }
+}
+@keyframes glow-tuck { to { transform: translateY(calc(var(--glow-peek) - 100%)); } }
 .post-rail, .post-body, .post > .article { position: relative; z-index: 1; }
 .post-head > *:not(.glow) { position: relative; z-index: 1; max-width: var(--col); margin-left: auto; margin-right: auto; }
 .post-meta { font-size: 14px; color: var(--muted); margin: 0; }

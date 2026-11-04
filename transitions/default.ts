@@ -21,8 +21,9 @@ function glowMorph(from: HTMLElement, to: HTMLElement, duration: number): Animat
   const a = from.querySelector<HTMLElement>(".post-head .glow"), b = to.querySelector<HTMLElement>(".post-head .glow");
   if (!a || !b) return [];
   // keep the drift where it was so the blobs don't jump back to their start
-  const olds = a.getAnimations({ subtree: true });
-  b.getAnimations({ subtree: true }).forEach((an, i) => { if (olds[i]) an.currentTime = olds[i].currentTime; });
+  const drifts = (el: HTMLElement) => el.getAnimations({ subtree: true }).filter((an) => (an as CSSAnimation).animationName === "drift");
+  const olds = drifts(a);
+  drifts(b).forEach((an, i) => { if (olds[i]) an.currentTime = olds[i].currentTime; });
   a.style.visibility = "hidden";
   const was = getComputedStyle(a), now = getComputedStyle(b);
   const frame = (cs: CSSStyleDeclaration) => Object.fromEntries(GLOW.map((p) => [p, cs.getPropertyValue(p).trim()]));

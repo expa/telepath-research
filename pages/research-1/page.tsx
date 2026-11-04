@@ -20,12 +20,12 @@ export default function Research() {
       <section className="posts" aria-label="Papers">
         {PAPERS.map((p) => (
           <article key={p.slug} className="post-row">
-            <a href={`/research/${p.slug}`} className="post-row-art" tabIndex={-1} aria-hidden="true">
+            <a href={`/research-1/${p.slug}`} className="post-row-art" tabIndex={-1} aria-hidden="true">
               <div inert>{(() => { const Art = ART[p.slug]; return <Art bare />; })()}</div>
             </a>
             <div>
               <p className="post-meta">{p.venue} {p.year}</p>
-              <Shared id={`title:${p.slug}`}><h2><a href={`/research/${p.slug}`}>{p.headline}</a></h2></Shared>
+              <Shared id={`title:${p.slug}`}><h2><a href={`/research-1/${p.slug}`}>{p.headline}</a></h2></Shared>
               <Shared id={`dek:${p.slug}`}><p className="post-row-dek">{p.dek}</p></Shared>
             </div>
           </article>

@@ -1,5 +1,6 @@
 import { Logo } from "@/components/v2/article/logo";
-import { Shared } from "modulato";
+import { Shared, useNavigation } from "modulato";
+import { useRef } from "react";
 import type { Paper } from "@/content/papers";
 import { PAPERS } from "@/content/papers";
 import { Toc } from "@/components/v2/article/toc";
@@ -10,11 +11,15 @@ type Section = { id: string; label: string };
 
 /** Shared page frame for posts and detailed walkthroughs: side rail, left-aligned header, one text column. */
 export function PaperLayout({ paper, back, title, dek, links, sections, children }: { paper: Paper; back?: React.ReactNode; title: React.ReactNode; dek?: React.ReactNode; links?: React.ReactNode; sections?: Section[]; children: React.ReactNode }) {
+  // Arriving from another research page, the logo was already on screen in this spot: show it at rest, no entrance.
+  const settled = useRef(useNavigation().from?.id.startsWith("research/") ?? false).current;
   return (
     <main className="post">
       {/* page-level, not inside the header: the header's container-type would trap the fixed glow */}
       <div className="glow" aria-hidden="true"><span /></div>
-      <a className="brand post-brand" href="/home-2" aria-label="Telepath home"><Logo /><span className="post-wordmark">Telepath</span></a>
+      {/* fixed band behind the logo: text scrolling under it blurs and fades out progressively */}
+      <div className="post-topfade" aria-hidden="true"><span /><span /><span /></div>
+      <a className={settled ? "brand post-brand is-settled" : "brand post-brand"} href="/" aria-label="Telepath home"><Logo settled={settled} /><span className="post-wordmark">Telepath</span></a>
       <aside className="post-rail">
         <div className="post-rail-inner">
           <dl className="post-details">
@@ -30,7 +35,7 @@ export function PaperLayout({ paper, back, title, dek, links, sections, children
         {title}
         {dek}
         <p className="post-links">
-          <a className="primary" href={paper.pdf} target="_blank" rel="noreferrer" data-native>Read the full paper</a>
+          <a className="primary" href={paper.pdf} target="_blank" rel="noreferrer" data-native>Full paper</a>
           {links}
           {paper.code ? <a href={paper.code} target="_blank" rel="noreferrer">Code</a> : null}
         </p>
@@ -49,11 +54,11 @@ export function Post({ paper, children }: { paper: Paper; children: React.ReactN
       paper={paper}
       title={<Shared id={`title:${paper.slug}`}><h1>{paper.headline}</h1></Shared>}
       dek={<Shared id={`dek:${paper.slug}`}><p className="post-dek">{paper.dek}</p></Shared>}
-      links={<a href={`/research-2/${paper.slug}/detailed`}>Detailed walkthrough</a>}
+      links={<a href={`/research/${paper.slug}/detailed`}>Detailed walkthrough</a>}
     >
       <article className="post-body">
         {children}
-        <PaperFoot paper={paper} other={{ href: `/research-2/${paper.slug}/detailed`, title: "Detailed walkthrough", sub: "The equations, figures and every experiment" }} next={{ href: `/research-2/${next.slug}`, title: next.headline }} />
+        <PaperFoot paper={paper} other={{ href: `/research/${paper.slug}/detailed`, title: "Detailed walkthrough", sub: "The equations, figures and every experiment" }} next={{ href: `/research/${next.slug}`, title: next.headline }} />
       </article>
     </PaperLayout>
   );

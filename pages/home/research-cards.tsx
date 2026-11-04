@@ -20,7 +20,7 @@ export function ResearchCards() {
               <div className="landing-paper-copy">
                 <p className="landing-paper-meta">{paper.venue} · {paper.year}</p>
                 <h3>
-                  <a href={`/research-2/${paper.slug}`} className="landing-paper-link">
+                  <a href={`/research/${paper.slug}`} className="landing-paper-link">
                     {paper.headline}
                   </a>
                 </h3>

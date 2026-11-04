@@ -80,7 +80,7 @@ export default function Page() {
 
       <Section id="lineage" n={7} title="From here to RQFs">
         <p>ORGaNICs set the agenda for our machine-learning work. Their recipe is the energy-based theory of cortex: a state that balances feedforward drive against an internally generated prediction, with oscillatory, complex-valued dynamics doing the bookkeeping of time.</p>
-        <p>The <a href="/research/prospective-coding/detailed">Recursive Quadrature Filter</a> is the smallest member of that family: one complex unit whose prior is a rotation, which turns out to be a diagonal state-space model you can train at scale. Our NeurIPS paper also applies its prospective-input correction to ORGaNICs themselves, as a nonlinear test bed, and the correction carries over. The <a href="/research/self-supervised-rqf/detailed">self-supervised encoder</a> then puts those filters to work on real brain recordings.</p>
+        <p>The <a href="/research-1/prospective-coding/detailed">Recursive Quadrature Filter</a> is the smallest member of that family: one complex unit whose prior is a rotation, which turns out to be a diagonal state-space model you can train at scale. Our NeurIPS paper also applies its prospective-input correction to ORGaNICs themselves, as a nonlinear test bed, and the correction carries over. The <a href="/research-1/self-supervised-rqf/detailed">self-supervised encoder</a> then puts those filters to work on real brain recordings.</p>
         <Callout label="The thread">Brains keep a running model of how the world is about to change. Build that model into the units, and small networks go a long way.</Callout>
       </Section>
     </Article>

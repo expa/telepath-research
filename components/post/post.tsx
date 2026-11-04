@@ -47,11 +47,11 @@ export function Post({ paper, children }: { paper: Paper; children: React.ReactN
       paper={paper}
       title={<Shared id={`title:${paper.slug}`}><h1>{paper.headline}</h1></Shared>}
       dek={<Shared id={`dek:${paper.slug}`}><p className="post-dek">{paper.dek}</p></Shared>}
-      links={<a href={`/research/${paper.slug}/detailed`}>Detailed walkthrough</a>}
+      links={<a href={`/research-1/${paper.slug}/detailed`}>Detailed walkthrough</a>}
     >
       <article className="post-body">
         {children}
-        <PaperFoot paper={paper} other={{ href: `/research/${paper.slug}/detailed`, title: "Detailed walkthrough", sub: "The equations, figures and every experiment" }} next={{ href: `/research/${next.slug}`, title: next.headline }} />
+        <PaperFoot paper={paper} other={{ href: `/research-1/${paper.slug}/detailed`, title: "Detailed walkthrough", sub: "The equations, figures and every experiment" }} next={{ href: `/research-1/${next.slug}`, title: next.headline }} />
       </article>
     </PaperLayout>
   );

@@ -13,7 +13,7 @@ const tmp = mkdtempSync(join(tmpdir(), "og-"));
 const chrome = (...args) => execFileSync(CHROME, ["--headless", "--disable-gpu", "--hide-scrollbars", ...args], { encoding: "utf8", maxBuffer: 1 << 26, stdio: ["ignore", "pipe", "ignore"] });
 
 // Let the figures animate a few seconds so the still isn't the resting first frame.
-const dom = chrome("--window-size=1400,5000", "--virtual-time-budget=3500", "--dump-dom", BASE + "/research");
+const dom = chrome("--window-size=1400,5000", "--virtual-time-budget=3500", "--dump-dom", BASE + "/research-1");
 const styles = (dom.match(/<style[^>]*>[\s\S]*?<\/style>/g) ?? []).join("\n");
 
 /** Outer markup of every `<svg class="iso-svg">`, balancing nested svgs. */
@@ -28,8 +28,8 @@ function figures(html) {
 }
 const figs = figures(dom);
 // Same order as PAPERS on the research index.
-const slugs = [...dom.matchAll(/class="post-row-art"[^>]*href="\/research\/([^"]+)"|href="\/research\/([^"]+)"[^>]*class="post-row-art"/g)].map((m) => m[1] ?? m[2]);
-const titles = [...dom.matchAll(/<h2[^>]*><a href="\/research\/[^"]+"[^>]*>([\s\S]*?)<\/a><\/h2>/g)].map((m) => m[1]);
+const slugs = [...dom.matchAll(/class="post-row-art"[^>]*href="\/research-1\/([^"]+)"|href="\/research-1\/([^"]+)"[^>]*class="post-row-art"/g)].map((m) => m[1] ?? m[2]);
+const titles = [...dom.matchAll(/<h2[^>]*><a href="\/research-1\/[^"]+"[^>]*>([\s\S]*?)<\/a><\/h2>/g)].map((m) => m[1]);
 if (figs.length !== slugs.length || titles.length !== slugs.length) throw new Error(`found ${figs.length} figures, ${slugs.length} slugs, ${titles.length} titles`);
 
 const LOGO = (size) => `<svg viewBox="0 0 24 24" width="${size}" height="${size}"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb36b"/><stop offset="1" stop-color="#ed6300"/></linearGradient></defs><ellipse cx="12" cy="5" rx="10" ry="3" fill="url(#g)"/><ellipse cx="12" cy="12" rx="5.6" ry="2.4" fill="url(#g)"/><circle cx="12" cy="18.6" r="2.4" fill="url(#g)"/></svg>`;

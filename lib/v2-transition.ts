@@ -9,8 +9,8 @@ function parts(page: HTMLElement) {
   const main = page.querySelector("main");
   if (!main?.classList.contains("post")) return { rail: [] as Element[], content: main ? [main] : [page] };
   const kids = [...main.children];
-  // The glow stays put (see glowMorph); everything else slides.
-  const content = kids.filter((k) => !k.classList.contains("post-rail") && !k.classList.contains("glow"));
+  // The glow stays put (see glowMorph) and so do the fixed logo and the fade behind it, which every post page shares; everything else slides.
+  const content = kids.filter((k) => !k.classList.contains("post-rail") && !k.classList.contains("glow") && !k.classList.contains("post-brand") && !k.classList.contains("post-topfade"));
   return { rail: kids.filter((k) => k.classList.contains("post-rail")), content };
 }
 
@@ -36,8 +36,8 @@ export default transition({
     const { from, to } = context;
     const d = matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 1;
     // Each page keeps its own logo; the homepage lockup travels with its content.
-    const goingHome = to.route.id === "home-2";
-    if (goingHome || from.route.id === "home-2") {
+    const goingHome = to.route.id === "home";
+    if (goingHome || from.route.id === "home") {
       const direction = goingHome ? -1 : 1;
       const center = (page: HTMLElement) => page.querySelectorAll(
         ".landing-logo, .landing-copy, .landing-papers, .post-rail, .post-head, .post-body, .post > .article",
@@ -70,7 +70,7 @@ export default transition({
     const a = parts(from.element), b = parts(to.element);
     // Leaving a detailed walkthrough for a lighter page reads as going back: slide the other way.
     const detailed = (id: string) => id.endsWith("/detailed");
-    const dir = (to.route.id === "home-2" || (detailed(from.route.id) && !detailed(to.route.id))) ? -1 : 1;
+    const dir = (to.route.id === "home" || (detailed(from.route.id) && !detailed(to.route.id))) ? -1 : 1;
     // the outgoing page lies on top; its opaque background would hide the incoming content as it fades in
     const fm = from.element.querySelector("main");
     if (fm) fm.style.background = "transparent";

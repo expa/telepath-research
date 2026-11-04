@@ -108,7 +108,7 @@ export default function Home() {
       <div className="landing-bg" ref={bg} aria-hidden="true" />
       <div className="landing-content">
         <div className="landing-logo" aria-label="Telepath" role="img">
-          <span /><span /><span />
+          <div className="landing-discs"><span /><span /><span /></div>
           <b aria-hidden="true">Telepath</b>
         </div>
         <h1>Intelligence<br />that evolves</h1>

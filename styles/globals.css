@@ -381,7 +381,9 @@ main { background: var(--paper); }
 /* ---------- Landing (copy of telepath.com) ---------- */
 .landing { position: relative; min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: clip; color: #fff; text-align: center;
   background: #fb975f; } /* the scene's average color, so its fade-in is gentle */
-.landing-bg { position: absolute; inset: 0; z-index: 0; opacity: 0; transition: opacity 1.4s ease; }
+.landing-bg { position: absolute; inset: 0; z-index: 0; opacity: 0; transition: opacity 3s ease; }
+/* Same orange behind the page while it's hidden for fonts, so the first paint is never the cream body. */
+html:has(.landing), html:has(.landing) body { background: #fb975f; }
 .landing-bg.is-ready { opacity: 1; }
 /* Intro: logo parked at screen center (--to-center, set in JS) slides up into place on .revealed,
    then the copy un-blurs in line by line, then the signup rises in. */

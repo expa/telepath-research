@@ -179,7 +179,9 @@ export default function Home() {
       .then((s) => {
         if (gone) return s.destroy();
         scene = s;
-        bg.current?.classList.add("is-ready"); // fade the scene in over the base orange
+        // The scene has its own 1s entrance (its nebula fades in over a paler gradient). Keep the canvas hidden
+        // until that's done so only finished colors fade in over the base orange; otherwise it reads as a flash.
+        setTimeout(() => bg.current?.classList.add("is-ready"), 1000);
       })
       .catch(() => {}); // the CSS gradient underneath stands in
     return () => { gone = true; scene?.destroy(); };

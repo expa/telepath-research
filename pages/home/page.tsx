@@ -73,7 +73,7 @@ function riseDiscs(root: HTMLDivElement | null) {
 function liquidGlass(el: HTMLFormElement | null) {
   if (!el || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   // ponytail: one shared stiffness/damping; per-property tuning if some motion feels off.
-  const K = 260, C = 26; // gently underdamped: a soft settle, no snap
+  const K = 600, C = 40; // damping ratio ~0.8: quick to respond, soft settle, no snap
   const keys = ["s", "sx", "sy", "dx", "dy", "mx", "my", "glint", "b"] as const;
   type Key = (typeof keys)[number];
   const rest: Record<Key, number> = { s: 1, sx: 1, sy: 1, dx: 0, dy: 0, mx: 50, my: 50, glint: 0, b: 1 };

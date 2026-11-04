@@ -602,6 +602,12 @@ main { background: var(--paper); }
 
 /* Preserve the established wordmark while the interface uses Geist. */
 .landing-logo b, .brand, .post-wordmark { font-family: "Instrument Sans", sans-serif; }
+
+/* Touch screens: the signup starts off-screen and slides up once the page is scrolled; thin darker border so it reads on the light page. */
+.landing.signup-on-scroll.revealed .landing-signup { transition-delay: 0s; }
+.landing.signup-on-scroll:not(.signup-shown) .landing-signup { opacity: 0; visibility: hidden; transform: translateY(calc(100% + 24px)); }
+@media (hover: none) { .landing-form.is-open { border-color: rgb(49 37 30 / .2); } }
 }
 .experience-v2 { display: contents; }
 html:has(.experience-v2), html:has(.experience-v2) body { background: #faf9f6; }
+

@@ -119,6 +119,15 @@ function Home() {
   // Touch screens can't hover to open the signup, so there it stays open.
   const [noHover, setNoHover] = useState(false);
   useEffect(() => setNoHover(matchMedia("(hover: none)").matches), []);
+  // On touch screens the signup waits off-screen until the visitor starts scrolling.
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    if (!noHover || scrolled) return;
+    const onScroll = () => { if (scrollY > 40) setScrolled(true); };
+    onScroll();
+    addEventListener("scroll", onScroll, { passive: true });
+    return () => removeEventListener("scroll", onScroll);
+  }, [noHover, scrolled]);
   const signupOpen = hoverOpen || noHover;
   const openSignup = () => {
     setSignupOpen(true);
@@ -191,7 +200,7 @@ function Home() {
   }
 
   return (
-    <main id="top" className={`landing${revealed ? " revealed" : ""}${returning ? " returning" : ""}${go ? " intro-running" : ""}`}>
+    <main id="top" className={`landing${revealed ? " revealed" : ""}${returning ? " returning" : ""}${go ? " intro-running" : ""}${noHover ? " signup-on-scroll" : ""}${scrolled ? " signup-shown" : ""}`}>
       <section className="landing-hero" aria-labelledby="landing-title">
         <div className="landing-atmosphere" aria-hidden="true">
           <div className="landing-bg" ref={bg} />

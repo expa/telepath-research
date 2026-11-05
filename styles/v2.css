@@ -270,7 +270,8 @@ input[type="range"]:focus-visible { outline: 2px solid var(--accent); outline-of
 .post-foot a { text-decoration: none; color: var(--ink); }
 .post-foot b { font-weight: 500; }
 .post-foot b span, .post-foot b i { display: inline-block; font-style: normal; color: var(--muted); transition: transform 0.2s var(--ease), color 0.2s; }
-.post-foot a:hover b span, .post-foot a:hover b i { color: var(--accent); transform: translateX(3px); }
+.post-foot a:hover b span, .post-foot a:hover b i { color: var(--accent); }
+@media (hover: hover) and (pointer: fine) { .post-foot a:hover b span, .post-foot a:hover b i { transform: translateX(3px); } }
 .post-deeper { display: grid; grid-template-columns: 1fr 1fr; gap: 0 32px; }
 .post-deeper a { display: grid; align-content: start; gap: 4px; padding: 20px 0 22px; border-top: 1px solid var(--rule); }
 .post-deeper b { font-size: 18px; }
@@ -346,7 +347,7 @@ main { background: var(--paper); }
 .post-head > *:not(.glow) { margin-left: max(0px, calc((100% - var(--col)) / 2)); margin-right: auto; }
 
 /* Post header actions: plain pill buttons. */
-.post-links a { display: inline-flex; align-items: center; height: 36px; padding: 0 16px; border-radius: 99px; font-size: 14px; font-weight: 500; color: var(--ink); text-decoration: none; box-shadow: inset 0 0 0 1px var(--rule); background: color-mix(in srgb, var(--paper) 70%, transparent); transition: background 0.15s, box-shadow 0.15s; }
+.post-links a { display: inline-flex; align-items: center; height: 36px; padding: 0 16px; border-radius: 99px; font-size: 14px; font-weight: 500; color: var(--ink); text-decoration: none; box-shadow: inset 0 0 0 1px var(--rule); background: color-mix(in srgb, var(--paper) 70%, transparent); transition: background 0.15s, box-shadow 0.15s, transform 160ms cubic-bezier(0.23, 1, 0.32, 1); }
 .post-links a:hover { box-shadow: inset 0 0 0 1px #e0cbb8; background: var(--paper); }
 .post-links a.primary { background: var(--ink); color: var(--paper); box-shadow: none; }
 .post-links a.primary:hover { background: #3a2c24; }
@@ -379,7 +380,7 @@ main { background: var(--paper); }
 .post-back { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 28px !important; font-size: 15px; color: var(--ink-2); text-decoration: none; transition: color 0.15s; }
 .post-back span { display: inline-block; transition: transform 0.2s var(--ease); }
 .post-back:hover { color: var(--ink); }
-.post-back:hover span { transform: translateX(-3px); }
+@media (hover: hover) and (pointer: fine) { .post-back:hover span { transform: translateX(-3px); } }
 
 /* Detailed walkthrough: darker gray glow so it reads apart from the blog post (page transition morphs the colors) */
 .post:has(.article) > .glow { --glow-1: #6b6b6b; --glow-2: #4a4a4a; --glow-3: #2a2a2a; }
@@ -594,6 +595,12 @@ main { background: var(--paper); }
 
 /* Hover opens a light glass field above a soft, local backdrop. */
 .landing-form { transition: width 460ms cubic-bezier(.22, 1.15, .36, 1), height 460ms cubic-bezier(.22, 1.15, .36, 1), background-color 460ms ease, box-shadow 460ms ease, backdrop-filter 460ms ease, -webkit-backdrop-filter 460ms ease, outline-color 220ms ease; }
+/* Open/close on a spring (duration 0.45s, bounce 0.3, sampled into linear()): a quick swell, a soft overshoot, a settle.
+   Browsers without linear() drop these and keep the cubic-bezier above. */
+.landing-form { transition: width 650ms linear(0, 0.017, 0.061, 0.124, 0.2, 0.284, 0.371, 0.458, 0.542, 0.62, 0.692, 0.758, 0.815, 0.865, 0.908, 0.943, 0.972, 0.995, 1.013, 1.026, 1.036, 1.042, 1.045, 1.046, 1.045, 1.043, 1.041, 1.037, 1.033, 1.029, 1.025, 1.021, 1.018, 1.014, 1.011, 1.009, 1.006, 1.004, 1.003, 1.001, 1, 0.999, 0.999, 0.998, 0.998, 0.998, 0.998, 0.998, 1), height 650ms linear(0, 0.017, 0.061, 0.124, 0.2, 0.284, 0.371, 0.458, 0.542, 0.62, 0.692, 0.758, 0.815, 0.865, 0.908, 0.943, 0.972, 0.995, 1.013, 1.026, 1.036, 1.042, 1.045, 1.046, 1.045, 1.043, 1.041, 1.037, 1.033, 1.029, 1.025, 1.021, 1.018, 1.014, 1.011, 1.009, 1.006, 1.004, 1.003, 1.001, 1, 0.999, 0.999, 0.998, 0.998, 0.998, 0.998, 0.998, 1), background-color 460ms ease, box-shadow 460ms ease, backdrop-filter 460ms ease, -webkit-backdrop-filter 460ms ease, outline-color 220ms ease; }
+.landing-form button[type="submit"] { transition: right 650ms linear(0, 0.017, 0.061, 0.124, 0.2, 0.284, 0.371, 0.458, 0.542, 0.62, 0.692, 0.758, 0.815, 0.865, 0.908, 0.943, 0.972, 0.995, 1.013, 1.026, 1.036, 1.042, 1.045, 1.046, 1.045, 1.043, 1.041, 1.037, 1.033, 1.029, 1.025, 1.021, 1.018, 1.014, 1.011, 1.009, 1.006, 1.004, 1.003, 1.001, 1, 0.999, 0.999, 0.998, 0.998, 0.998, 0.998, 0.998, 1); }
+.landing-form button[type="submit"]::before { transition: transform 650ms linear(0, 0.017, 0.061, 0.124, 0.2, 0.284, 0.371, 0.458, 0.542, 0.62, 0.692, 0.758, 0.815, 0.865, 0.908, 0.943, 0.972, 0.995, 1.013, 1.026, 1.036, 1.042, 1.045, 1.046, 1.045, 1.043, 1.041, 1.037, 1.033, 1.029, 1.025, 1.021, 1.018, 1.014, 1.011, 1.009, 1.006, 1.004, 1.003, 1.001, 1, 0.999, 0.999, 0.998, 0.998, 0.998, 0.998, 0.998, 1); }
+@media (prefers-reduced-motion: reduce) { .landing-form button[type="submit"], .landing-form button[type="submit"]::before { transition: none; } }
 .landing-form.is-open { background: #fff9; border-color: #ffffffa0; box-shadow: inset 0 -2px 11px #ffffff70, 0 4px 16px rgb(49 37 30 / .08), 0 1px 3px rgb(49 37 30 / .06); }
 .landing-form.is-open:focus-within { box-shadow: inset 0 -2px 11px #ffffff70, 0 4px 16px rgb(49 37 30 / .08), 0 1px 3px rgb(49 37 30 / .06), 0 0 32px 2px #ff792e26, 0 0 72px 12px #ff792e14; }
 .landing-form.is-open input, .landing-form.is-open .landing-placeholder { color: #31251e; }

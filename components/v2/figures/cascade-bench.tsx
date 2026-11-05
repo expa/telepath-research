@@ -134,16 +134,19 @@ export function CascadeBenchFigure({ bare = false, speed = 1, amplitude = 1 }: {
 
   useEffect(() => {
     const svg = anchor.current!;
-    const io = new IntersectionObserver(([e]) => (live.current.visible = e.isIntersecting));
+    const io = new IntersectionObserver(([e]) => {
+      live.current.visible = e.isIntersecting;
+      if (e.isIntersecting && !raf) { last = 0; raf = requestAnimationFrame(tick); } // resume; the loop stops itself off-screen
+    });
     io.observe(svg);
     const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const L = live.current;
     // settle into steady state before the first frame
     for (let i = 0; i < 1500; i++) { L.t += H; cascadeStep(L.ys, L.prev, Math.sin(2 * Math.PI * HZ * L.t), H, TAU, L.pros); }
-    let raf = 0, last = 0;
+    let raf = 0, last = 0, rodWas = "";
     const tick = (now: number) => {
+      if (!L.visible && last) { raf = 0; return; }
       raf = requestAnimationFrame(tick);
-      if (!L.visible && last) return;
       const dt = (last ? Math.min(0.05, (now - last) / 1000) : 0) * speed;
       last = now;
       const n = still ? 0 : Math.round((dt * SLOW) / H);
@@ -152,7 +155,8 @@ export function CascadeBenchFigure({ bare = false, speed = 1, amplitude = 1 }: {
       const move = (g: SVGGElement | null, v: number) => g?.setAttribute("transform", k.translateAlong(P, [AMP * v * amplitude, 0, 0]));
       move(cars.current[0], input);
       for (let l = 0; l < LAYERS; l++) { move(cars.current[l + 1], L.ys[l]); move(ghosts.current[l + 1], input); }
-      if (rod.current) rod.current.innerHTML = pushrod(X0 + AMP * input * amplitude);
+      const rd = pushrod(X0 + AMP * input * amplitude);
+      if (rod.current && rd !== rodWas) { rod.current.innerHTML = rd; rodWas = rd; }
     };
     raf = requestAnimationFrame(tick);
     return () => { cancelAnimationFrame(raf); io.disconnect(); };

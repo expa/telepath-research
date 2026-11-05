@@ -88,7 +88,7 @@ img, video { max-width: 100%; display: block; }
 @property --glow-3 { syntax: "<color>"; inherits: true; initial-value: #c8361a; }
 .glow { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
 .glow::before, .glow::after, .glow span {
-  content: ""; position: absolute; border-radius: 50%; filter: blur(70px); opacity: 0.85;
+  content: ""; position: absolute; border-radius: 50%; opacity: 0.85;
   animation: drift 22s var(--ease) infinite alternate;
 }
 .glow::before { width: 60vmax; height: 46vmax; left: -12vmax; top: -18vmax; background: radial-gradient(closest-side, var(--glow-1), transparent); }

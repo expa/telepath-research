@@ -432,7 +432,7 @@ main { background: var(--paper); }
 .landing-form button:disabled { opacity: .6; cursor: progress; }
 .landing-thanks, .landing-error { margin: 0; padding: 14px 24px; border-radius: 100px; background: #fffcf4f5; color: var(--ink); box-shadow: 0 8px 30px #4a2b1624; font-size: 14px; pointer-events: auto; }
 .landing-error { color: #9a320e; }
-.landing-research { display: inline-flex; align-items: center; gap: 10px; padding-block: 12px; font-size: 14px; line-height: 1.2; font-weight: 500; color: #fff; text-decoration: none; }
+.landing-research { display: inline-flex; align-items: center; gap: 10px; padding-block: 12px; font-size: 15px; background: linear-gradient(currentColor, currentColor) 0 calc(100% - 8px) / 0 1px no-repeat; line-height: 1.2; font-weight: 500; color: #fff; text-decoration: none; }
 .landing-research:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; border-radius: 8px; }
 
 .landing-papers { position: relative; z-index: 1; width: min(100% - 64px, 1000px); margin: 0 auto; scroll-margin-block-start: 40px; }
@@ -443,7 +443,7 @@ main { background: var(--paper); }
 .landing-paper { position: relative; isolation: isolate; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 24px; align-items: center; padding: 44px; border: 1px solid transparent; border-radius: 28px; background: #fff;
   box-shadow: 0 0 0 1px #30201208, 0 4px 8px #30201202, 0 18px 48px -24px #30201226; }
 .landing-paper-copy { min-width: 0; }
-.landing-paper-meta { margin: 0 0 20px; font-size: 11px; line-height: 1.6; font-family: var(--font-sans), sans-serif; color: #76685d; }
+.landing-paper-meta { margin: 0 0 20px; font-size: 12px; text-wrap: balance; font-variant-numeric: tabular-nums; line-height: 1.6; font-family: var(--font-sans), sans-serif; color: #76685d; }
 .landing-paper h3 { margin: 0; max-width: 15ch; font-size: clamp(26px, 2.6vw, 34px); line-height: 1.13; font-weight: 500; letter-spacing: -0.04em; text-wrap: balance; }
 .landing-paper-link { text-decoration: none; }
 .landing-paper-link::after { content: ""; position: absolute; z-index: 2; inset: 0; border-radius: 28px; }
@@ -461,14 +461,17 @@ main { background: var(--paper); }
 .landing-footer { display: flex; justify-content: space-between; gap: 20px; width: min(100% - 64px, 1000px); margin: 40px auto 0; padding-block: 12px 144px; font-size: 12px; color: #75695f; }
 .landing-footer a { text-decoration: none; }
 @media (hover: hover) {
-  .landing-research:hover { text-decoration: underline; text-underline-offset: 4px; }
+  .landing-research:hover { background-size: 100% 1px; }
+  .landing-paper:hover { transform: translateY(-2px); box-shadow: 0 0 0 1px #3020120d, 0 6px 12px #30201205, 0 24px 56px -24px #30201233; }
+  .landing-paper:hover .landing-paper-action > span { translate: 2px 0; }
   .landing-paper:hover .landing-paper-action { color: #ff792e; }
   .landing-paper:hover .landing-paper-action > span { background: #ff792e26; color: #ff792e; }
   .landing-footer a:hover { color: var(--ink); }
 }
 @media (prefers-reduced-motion: no-preference) {
-  .landing-paper { transition: box-shadow 150ms ease; }
-  .landing-paper-action, .landing-paper-action > span { transition: color 150ms ease, background-color 150ms ease; }
+  .landing-paper { transition: box-shadow 200ms ease-out, transform 200ms ease-out; }
+  .landing-paper-action, .landing-paper-action > span { transition: color 150ms ease, background-color 150ms ease, translate 200ms ease-out; }
+  .landing-research { transition: background-size 250ms ease-out; }
   .landing-form button:not(:disabled):active { scale: .96; transition: scale 150ms ease-out; }
 }
 @media (max-width: 800px) {
@@ -484,7 +487,7 @@ main { background: var(--paper); }
   .landing-paper-link::after { border-radius: 24px; }
   .landing-paper h3 { max-width: 21ch; font-size: 29px; }
   .landing-paper-dek { max-width: none; }
-  .landing-paper-visual { width: 100%; max-width: 460px; margin-inline: auto; }
+  .landing-paper-visual { order: -1; width: 100%; max-width: 460px; margin-inline: auto; }
   .landing-paper-caption { margin-block-start: 8px; }
   .landing-signup { inset-inline: 20px; bottom: 16px; }
   .landing-footer { width: calc(100% - 48px); font-size: 11px; }

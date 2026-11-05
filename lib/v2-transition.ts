@@ -1,7 +1,7 @@
 import { transition } from "modulato";
 
 const SLIDE = 48; // px
-const OUT = "cubic-bezier(0.4, 0, 1, 1)";
+const OUT = "cubic-bezier(0.23, 1, 0.32, 1)"; // strong ease-out: the exit starts moving at once instead of lagging
 const IN = "cubic-bezier(0, 0, 0.2, 1)";
 
 /** Rail and content of a page; pages without the post frame are all content. */
@@ -34,7 +34,8 @@ function glowMorph(from: HTMLElement, to: HTMLElement, duration: number): Animat
 export default transition({
   async run(context) {
     const { from, to } = context;
-    const d = matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 1;
+    // Reduced motion keeps the crossfades and drops the movement.
+    const m = matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 1;
     // Each page keeps its own logo; the homepage lockup travels with its content.
     const goingHome = to.route.id === "home";
     if (goingHome || from.route.id === "home") {
@@ -44,17 +45,17 @@ export default transition({
       );
       const shifts: Animation[] = [];
       for (const el of center(from.element)) shifts.push(el.animate([
-        { transform: "translateY(0)" }, { transform: `translateY(${-32 * direction}px)` },
-      ], { duration: 650 * d, easing: "cubic-bezier(.22, 1, .36, 1)", fill: "both" }));
+        { transform: "translateY(0)" }, { transform: `translateY(${-32 * direction * m}px)` },
+      ], { duration: 650, easing: "cubic-bezier(.22, 1, .36, 1)", fill: "both" }));
       for (const el of center(to.element)) shifts.push(el.animate([
-        { transform: `translateY(${32 * direction}px)` }, { transform: "translateY(0)" },
-      ], { duration: 750 * d, delay: 80 * d, easing: "cubic-bezier(.22, 1, .36, 1)", fill: "both" }));
+        { transform: `translateY(${32 * direction * m}px)` }, { transform: "translateY(0)" },
+      ], { duration: 750, delay: 80, easing: "cubic-bezier(.22, 1, .36, 1)", fill: "both" }));
       const incoming = to.element.querySelector("main") ?? to.element;
       const outgoing = from.element.animate([{ opacity: 1 }, { opacity: 0 }], {
-        duration: 500 * d, easing: "ease-out", fill: "forwards",
+        duration: 500, easing: "ease-out", fill: "forwards",
       });
       const reveal = incoming.animate([{ opacity: 0 }, { opacity: 1 }], {
-        duration: 650 * d, delay: 80 * d, easing: "ease-out", fill: "both",
+        duration: 650, delay: 80, easing: "ease-out", fill: "both",
       });
       try {
         await Promise.all([outgoing.finished, reveal.finished, ...shifts.map(a => a.finished)]);
@@ -74,12 +75,12 @@ export default transition({
     // the outgoing page lies on top; its opaque background would hide the incoming content as it fades in
     const fm = from.element.querySelector("main");
     if (fm) fm.style.background = "transparent";
-    const all: Animation[] = glowMorph(from.element, to.element, 700 * d);
+    const all: Animation[] = glowMorph(from.element, to.element, 700);
     const run = (els: Element[], x: [number, number], o: [number, number], duration: number, delay: number, easing: string) =>
       els.forEach((el) =>
         all.push(el.animate(
-          [{ opacity: o[0], transform: `translateX(${x[0]}px)` }, { opacity: o[1], transform: `translateX(${x[1]}px)` }],
-          { duration: duration * d, delay: delay * d, easing, fill: "both" },
+          [{ opacity: o[0], transform: `translateX(${x[0] * m}px)` }, { opacity: o[1], transform: `translateX(${x[1] * m}px)` }],
+          { duration, delay, easing, fill: "both" },
         )),
       );
     run(a.rail, [0, 0], [1, 0], 360, 120, "ease");

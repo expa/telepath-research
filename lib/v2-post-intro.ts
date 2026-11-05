@@ -7,7 +7,6 @@ import { intro } from "modulato";
  */
 export default intro({
   async run({ element }) {
-    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const vh = innerHeight, picked: Element[] = [];
     const visit = (el: Element) => {
       const r = el.getBoundingClientRect();

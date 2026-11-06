@@ -184,7 +184,11 @@ function Home() {
           </div>
           <div className="landing-copy">
             <h1 id="landing-title">Pioneering biologically plausible intelligence that learns continuously through experience, adapting locally as it operates.</h1>
-            <a className="landing-research" href="#research">Our Research <span aria-hidden="true">↓</span></a>
+            <a className="landing-research" href="#research" onClick={e => {
+              e.preventDefault();
+              const smooth = !matchMedia("(prefers-reduced-motion: reduce)").matches;
+              document.getElementById("research")?.scrollIntoView({ behavior: smooth ? "smooth" : "auto" });
+            }}>Our Research <span aria-hidden="true">↓</span></a>
           </div>
         </div>
       </section>

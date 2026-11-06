@@ -34,7 +34,7 @@ export default function Page() {
         <p>Machine learning met the same problem in recurrent networks and solved it with gates. The LSTM decides at every step what to let in and what to forget. ORGaNICs ask what a gated recurrent circuit looks like when it is built from neurons, and what it explains.</p>
       </Section>
 
-      <Fig caption="Each piston is a neuron tuned to one direction; its height is the response y. A target flashes, the bump it leaves is held, slides round the ring while the eyes move, then is cleared. Click the platter to set your own target.">
+      <Fig caption="Each piston is a neuron tuned to one direction; its height is the response y. A target flashes, the bump it leaves is held, slides round the ring while the eyes move, then is cleared. Use the slider to flash a target at your own direction.">
         <OrganicsCarouselFigure bare />
       </Fig>
 

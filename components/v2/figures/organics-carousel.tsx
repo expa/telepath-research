@@ -6,6 +6,7 @@ import { Plate } from "@/components/iso/react/draw";
 import { useReadout } from "@/components/iso/react/live";
 import { N, PHASES, decode, driveOf, makeRing, responses, step, type Phase } from "@/lib/organics";
 import { basePlate, labelPlate } from "@/components/figures/parts";
+import { Range, useRange } from "@/components/widgets/slider";
 
 const WIDTH = 620, HEIGHT = 420;
 const BASE: Plan = { x: -140, y: -140, w: 280, d: 280, r: 14 };
@@ -117,6 +118,7 @@ const readoutOf = (word: string, angle: number | null) => `${word} · ${angle ==
 
 export function OrganicsCarouselFigure({ bare = false, speed = 1, amplitude = 1 }: { bare?: boolean; speed?: number; amplitude?: number } = {}) {
   const { anchor, say } = useReadout<SVGSVGElement>();
+  const range = useRange();
   const pistons = useRef<(SVGGElement | null)[]>([]);
   const needle = useRef<SVGGElement>(null);
   const arm = useRef<SVGGElement>(null);
@@ -164,6 +166,8 @@ export function OrganicsCarouselFigure({ bare = false, speed = 1, amplitude = 1 
         }
       }
       litWas = best;
+      const deg = Math.round((L.target * 180) / Math.PI) % 360;
+      range.show(deg, `${deg}°`);
       const nd = needles(L.ring.mods), am = pointerArm(L.target, L.flash);
       if (needle.current && nd !== needleWas) { needle.current.innerHTML = nd; needleWas = nd; }
       if (arm.current && am !== armWas) { arm.current.innerHTML = am; armWas = am; }
@@ -173,18 +177,10 @@ export function OrganicsCarouselFigure({ bare = false, speed = 1, amplitude = 1 
     return () => { cancelAnimationFrame(raf); io.disconnect(); };
   }, [anchor, say, speed, amplitude]);
 
-  const pick = (e: React.PointerEvent<SVGSVGElement>) => {
-    const svg = anchor.current!;
-    const r = svg.getBoundingClientRect();
-    const sx = ((e.clientX - r.left) / r.width) * WIDTH, sy = ((e.clientY - r.top) / r.height) * HEIGHT;
-    // invert the projection on the platter plane
-    const o = at([0, 0, TOP]), ex = k.axisVector(P, [1, 0, 0]), ey = k.axisVector(P, [0, 1, 0]);
-    const det = ex[0] * ey[1] - ex[1] * ey[0];
-    const dx = sx - o[0], dy = sy - o[1];
-    const wx = (dx * ey[1] - dy * ey[0]) / det, wy = (ex[0] * dy - ex[1] * dx) / det;
-    const th = (Math.atan2(wx, -wy) + Math.PI * 2) % (Math.PI * 2);
+  /** Flash a target at this direction (degrees) and replay the trial from the start. */
+  const flashAt = (deg: number) => {
     const L = live.current;
-    L.target = Math.round((th / (Math.PI * 2)) * N) * ((Math.PI * 2) / N);
+    L.target = (Math.round(deg / 10) * 10 * Math.PI) / 180;
     L.touched = performance.now();
     L.ix = 0;
     L.clock = 0;
@@ -197,7 +193,6 @@ export function OrganicsCarouselFigure({ bare = false, speed = 1, amplitude = 1 
       <Plate
         fig="Fig 1"
         title="A memory you can turn"
-        hint="Click a direction on the platter to flash a target"
         readout={readoutOf("present", null)}
         keys={bare ? [] : [
           { mark: "raised", label: "36 neurons, one per 10° of direction" },
@@ -207,7 +202,7 @@ export function OrganicsCarouselFigure({ bare = false, speed = 1, amplitude = 1 
         caption={bare ? undefined : "Each piston is one neuron of an ORGaNICs circuit; its height is the neuron’s response y. The three dials on the hub are the modulators: b opens the input, a turns the recurrent drive down (reset), and the third gates derivative-shaped recurrent weights. A target flashes, the bump of activity it leaves is held with no input at all, then slides round the ring while the shift dial is up, and is wiped when a rises. The heights come from the circuit’s equation, at half speed."}
       >
         <div className="iso-stage">
-          <svg ref={anchor} className="iso-svg" viewBox={`0 0 ${WIDTH} ${HEIGHT}`} role="img" aria-label="An isometric turntable with 36 pistons on a ring and three dials on a central hub. Piston heights show a bump of neural activity that is held, moved and cleared." onPointerDown={pick} style={{ cursor: "crosshair" }}>
+          <svg ref={anchor} className="iso-svg" viewBox={`0 0 ${WIDTH} ${HEIGHT}`} role="img" aria-label="An isometric turntable with 36 pistons on a ring and three dials on a central hub. Piston heights show a bump of neural activity that is held, moved and cleared.">
             <g suppressHydrationWarning dangerouslySetInnerHTML={{ __html: STATIC }} />
             <g ref={arm} />
             {BEHIND.map((j) => <Unit key={j} j={j} refs={pistons} />)}
@@ -215,6 +210,9 @@ export function OrganicsCarouselFigure({ bare = false, speed = 1, amplitude = 1 
             <g ref={needle} />
             {INFRONT.map((j) => <Unit key={j} j={j} refs={pistons} />)}
           </svg>
+          <div className="controls">
+            <Range range={range} label="Target direction" min={0} max={350} step={10} initial={54} text="54°" onInput={flashAt} />
+          </div>
         </div>
       </Plate>
     </div>

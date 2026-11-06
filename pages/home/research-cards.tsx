@@ -1,11 +1,15 @@
 import { CascadeBenchFigure } from "@/components/v2/figures/cascade-bench";
 import { ReedBankFigure } from "@/components/v2/figures/reed-bank";
 import { OrganicsCarouselFigure } from "@/components/v2/figures/organics-carousel";
+import { GovernorFigure } from "@/components/v2/figures/governor";
+import { DamperRigFigure } from "@/components/v2/figures/damper-rig";
 import { PAPERS } from "@/content/papers";
 
 const ART = {
   "prospective-coding": CascadeBenchFigure,
   "self-supervised-rqf": ReedBankFigure,
+  "long-timescales": GovernorFigure,
+  "unconditional-stability": DamperRigFigure,
   organics: OrganicsCarouselFigure,
 };
 

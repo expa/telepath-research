@@ -6,7 +6,7 @@ const list = (names: string[]) => (names.length < 2 ? names.join("") : `${names.
 
 export const bibtexOf = (p: Paper) => {
   const key = `${p.authors[0].split(" ").pop()!.toLowerCase()}${p.year}${p.short.split(/\W/)[0].toLowerCase()}`;
-  const [kind, field] = p.venueKind === "Journal" ? ["article", "journal"] : ["inproceedings", "booktitle"];
+  const [kind, field] = p.venueKind === "Journal" ? ["article", "journal"] : p.venueKind === "Preprint" ? ["misc", "note"] : ["inproceedings", "booktitle"];
   return `@${kind}{${key},\n  title     = {${p.title}},\n  author    = {${p.authors.join(" and ")}},\n  ${field.padEnd(9)} = {${p.citeVenue}},\n  year      = {${p.year}}\n}`;
 };
 

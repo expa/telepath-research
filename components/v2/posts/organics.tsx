@@ -21,7 +21,7 @@ export default function Page() {
 
       <h2>Hold it, move it, clear it</h2>
       <p>
-        Below, each piston is a neuron that prefers one direction. A target flashes and leaves a bump of activity. The input switches off, and the bump stays: the memory is held. Then, while the eyes move, the bump slides around the ring to stay correct, and stops in its new place. Finally a gate wipes it clean. Click the platter to set your own target.
+        Below, each piston is a neuron that prefers one direction. A target flashes and leaves a bump of activity. The input switches off, and the bump stays: the memory is held. Then, while the eyes move, the bump slides around the ring to stay correct, and stops in its new place. Finally a gate wipes it clean. Use the slider to flash a target at your own direction.
       </p>
       <Fig>
         <OrganicsCarouselFigure bare />

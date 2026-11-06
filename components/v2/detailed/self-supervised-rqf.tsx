@@ -35,7 +35,7 @@ export default function Page() {
         <p>We asked the opposite question. If an encoder’s dynamics already match the statistics of the signal, if every unit is a tuned oscillator, how small can it be and still compete, without scale and without masking?</p>
       </Section>
 
-      <Fig caption="Sixteen reeds, each tuned to one frequency from 1 to 40 Hz, the way a layer of filters tiles the EEG bands. Each reed’s swing is its filter’s true gain at the input frequency. Drag across it to change the input frequency.">
+      <Fig caption="Sixteen reeds, each tuned to one frequency from 1 to 40 Hz, the way a layer of filters tiles the EEG bands. Each reed’s swing is its filter’s true gain at the input frequency. Use the slider to change the input frequency.">
         <ReedBankFigure bare />
       </Fig>
 

@@ -6,6 +6,9 @@ import { Plate } from "@/components/iso/react/draw";
 import { useReadout } from "@/components/iso/react/live";
 import { gain, phase, type Rqf } from "@/lib/rqf";
 import { basePlate, bindingPost, knob, labelPlate } from "@/components/figures/parts";
+import { Range, useRange } from "@/components/widgets/slider";
+
+const HZ_U = (hz: number) => Math.log(hz) / Math.log(40);
 
 // ---- truth: 16 RQFs, constant Q, centres log-spaced over the EEG range ----
 const COUNT = 16;
@@ -111,6 +114,7 @@ const knobAt = (hz: number) => knob(KNOB[0], KNOB[1], 0, 8, P, -Math.PI * 0.8 + 
 
 export function ReedBankFigure({ bare = false, speed = 1, amplitude = 1 }: { bare?: boolean; speed?: number; amplitude?: number } = {}) {
   const { anchor, say } = useReadout<SVGSVGElement>();
+  const range = useRange();
   const groups = useRef<(SVGGElement | null)[]>([]);
   const flags = useRef<(SVGGElement | null)[]>([]);
   const knobRef = useRef<SVGGElement>(null);
@@ -157,25 +161,16 @@ export function ReedBankFigure({ bare = false, speed = 1, amplitude = 1 }: { bar
       });
       const kn = knobAt(s.hz);
       if (kn !== lastKnob && knobRef.current) { knobRef.current.innerHTML = kn; lastKnob = kn; }
+      range.show(HZ_U(s.target), `${s.target.toFixed(1)} Hz`);
       say(readoutOf(s.hz, best));
     };
     raf = requestAnimationFrame(tick);
     return () => { cancelAnimationFrame(raf); io.disconnect(); };
   }, [anchor, say, speed, amplitude]);
 
-  const setFrom = (clientX: number) => {
-    const r = anchor.current!.getBoundingClientRect();
-    const u = Math.max(0, Math.min(1, (clientX - r.left) / r.width));
+  const setHz = (u: number) => {
     state.current.target = F_LO * (F_HI / F_LO) ** u;
     state.current.touched = performance.now();
-  };
-  const onKey = (e: React.KeyboardEvent) => {
-    const s = state.current;
-    if (e.key === "ArrowRight" || e.key === "ArrowUp") s.target = Math.min(F_HI, s.target * 1.06);
-    else if (e.key === "ArrowLeft" || e.key === "ArrowDown") s.target = Math.max(F_LO, s.target / 1.06);
-    else return;
-    e.preventDefault();
-    s.touched = performance.now();
   };
 
   return (
@@ -183,7 +178,6 @@ export function ReedBankFigure({ bare = false, speed = 1, amplitude = 1 }: { bar
       <Plate
         fig="Fig 1"
         title="A bank of tuned reeds"
-        hint="Drag across, or ← → to tune the input"
         readout={readoutOf(10, FREQS.findIndex((f) => f > 9) - 1)}
         keys={bare ? [] : [
           { mark: "raised", label: "One reed = one RQF" },
@@ -192,15 +186,13 @@ export function ReedBankFigure({ bare = false, speed = 1, amplitude = 1 }: { bar
         ]}
         caption={bare ? undefined : "Sixteen steel reeds on a common comb, each tuned to one frequency from 1 to 40 Hz with the same quality factor, the way an RQF layer tiles the EEG bands. The coil shakes the comb at the input frequency. Each reed’s swing is the true gain |H| of its filter at that frequency, and its timing is the true phase. Motion is slowed so you can follow it."}
       >
-        <div className="iso-stage" tabIndex={0} onKeyDown={onKey} aria-label="Reed bank; use arrow keys to change the input frequency" style={{ touchAction: "pan-y", cursor: "ew-resize" }}>
+        <div className="iso-stage">
           <svg
             ref={anchor}
             className="iso-svg"
             viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
             role="img"
             aria-label="An isometric vibrating-reed frequency meter: sixteen reeds of decreasing length on a comb, a drive coil and a tuning knob"
-            onPointerDown={(e) => setFrom(e.clientX)}
-            onPointerMove={(e) => e.buttons && setFrom(e.clientX)}
           >
             <g suppressHydrationWarning dangerouslySetInnerHTML={{ __html: BACK }} />
             {REEDS.map((r, i) => (
@@ -212,6 +204,9 @@ export function ReedBankFigure({ bare = false, speed = 1, amplitude = 1 }: { bar
             <g suppressHydrationWarning dangerouslySetInnerHTML={{ __html: FRONT }} />
             <g ref={knobRef} suppressHydrationWarning dangerouslySetInnerHTML={{ __html: knobAt(10) }} />
           </svg>
+          <div className="controls">
+            <Range range={range} label="Input frequency" min={0} max={1} step={0.001} initial={HZ_U(10)} text="10.0 Hz" onInput={setHz} />
+          </div>
         </div>
       </Plate>
     </div>

@@ -27,7 +27,7 @@ export default function Page() {
         We add a single unit to the network. It watches the total activity and, the busier the network gets, the more it turns every connection down by the same factor. It doesn’t know any individual connection. It only knows how loud the whole network is.
       </p>
       <p>
-        It works like the governor on a steam engine. When the engine speeds up, the spinning balls fly out and close the throttle. Below, the knob sets how strongly the network is wired; drag across the figure to turn it. The dial, which shows how close the network is to the edge, swings and then settles back on the edge mark.
+        It works like the governor on a steam engine. When the engine speeds up, the spinning balls fly out and close the throttle. Below, the knob sets how strongly the network is wired; use the slider below it to turn it. The dial, which shows how close the network is to the edge, swings and then settles back on the edge mark.
       </p>
       <Fig>
         <GovernorFigure bare />

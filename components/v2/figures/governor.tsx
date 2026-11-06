@@ -5,6 +5,7 @@ import type { Flat, Plan, Point3 } from "@/components/iso/iso-kit";
 import { Plate } from "@/components/iso/react/draw";
 import { useReadout } from "@/components/iso/react/live";
 import { basePlate, bindingPost, knob, labelPlate } from "@/components/figures/parts";
+import { Range, useRange } from "@/components/widgets/slider";
 import { C_CRIT, SIGMA2, edgeOf, gainStar, governorStep, type Governor } from "@/lib/gain";
 
 // ---- truth: the top mode and the gain unit of the paper (σ² = 0.1), shown at RATE model time units per second ----
@@ -135,12 +136,12 @@ function needle(e: number) {
 }
 
 const ART = art();
-const toC = (u: number) => C_LO + (C_HI - C_LO) * u;
 const knobAt = (c: number) => knob(KNOB[0], KNOB[1], 2, 7, P, KFROM + (KSPAN * (c - C_LO)) / (C_HI - C_LO) - Math.PI / 2);
 const START_C = 1.6;
 
 export function GovernorFigure({ bare = false, speed = 1, amplitude = 1 }: { bare?: boolean; speed?: number; amplitude?: number } = {}) {
   const { anchor, say } = useReadout<SVGSVGElement>();
+  const range = useRange();
   const headRef = useRef<SVGGElement>(null);
   const needleRef = useRef<SVGGElement>(null);
   const knobRef = useRef<SVGGElement>(null);
@@ -175,24 +176,16 @@ export function GovernorFigure({ bare = false, speed = 1, amplitude = 1 }: { bar
       if (needleRef.current) needleRef.current.innerHTML = needle(edgeOf(S.c, S.s.a));
       const kn = knobAt(S.c);
       if (kn !== lastKnob && knobRef.current) { knobRef.current.innerHTML = kn; lastKnob = kn; }
+      range.show(S.target, S.target.toFixed(2));
       say(readoutOf(S.c, S.s.a));
     };
     raf = requestAnimationFrame(tick);
     return () => { cancelAnimationFrame(raf); io.disconnect(); };
   }, [anchor, say, speed, amplitude]);
 
-  const setFrom = (clientX: number) => {
-    const r = anchor.current!.getBoundingClientRect();
-    state.current.target = toC(Math.max(0, Math.min(1, (clientX - r.left) / r.width)));
+  const setC = (c: number) => {
+    state.current.target = c;
     state.current.touched = performance.now();
-  };
-  const onKey = (e: React.KeyboardEvent) => {
-    const s = state.current;
-    if (e.key === "ArrowRight" || e.key === "ArrowUp") s.target = Math.min(C_HI, s.target + 0.1);
-    else if (e.key === "ArrowLeft" || e.key === "ArrowDown") s.target = Math.max(C_LO, s.target - 0.1);
-    else return;
-    e.preventDefault();
-    s.touched = performance.now();
   };
 
   return (
@@ -200,7 +193,6 @@ export function GovernorFigure({ bare = false, speed = 1, amplitude = 1 }: { bar
       <Plate
         fig="Fig 1"
         title="A governor for the network"
-        hint="Drag across, or ← → to change the coupling"
         readout={readoutOf(START_C, gainStar(START_C))}
         keys={bare ? [] : [
           { mark: "raised", label: "Flyballs: the one gain unit" },
@@ -209,21 +201,22 @@ export function GovernorFigure({ bare = false, speed = 1, amplitude = 1 }: { bar
         ]}
         caption={bare ? undefined : "A flyball governor stands in for the paper’s single gain unit. The more the network is active, the faster the head spins and the further the balls fly out, lifting the sleeve that scales every connection by (1 − a). The dial reads the top eigenvalue of the effective connection matrix, (1 − a)λ. Below the threshold c ≈ 0.79 it sits short of the edge; above it the needle settles on exactly 1 for every coupling you choose, after a damped swing. The motion is the paper’s own equations for the top mode and the gain, σ² = 0.1."}
       >
-        <div className="iso-stage" tabIndex={0} onKeyDown={onKey} aria-label="Flyball governor; use arrow keys to change the coupling strength" style={{ touchAction: "pan-y", cursor: "ew-resize" }}>
+        <div className="iso-stage">
           <svg
             ref={anchor}
             className="iso-svg"
             viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
             role="img"
             aria-label="An isometric flyball governor on a gearbox driven by a motor, beside a dial gauge whose needle settles on the edge-of-stability mark, and a coupling knob"
-            onPointerDown={(e) => setFrom(e.clientX)}
-            onPointerMove={(e) => e.buttons && setFrom(e.clientX)}
           >
             <g suppressHydrationWarning dangerouslySetInnerHTML={{ __html: ART }} />
             <g ref={needleRef} suppressHydrationWarning dangerouslySetInnerHTML={{ __html: needle(1) }} />
             <g ref={knobRef} suppressHydrationWarning dangerouslySetInnerHTML={{ __html: knobAt(START_C) }} />
             <g ref={headRef} suppressHydrationWarning dangerouslySetInnerHTML={{ __html: head(gainStar(START_C), 0.6) }} />
           </svg>
+          <div className="controls">
+            <Range range={range} label="Coupling strength c" min={C_LO} max={C_HI} step={0.01} initial={START_C} text={START_C.toFixed(2)} onInput={setC} />
+          </div>
         </div>
       </Plate>
     </div>

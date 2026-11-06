@@ -1,7 +1,7 @@
 import { Article, Callout, Eq, M, Section, Tldr } from "@/components/v2/article/blocks";
 import { Facts, Fig } from "@/components/v2/post/post";
 import { paperOf } from "@/content/papers";
-import { DamperBenchFigure } from "@/components/v2/figures/damper-bench";
+import { EnergyDishFigure } from "@/components/v2/figures/energy-dish";
 import { HBars } from "@/components/widgets/charts";
 
 const paper = paperOf("unconditional-stability");
@@ -57,8 +57,8 @@ export default function Page() {
         <Callout label="Result">For W_r = I, the normalization fixed point is asymptotically stable for all parameter values and all inputs, in any dimension, even when every neuron has its own time constant.</Callout>
       </Section>
 
-      <Fig caption="The oscillator picture made physical. Each rail is one excitatory neuron, with its response y as the carriage position, held between a spring and a dashpot. All five share one normalization pool, read on the gauge as √a, which sets the stiffness K. Click to knock the carriages; drag to change the input contrast. They always settle, on the normalization fixed point marked on each ruler. The motion is Eq. 3 of the paper with W = 1/n, σ = 0.2 and τa = 3τy.">
-        <DamperBenchFigure />
+      <Fig caption="The energy of Eq. 14 as a dish, drawn in coordinates where it is round near the bottom; the rings are levels of equal energy. The marble is the state (y, a) of the 2D circuit, with w = 1, σ = 0.2 and τa = 3τy. Knock it and it spirals back to the bottom, the damped oscillation of the phase portraits in Fig. 1 of the paper. Change the input and the bottom moves: the gauge shows the response settling on its normalized value, z/√(σ² + z²).">
+        <EnergyDishFigure bare />
       </Fig>
 
       <Section id="energy" n={4} title="An energy for the circuit">

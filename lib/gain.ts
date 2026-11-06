@@ -42,3 +42,25 @@ export function organicsStep(y: number[], a: number[], z: number[], dt: number) 
     y[j] += dt * dy;
   }
 }
+
+// ---- The 2D circuit (one y, one a; w = 1) and its energy, Eq. 14 ----
+/** Fixed point of the 2D circuit for input z: y_s = z/√(σ²+z²), a_s = σ²+z². */
+export const fixed2 = (z: number) => ({ ys: z / Math.sqrt(ORG.sigma ** 2 + z * z), as: ORG.sigma ** 2 + z * z });
+
+/** V(y, a) = (τy/τa)√a_s (y − y_s)² + (√a y − z)², minimized at the fixed point. */
+export function energy2(y: number, a: number, z: number) {
+  const { ys, as } = fixed2(z);
+  return (ORG.tauY / ORG.tauA) * Math.sqrt(as) * (y - ys) ** 2 + (Math.sqrt(Math.max(a, 0)) * y - z) ** 2;
+}
+
+/**
+ * Coordinates in which V is round to second order: u = Lᵀ d with d = (y − y_s, a − a_s) and LLᵀ the
+ * Hessian of V over 2, so |u|² ≈ V near the fixed point.
+ */
+export function roundOf(y: number, a: number, z: number): [number, number] {
+  const { ys, as } = fixed2(z);
+  const m11 = (ORG.tauY / ORG.tauA) * Math.sqrt(as) + as, m12 = ys / 2, m22 = (ys * ys) / (4 * as);
+  const l11 = Math.sqrt(m11), l21 = m12 / l11, l22 = Math.sqrt(Math.max(1e-9, m22 - l21 * l21));
+  const dy = y - ys, da = a - as;
+  return [l11 * dy + l21 * da, l22 * da];
+}

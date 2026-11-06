@@ -50,8 +50,8 @@ export default function Page() {
         <p>At a fixed gain this is just a linear network with matrix <M>{"(1-a)M"}</M>. But the gain is driven by the activity, and any change in it moves every decay rate at once.</p>
       </Section>
 
-      <Fig caption="The paper’s top mode and gain unit, as a flyball governor. Activity spins the head; the balls’ opening is the gain a, which scales every connection by (1 − a). The dial reads the top eigenvalue of the effective connections, (1 − a)λ_N. Drag across to change the coupling c: below c ≈ 0.79 the needle rests short of the edge; above it, it swings and settles on 1.">
-        <GovernorFigure />
+      <Fig caption="The paper’s top mode and gain unit, as a flyball governor. Activity spins the head; the balls’ opening is the gain a, which scales every connection by (1 − a). The dial reads the top eigenvalue of the effective connections, (1 − a)λ_N. Use the slider to change the coupling c: below c ≈ 0.79 the needle rests short of the edge; above it, it swings and settles on 1.">
+        <GovernorFigure bare />
       </Fig>
 
       <Section id="pinning" n={4} title="Pinned to the edge">

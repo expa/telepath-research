@@ -167,7 +167,6 @@ export function CascadeBenchFigure({ bare = false, speed = 1, amplitude = 1 }: {
       <Plate
         fig="Fig 1"
         title="Six followers on a bench"
-        hint="Click the bench, or use the switch below"
         readout={bare ? plainOf(false) : readoutOf(false)}
         keys={bare ? [] : [
           { mark: "raised", label: "Front rail: the input" },
@@ -177,7 +176,7 @@ export function CascadeBenchFigure({ bare = false, speed = 1, amplitude = 1 }: {
         caption={bare ? undefined : "Each rail is one layer. Its carriage follows the carriage in front of it through a damper, the way a leaky integrator follows its input, so every rail adds a little lag. The dotted index on each ruler shows where the input is right now. Flip the switch to drive every layer with the look-ahead z + τż, and the six carriages fall into line. The motion is the paper’s own update rule, τ = 20 ms, a 4 Hz input, shown at 0.18× speed."}
       >
         <div className="iso-stage">
-          <svg ref={anchor} className="iso-svg" viewBox={`0 0 ${WIDTH} ${HEIGHT}`} role="img" aria-label="An isometric bench with seven stepped rails. The front carriage is driven back and forth; each carriage behind follows the one in front with a delay." onClick={() => setPros((p) => !p)} style={{ cursor: "pointer" }}>
+          <svg ref={anchor} className="iso-svg" viewBox={`0 0 ${WIDTH} ${HEIGHT}`} role="img" aria-label="An isometric bench with seven stepped rails. The front carriage is driven back and forth; each carriage behind follows the one in front with a delay.">
             <g suppressHydrationWarning dangerouslySetInnerHTML={{ __html: STATIC }} />
             {ORDER.map((r) => (
               <g key={r}>

@@ -1,5 +1,5 @@
 import { Facts, Fig, Post } from "@/components/v2/post/post";
-import { DamperBenchFigure } from "@/components/v2/figures/damper-bench";
+import { EnergyDishFigure } from "@/components/v2/figures/energy-dish";
 import { paperOf } from "@/content/papers";
 
 const paper = paperOf("unconditional-stability");
@@ -19,15 +19,15 @@ export default function Page() {
         One computation shows up all over the brain: <strong>normalization</strong>. Each neuron’s response is divided by the combined activity of its neighbours, so responses stay in a useful range however strong the input. Our circuit model, ORGaNICs, computes this as part of its own dynamics: a pool of inhibitory neurons tracks the total activity and turns down the feedback that keeps each neuron going.
       </p>
 
-      <h2>Springs and shock absorbers</h2>
+      <h2>A marble in a dish</h2>
       <p>
-        We proved that this circuit always settles. Close to its resting point, it behaves exactly like a set of weights on springs with shock absorbers. However you knock them, they ring and come to rest. The normalization pool sets how stiff the springs are: the more activity there is, the stiffer they get.
+        We proved that this circuit always settles. Close to its resting point, it behaves exactly like a set of weights on springs with shock absorbers: however you knock them, they ring and come to rest. The proof also hands us the circuit’s energy, the quantity it always runs downhill on. Picture it as a dish, and the circuit’s state as a marble in it.
       </p>
       <Fig>
-        <DamperBenchFigure bare />
+        <EnergyDishFigure bare />
       </Fig>
       <p>
-        Click the bench to knock the carriages, or drag to turn the input up and down. Every carriage settles, and they settle on the answer normalization predicts. Turn the input way up and they move out but stop short: that’s the division at work.
+        Knock the marble and it rolls round and back down to the bottom, every time. Change the input with the slider and the bottom of the dish moves, so the marble rolls to the new answer, the response normalization predicts. Turn the input way up and the response on the gauge climbs but stops short: that’s the division at work.
       </p>
       <p>
         The proof holds for <strong>any</strong> setting of the circuit’s parameters and <strong>any</strong> input, for circuits of any size, when each neuron feeds back only onto itself. With arbitrary connections between neurons we prove it for the smallest circuit, and in simulations of larger ones, with the connection strength kept within bounds, every circuit we tried was stable.

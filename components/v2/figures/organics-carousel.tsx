@@ -124,19 +124,22 @@ export function OrganicsCarouselFigure({ bare = false, speed = 1, amplitude = 1 
 
   useEffect(() => {
     const svg = anchor.current!;
-    const io = new IntersectionObserver(([e]) => (live.current.visible = e.isIntersecting));
+    const io = new IntersectionObserver(([e]) => {
+      live.current.visible = e.isIntersecting;
+      if (e.isIntersecting && !raf) { last = 0; raf = requestAnimationFrame(tick); } // resume; the loop stops itself off-screen
+    });
     io.observe(svg);
     const L = live.current;
     const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const y = new Float64Array(N);
     const shown = new Float64Array(N).fill(-1);
     let litWas = -1;
-    let raf = 0, last = 0;
+    let raf = 0, last = 0, needleWas = "", armWas = "";
     const setPhase = (p: Phase) => { L.phase = p; L.ring.target = { ...PHASES[p] }; };
     setPhase("present");
     const tick = (now: number) => {
+      if (!L.visible && last) { raf = 0; return; }
       raf = requestAnimationFrame(tick);
-      if (!L.visible && last) return;
       const dt = (last ? Math.min(0.05, (now - last) / 1000) : 1 / 60) * speed;
       last = now;
       L.clock += dt;
@@ -161,8 +164,9 @@ export function OrganicsCarouselFigure({ bare = false, speed = 1, amplitude = 1 
         }
       }
       litWas = best;
-      if (needle.current) needle.current.innerHTML = needles(L.ring.mods);
-      if (arm.current) arm.current.innerHTML = pointerArm(L.target, L.flash);
+      const nd = needles(L.ring.mods), am = pointerArm(L.target, L.flash);
+      if (needle.current && nd !== needleWas) { needle.current.innerHTML = nd; needleWas = nd; }
+      if (arm.current && am !== armWas) { arm.current.innerHTML = am; armWas = am; }
       say(readoutOf(SCRIPT[L.ix].say === L.phase ? L.phase : L.phase, best < 0 ? null : Math.round((best / N) * 360)));
     };
     raf = requestAnimationFrame(tick);

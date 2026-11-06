@@ -11,3 +11,6 @@ export function meta({ props }: LoadArgs & { props: ReturnType<typeof load> }) {
   if (!p) return { title: "Not found · Telepath Research" };
   return { title: `${p.short}, in detail · Telepath Research`, description: p.summary, meta: ogImage(p.slug) };
 }
+
+// Native scrolling: no Lenis smooth-scroll loop running every frame.
+export const scroll = false;

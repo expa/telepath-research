@@ -7,7 +7,7 @@ const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(
 
 /** Jump links. Without `sections`, it lists the h2s of the page's `.post-body`. */
 export function Toc({ sections: given, label = "Contents" }: { sections?: Section[]; label?: string }) {
-  const { lenis, element } = usePage();
+  const { element } = usePage();
   const [found, setFound] = useState<Section[]>([]);
   const sections = given ?? found;
   const [active, setActive] = useState("");
@@ -39,8 +39,7 @@ export function Toc({ sections: given, label = "Contents" }: { sections?: Sectio
     const el = element?.querySelector<HTMLElement>(`#${CSS.escape(id)}`);
     if (!el) return;
     e.preventDefault();
-    if (lenis) lenis.scrollTo(el, { offset: -88 });
-    else el.scrollIntoView({ behavior: "smooth" });
+    el.scrollIntoView({ behavior: "smooth" });
     history.replaceState(history.state, "", `#${id}`);
   };
 

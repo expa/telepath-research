@@ -118,14 +118,17 @@ export function ReedBankFigure({ bare = false, speed = 1, amplitude = 1 }: { bar
 
   useEffect(() => {
     const svg = anchor.current!;
-    const io = new IntersectionObserver(([e]) => (state.current.visible = e.isIntersecting));
+    const io = new IntersectionObserver(([e]) => {
+      state.current.visible = e.isIntersecting;
+      if (e.isIntersecting && !raf) { last = 0; raf = requestAnimationFrame(tick); } // resume; the loop stops itself off-screen
+    });
     io.observe(svg);
     const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let raf = 0, last = 0, lastKnob = "";
     const tick = (now: number) => {
-      raf = requestAnimationFrame(tick);
       const s = state.current;
-      if (!s.visible) { last = 0; return; }
+      if (!s.visible) { raf = 0; return; }
+      raf = requestAnimationFrame(tick);
       const dt = (last ? Math.min(0.05, (now - last) / 1000) : 1 / 60) * speed;
       last = now;
       if (!still && now - s.touched > 4000) {

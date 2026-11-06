@@ -5,24 +5,11 @@ import { useNavigation } from "modulato";
 import { REVEAL_EVENT } from "@/lib/landing-flight";
 import { ResearchCards } from "./research-cards";
 
-// Telepath's original glow and logo intro, contained in the hero above the research.
-const SCENE = "https://storage.googleapis.com/unicornstudio-production/embeds/CbHFIFV3Ha4q38DuFzTP";
-const SDK = "https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v2.0.5/dist/unicornStudio.umd.js";
+// Telepath's original glow as a seamless 15s loop, recorded frame by frame from the Unicorn Studio scene
+// (logo and wordmark layers removed; we draw those in the DOM). A video costs a fraction of the live WebGL scene.
+// Portrait screens get their own render: the nebula lays out differently on a tall canvas.
+const VIDEO = "/video/hero.mp4", VIDEO_PORTRAIT = "/video/hero-portrait.mp4";
 const WAITLIST = "32473"; // getwaitlist.com waitlist, same one the Framer site posts to
-
-type Scene = { destroy(): void };
-type US = { addScene(o: object): Promise<Scene> };
-declare global { interface Window { UnicornStudio?: US } }
-
-/** The scene minus its baked-in logo (3D model layers) and wordmark (image layer); we draw those in the DOM. */
-async function backgroundOnly(): Promise<string> {
-  const id = "telepath-scene";
-  if (document.getElementById(id)) return id;
-  const json = await (await fetch(SCENE)).json();
-  json.history = json.history.filter((l: { layerType: string }) => l.layerType !== "model" && l.layerType !== "image");
-  document.head.append(Object.assign(document.createElement("script"), { type: "application/json", id, text: JSON.stringify(json) }));
-  return id;
-}
 
 /**
  * Logo intro, as storyboarded from the side (camera looking at the discs face-on):
@@ -94,28 +81,14 @@ function liquidGlass(el: HTMLFormElement | null) {
   };
 }
 
-let sdk: Promise<US> | undefined;
-const loadSdk = () => (sdk ??= new Promise((ok, fail) => {
-  const s = Object.assign(document.createElement("script"), { src: SDK, async: true });
-  s.onload = () => ok(window.UnicornStudio!);
-  s.onerror = fail;
-  document.head.append(s);
-}));
-
-// Intro timeline (ms after the scene has warmed up, see WARM): the horizontal logo plays in the top
+// Intro timeline (ms after mount): the horizontal logo plays in the top
 // row (discs, then wordmark), followed by the copy and floating signup.
 const LOGO_AT = 0;
 const WORD_AT = LOGO_AT + 300;
 const REVEAL_AT = LOGO_AT + 420;
-// Creating the WebGL scene blocks the main thread, and its first drawn frames stall the GPU, freezing anything
-// animating at the time. So the intro waits until the scene exists and has drawn a few (invisible) frames,
-// or at most this long after mount if the scene is slow or fails.
-const WARM = 700, GO_MAX = 2500;
-// Back from another page: page transition (~0.8s) plus the copy and signup reveal (~1.5s) finish before the scene is created.
-const RETURN_SCENE_AT = 1600; // ponytail: fixed warm-up guess from measuring (stall lands 0–700ms after creation); watch frame gaps if it varies more
 
 function Home() {
-  const bg = useRef<HTMLDivElement>(null);
+  const bg = useRef<HTMLVideoElement>(null);
   const glass = useRef<HTMLFormElement>(null);
   const [hoverOpen, setSignupOpen] = useState(false);
   // Touch screens can't hover to open the signup, so there it stays open.
@@ -168,29 +141,16 @@ function Home() {
   }, [go]);
 
   useEffect(() => {
-    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setGo(true);
-      return;
-    }
-    let scene: Scene | undefined, gone = false;
-    let warm: ReturnType<typeof setTimeout>, ready: ReturnType<typeof setTimeout>, later: ReturnType<typeof setTimeout>;
-    const start = () => { if (!gone) setGo(true); }, t = setTimeout(start, GO_MAX);
-    // Arriving from another page, the page transition and the copy reveal are running: creating the scene now would
-    // freeze them mid-way. Let them finish first; the orange gradient underneath stands in until the scene fades in.
-    const afterArrival = returning ? new Promise<void>((ok) => { later = setTimeout(ok, RETURN_SCENE_AT); }) : Promise.resolve();
-    afterArrival.then(() => Promise.all([loadSdk(), backgroundOnly()]))
-      .then(([us, filePath]) => gone ? undefined : us.addScene({ element: bg.current, filePath, dpi: 1.5, scale: 1, fps: 60, fixed: false }))
-      .then((s) => {
-        if (!s) return;
-        if (gone) return s.destroy();
-        scene = s;
-        warm = setTimeout(start, WARM);
-        // The scene has its own 1s entrance (its nebula fades in over a paler gradient). Keep the canvas hidden
-        // until that's done so only finished colors fade in over the base orange; otherwise it reads as a flash.
-        ready = setTimeout(() => bg.current?.classList.add("is-ready"), WARM);
-      })
-      .catch(start); // the CSS gradient underneath stands in
-    return () => { gone = true; clearTimeout(t); clearTimeout(warm); clearTimeout(ready); clearTimeout(later); scene?.destroy(); };
+    setGo(true);
+    const v = bg.current;
+    if (!v) return;
+    // Fade the video in over the orange base once it has a frame. SSR markup can't carry `muted`, so set it here
+    // before playing (autoplay needs it). Reduced motion keeps the first frame as a still.
+    const show = () => v.classList.add("is-ready");
+    v.muted = true;
+    if (v.readyState >= 2) show(); else v.addEventListener("loadeddata", show, { once: true });
+    if (!matchMedia("(prefers-reduced-motion: reduce)").matches) v.play().catch(() => {});
+    return () => v.removeEventListener("loadeddata", show);
   }, []);
 
   async function join(e: React.FormEvent<HTMLFormElement>) {
@@ -212,7 +172,10 @@ function Home() {
     <main id="top" className={`landing${revealed ? " revealed" : ""}${returning ? " returning" : ""}${go ? " intro-running" : ""}${noHover ? " signup-on-scroll" : ""}${scrolled ? " signup-shown" : ""}`}>
       <section className="landing-hero" aria-labelledby="landing-title">
         <div className="landing-atmosphere" aria-hidden="true">
-          <div className="landing-bg" ref={bg} />
+          <video className="landing-bg" ref={bg} muted loop playsInline preload="auto" aria-hidden="true">
+            <source src={VIDEO_PORTRAIT} type="video/mp4" media="(max-aspect-ratio: 1/1)" />
+            <source src={VIDEO} type="video/mp4" />
+          </video>
         </div>
         <div className="landing-content">
           <div className="landing-logo" aria-label="Telepath" role="img">

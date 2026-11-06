@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { PageOutlet, useNavigation, useRoute } from "modulato";
 import { Logo } from "@/components/article/logo";
 import "./styles/globals.css";
@@ -14,18 +13,6 @@ export default function App() {
   const landing = route.id === "home-1" && id === "home-1", leaving = nav.to?.id === "home-1";
   const v2 = [route.id, id].some(value => value === "home" || value.startsWith("research/"));
   const research = id.startsWith("research");
-  // Cmd+↑ / Cmd+↓ jump to the top / bottom of any page (smooth scroll otherwise swallows the native shortcut).
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (!e.metaKey || (e.key !== "ArrowUp" && e.key !== "ArrowDown")) return;
-      const t = e.target as HTMLElement;
-      if (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) return;
-      e.preventDefault();
-      window.scrollTo(0, e.key === "ArrowUp" ? 0 : document.documentElement.scrollHeight);
-    };
-    addEventListener("keydown", onKey);
-    return () => removeEventListener("keydown", onKey);
-  }, []);
   return (
     <>
       {landing || v2 ? null : <header className={leaving ? "site-header is-leaving" : "site-header"}>

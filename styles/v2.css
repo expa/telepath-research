@@ -84,13 +84,16 @@ img, video { max-width: 100%; display: block; }
 @property --glow-2 { syntax: "<color>"; inherits: true; initial-value: #ff7a2e; }
 @property --glow-3 { syntax: "<color>"; inherits: true; initial-value: #c8361a; }
 .glow { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+/* The soft falloff is baked into the gradient (fitted to the old filter: blur(70px)) and the boxes are 1.4x larger
+   around the same centers to hold its tail. A live blur on drifting vmax-sized layers was re-run every frame, forever. */
 .glow::before, .glow::after, .glow span {
-  content: ""; position: absolute; border-radius: 50%; filter: blur(70px); opacity: 0.85;
+  content: ""; position: absolute; border-radius: 50%; opacity: 0.85;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--c) 70%, transparent) 0%, color-mix(in srgb, var(--c) 64.9%, transparent) 14.3%, color-mix(in srgb, var(--c) 52.1%, transparent) 28.6%, color-mix(in srgb, var(--c) 44%, transparent) 35.7%, color-mix(in srgb, var(--c) 35.6%, transparent) 42.9%, color-mix(in srgb, var(--c) 27.3%, transparent) 50%, color-mix(in srgb, var(--c) 19.7%, transparent) 57.1%, color-mix(in srgb, var(--c) 13.2%, transparent) 64.3%, color-mix(in srgb, var(--c) 8%, transparent) 71.4%, color-mix(in srgb, var(--c) 4.4%, transparent) 78.6%, color-mix(in srgb, var(--c) 2.2%, transparent) 85.7%, transparent);
   animation: drift 22s var(--ease) infinite alternate;
 }
-.glow::before { width: 60vmax; height: 46vmax; left: -12vmax; top: -18vmax; background: radial-gradient(closest-side, var(--glow-1), transparent); }
-.glow::after { width: 52vmax; height: 40vmax; right: -14vmax; top: -6vmax; background: radial-gradient(closest-side, var(--glow-2), transparent); animation-duration: 28s; }
-.glow span { width: 38vmax; height: 30vmax; left: 30%; top: 10%; background: radial-gradient(closest-side, var(--glow-3), transparent); opacity: 0.55; animation-duration: 34s; }
+.glow::before { --c: var(--glow-1); width: 84vmax; height: 64.4vmax; left: -24vmax; top: -27.2vmax; }
+.glow::after { --c: var(--glow-2); width: 72.8vmax; height: 56vmax; right: -24.4vmax; top: -14vmax; animation-duration: 28s; }
+.glow span { --c: var(--glow-3); width: 53.2vmax; height: 42vmax; left: calc(30% - 7.6vmax); top: calc(10% - 6vmax); opacity: 0.55; animation-duration: 34s; }
 @keyframes drift { to { transform: translate3d(6vmax, 4vmax, 0) scale(1.12); } }
 @media (prefers-reduced-motion: reduce) { .glow::before, .glow::after, .glow span { animation: none; } }
 
@@ -390,10 +393,7 @@ main { background: var(--paper); }
 .landing-hero { position: relative; display: grid; place-items: start center; height: 56svh; min-height: 560px; padding-block: 0; color: #fff; text-align: start; }
 .landing-atmosphere { position: absolute; inset: 0 0 -260px; overflow: clip; background: #fb975f; pointer-events: none;
   mask-image: linear-gradient(to bottom, #000 0%, #000 50%, rgb(0 0 0 / .98) 57%, rgb(0 0 0 / .92) 64%, rgb(0 0 0 / .80) 71%, rgb(0 0 0 / .62) 78%, rgb(0 0 0 / .40) 85%, rgb(0 0 0 / .18) 92%, rgb(0 0 0 / .04) 97%, transparent 100%); }
-.landing-bg { position: absolute; inset: 0; z-index: 0; opacity: .001; transition: opacity 600ms ease-out; }
-/* .001, not 0: at 0 the browser skips drawing the WebGL canvas, so its one-time GPU warm-up would land on the
-   first visible frame of the fade and freeze the intro. Drawn invisibly, it warms up before the intro starts. */
-/* Match the page canvas to the color at the end of the hero fade. */
+.landing-bg { position: absolute; inset: 0; z-index: 0; display: block; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 600ms ease-out; }
 .landing-bg.is-ready { opacity: 1; }
 /* The logo starts in its final horizontal layout; copy and signup follow its entrance. */
 .landing-copy > * { opacity: 0; filter: blur(10px); transform: translateY(10px); transition: opacity .6s ease-out, filter .6s ease-out, transform .6s cubic-bezier(.2, 0, .2, 1); }
@@ -643,3 +643,6 @@ main { background: var(--paper); }
 .experience-v2 { display: contents; }
 html:has(.experience-v2), html:has(.experience-v2) body { background: #faf9f6; }
 
+
+/* TOC jumps land below the fixed logo band. */
+.post-body h2 { scroll-margin-top: 88px; }

@@ -88,7 +88,7 @@ img, video { max-width: 100%; display: block; }
 @property --glow-3 { syntax: "<color>"; inherits: true; initial-value: #c8361a; }
 .glow { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
 .glow::before, .glow::after, .glow span {
-  content: ""; position: absolute; border-radius: 50%; filter: blur(70px); opacity: 0.85;
+  content: ""; position: absolute; border-radius: 50%; opacity: 0.85;
   animation: drift 22s var(--ease) infinite alternate;
 }
 .glow::before { width: 60vmax; height: 46vmax; left: -12vmax; top: -18vmax; background: radial-gradient(closest-side, var(--glow-1), transparent); }
@@ -385,11 +385,7 @@ main { background: var(--paper); }
 /* ---------- Landing (copy of telepath.com) ---------- */
 .landing { position: relative; min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: clip; color: #fff; text-align: center;
   background: #fb975f; } /* the scene's average color, so its fade-in is gentle */
-.landing-bg { position: absolute; inset: 0; z-index: 0; opacity: .001; transition: opacity 3s ease; }
-/* .001, not 0: at 0 the browser skips drawing the WebGL canvas, so its one-time GPU warm-up would land on the
-   first visible frame of the fade and freeze the intro. Drawn invisibly, it warms up before the intro starts. */
-/* Same orange behind the page while it's hidden for fonts, so the first paint is never the cream body. */
-html:has(.landing), html:has(.landing) body { background: #fb975f; }
+.landing-bg { position: absolute; inset: 0; z-index: 0; opacity: 0; transition: opacity 3s ease; }
 .landing-bg.is-ready { opacity: 1; }
 /* Intro: logo parked at screen center (--to-center, set in JS) slides up into place on .revealed,
    then the copy un-blurs in line by line, then the signup rises in. */

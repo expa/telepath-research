@@ -1,7 +1,7 @@
 import { Article, Callout, Eq, M, Section, Tldr } from "@/components/v2/article/blocks";
 import { Facts, Fig } from "@/components/v2/post/post";
 import { paperOf } from "@/content/papers";
-import { TwinGaugeFigure } from "@/components/v2/figures/twin-gauges";
+import { DamperRigFigure } from "@/components/v2/figures/damper-rig";
 import { HBars } from "@/components/widgets/charts";
 
 const paper = paperOf("unconditional-stability");
@@ -57,6 +57,10 @@ export default function Page() {
         <Callout label="Result">For W_r = I, the normalization fixed point is asymptotically stable for all parameter values and all inputs, in any dimension, even when every neuron has its own time constant.</Callout>
       </Section>
 
+      <Fig caption="The oscillator form of Eq. 9 as a test rig, one mode. The motor's push stands for recurrent feedback, which feeds energy into the motion: with friction c alone the damping is B = c − push, and past push = c the motion grows until it hits the stops. Switching on the damper stands for normalization: the negative term in B (Eq. 11) can never outgrow the positive ones, so B stays positive and the motion dies away for any push. The pen records x(t).">
+        <DamperRigFigure bare />
+      </Fig>
+
       <Section id="energy" n={4} title="An energy for the circuit">
         <p>Because the proof constructs a Lyapunov function directly, it gives an energy that ORGaNICs minimize near the fixed point. For one excitatory and one inhibitory neuron it reads</p>
         <Eq tex={String.raw`V(y,a) = \frac{\tau_y}{\tau_a}\sqrt{b_0^2\sigma^2 + w b^2z^2}\;\Big(y - \frac{bz}{\sqrt{b_0^2\sigma^2+wb^2z^2}}\Big)^2 + \big(\sqrt a\,y - bz\big)^2`} />
@@ -72,10 +76,6 @@ export default function Page() {
         </ul>
         <p>In higher dimensions we conjecture that if <M>{"\\lVert z\\rVert\\le1"}</M> and the largest singular value of <M>{"W_r"}</M> is 1, there is at least one asymptotically stable fixed point. Circuits with random parameters and inputs under these constraints were stable in 100% of trials. Raising the singular-value bound to 2 still gave 100%; at 3, circuits became unstable. A fixed-point iteration finds the steady state in fewer than five steps.</p>
       </Section>
-
-      <Fig caption="Two 2D circuits with the same input z = 0.5 and the same recurrent weight w_r, set by the knob. Left: a plain recurrent neuron, ẏ = −y + w_r y + z, which diverges for any w_r > 1. Right: the 2D ORGaNICs of Eq. 16 with b = b0 = w = 1, σ = 0.2 and τa = 3τy. However expansive the recurrence, the normalization neuron a rises until the gated feedback (1 − √a) w_r is contracting, and y settles on its stable fixed point (Theorems 5.1 and 5.2). Both circuits restart every few seconds.">
-        <TwinGaugeFigure bare />
-      </Fig>
 
       <Section id="experiments" n={6} title="Training by BPTT">
         <p>For the ML tasks we let the intrinsic time constants be learned, and for sequences we use a rectified variant whose 2D form provably has no unstable fixed point for positive inputs, with input gains <M>{"b"}</M> and <M>{"b_0"}</M> made dynamical. No hyperparameter search, no gradient clipping.</p>

@@ -1,5 +1,5 @@
 import { Facts, Fig, Post } from "@/components/v2/post/post";
-import { TwinGaugeFigure } from "@/components/v2/figures/twin-gauges";
+import { DamperRigFigure } from "@/components/v2/figures/damper-rig";
 import { paperOf } from "@/content/papers";
 
 const paper = paperOf("unconditional-stability");
@@ -19,18 +19,21 @@ export default function Page() {
         One computation shows up all over the brain: <strong>normalization</strong>. Each neuron’s response is divided by the combined activity of its neighbours, so responses stay in a useful range however strong the input. Our circuit model, ORGaNICs, computes this as part of its own dynamics: a pool of inhibitory neurons tracks the total activity and turns down the feedback that keeps each neuron going.
       </p>
 
-      <h2>Two circuits, one knob</h2>
+      <h2>A spring and its damper</h2>
       <p>
-        Below are two one-neuron circuits wired to the same input. Each feeds its own output back into itself, and the knob sets how strongly. Turn the feedback up and an echo builds on itself: past a strength of 1, every round trip comes back louder than it left.
+        We proved that this circuit always settles, and the proof says something concrete about why. Close to its resting point, the circuit behaves exactly like a weight on a spring with a damper, the shock absorber that stops a car bouncing after a bump.
+      </p>
+      <p>
+        Feedback is what makes a circuit useful, and also what makes it dangerous: it pushes the weight along with its own motion, feeding energy in. Below, a motor does that pushing, and a pen traces the weight’s motion on a strip of paper.
       </p>
       <Fig>
-        <TwinGaugeFigure bare />
+        <DamperRigFigure bare />
       </Fig>
       <p>
-        The left circuit is plain. Below 1 its needle settles; above 1 it runs off the scale and the lamp lights. That’s the blow-up that wrecks training. The right circuit is the same one with normalization: a second neuron watches how busy it is and turns the feedback down to match. Turn the knob as far as it goes and its needle surges, swings back and settles every time, on the answer normalization predicts.
+        With the damper off, a gentle push still dies away. Turn the push up past a certain point and every swing comes back bigger than the last, until the weight slams into the stops. That’s a circuit blowing up. Switch the damper on and the same shaking dies away, however hard the motor pushes.
       </p>
       <p>
-        We proved that it always settles. Close to its resting point the circuit behaves exactly like a weight on a spring with a shock absorber: however you knock it, it rings and comes to rest. The proof also hands us the circuit’s energy, the quantity it always runs downhill on.
+        In ORGaNICs, normalization is the damper. It divides the feedback down as activity grows, so the damping never runs out.
       </p>
       <p>
         The proof holds for <strong>any</strong> setting of the circuit’s parameters and <strong>any</strong> input, for circuits of any size, when each neuron feeds back only onto itself. With arbitrary connections between neurons we prove it for the smallest circuit, and in simulations of larger ones, with the connection strength kept within bounds, every circuit we tried was stable.

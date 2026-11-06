@@ -43,12 +43,15 @@ export function organicsStep(y: number[], a: number[], z: number[], dt: number) 
   }
 }
 
-// ---- The 2D circuit with recurrence w_r (Eq. 16, b = b0 = w = 1) next to a plain recurrent neuron ----
-export interface Pair { plain: number; y: number; a: number }
-/** Plain: ẏ = −y + w_r y + z, which diverges for w_r > 1. ORGaNICs: ẏ = −y + w_r(1 − √a) y + z, τa ȧ = −a + σ² + a y². */
-export function pairStep(s: Pair, wr: number, z: number, dt: number) {
-  if (Math.abs(s.plain) < 1e6) s.plain += dt * (-s.plain + wr * s.plain + z);
-  const dy = -s.y + wr * (1 - Math.sqrt(Math.max(s.a, 0))) * s.y + z;
-  s.a += (dt * (-s.a + ORG.sigma ** 2 + s.a * s.y * s.y)) / ORG.tauA;
-  s.y += dt * dy;
+// ---- The stability paper as a vibration rig ----
+// Near rest the circuit is a mass on a spring with a damper, ẍ + Bẋ + Kx = 0 (Eqs. 8–11). Recurrent feedback
+// pushes along with the motion, taking damping away. A plain circuit has nothing to stop it: B = c − push, and past
+// push = c the motion grows. Normalization is the damper: it divides the feedback down, so B stays positive for any push.
+export const SPRING = 6, FRICTION = 0.35, DAMPER = 0.5, PUSH_MAX = 1.5;
+export const dampingOf = (push: number, damper: boolean) => (damper ? FRICTION + DAMPER : FRICTION - push);
+export interface Shake { x: number; v: number }
+/** One semi-implicit Euler step of ẍ + Bẋ + Kx = 0. */
+export function shakeStep(s: Shake, B: number, h: number) {
+  s.v += h * (-B * s.v - SPRING * s.x);
+  s.x += h * s.v;
 }

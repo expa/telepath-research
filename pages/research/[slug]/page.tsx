@@ -2,8 +2,10 @@ import { V2Scope } from "@/components/v2/scope";
 import ProspectiveCoding from "@/components/v2/posts/prospective-coding";
 import SelfSupervisedRqf from "@/components/v2/posts/self-supervised-rqf";
 import Organics from "@/components/v2/posts/organics";
+import LongTimescales from "@/components/v2/posts/long-timescales";
+import UnconditionalStability from "@/components/v2/posts/unconditional-stability";
 
-const POSTS: Record<string, () => React.JSX.Element> = { "prospective-coding": ProspectiveCoding, "self-supervised-rqf": SelfSupervisedRqf, organics: Organics };
+const POSTS: Record<string, () => React.JSX.Element> = { "prospective-coding": ProspectiveCoding, "self-supervised-rqf": SelfSupervisedRqf, "long-timescales": LongTimescales, "unconditional-stability": UnconditionalStability, organics: Organics };
 
 function PostPage({ slug }: { slug: string }) {
   const Post = POSTS[slug];

@@ -2,10 +2,12 @@ import { Shared } from "modulato";
 import { CascadeBenchFigure } from "@/components/figures/cascade-bench";
 import { ReedBankFigure } from "@/components/figures/reed-bank";
 import { OrganicsCarouselFigure } from "@/components/figures/organics-carousel";
+import { GovernorFigure } from "@/components/v2/figures/governor";
+import { DamperBenchFigure } from "@/components/v2/figures/damper-bench";
 import { PAPERS } from "@/content/papers";
 
 // Each paper's live figure, running on its own idle loop.
-const ART: Record<string, (p: { bare?: boolean }) => React.JSX.Element> = { "prospective-coding": CascadeBenchFigure, "self-supervised-rqf": ReedBankFigure, organics: OrganicsCarouselFigure };
+const ART: Record<string, (p: { bare?: boolean }) => React.JSX.Element> = { "prospective-coding": CascadeBenchFigure, "self-supervised-rqf": ReedBankFigure, "long-timescales": GovernorFigure, "unconditional-stability": DamperBenchFigure, organics: OrganicsCarouselFigure };
 
 export default function Research() {
   return (

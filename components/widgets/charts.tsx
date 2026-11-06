@@ -125,3 +125,91 @@ export function PairedBars({ title, unit, groups, a, b, lo, hi, caption }: { tit
     </>
   );
 }
+
+/** One horizontal bar per model; ours in the accent colour. */
+export function HBars({ title, unit, rows, lo, hi, caption }: { title: string; unit: string; rows: { label: string; value: number; note?: string; ours?: boolean }[]; lo: number; hi: number; caption: React.ReactNode }) {
+  const W = 640, ROW = 30, PL = 230, PR = 60, H = rows.length * ROW + 8;
+  const sx = lin(lo, hi, PL, W - PR);
+  return (
+    <>
+      <div className="widget">
+        <div className="widget-head">
+          <span><b>{title}</b></span>
+          <span className="mono">{unit}</span>
+        </div>
+        <div style={{ padding: "8px 18px 12px" }}>
+          <svg className="plot" viewBox={`0 0 ${W} ${H}`} aria-label={`${title}: ${rows.map((r) => `${r.label} ${r.value}%`).join(", ")}`}>
+            {rows.map((r, i) => {
+              const y = 4 + i * ROW;
+              return (
+                <g key={r.label}>
+                  <text x={PL - 10} y={y + 15} textAnchor="end" style={r.ours ? { fill: "var(--ink)" } : undefined}>{r.label}</text>
+                  <rect x={PL} y={y + 4} width={+(sx(r.value) - PL).toFixed(2)} height={ROW - 12} rx={3} fill={r.ours ? "var(--accent)" : "#d9cbbf"} />
+                  <text x={sx(r.value) + 6} y={y + 15} style={r.ours ? { fill: "var(--deep)" } : undefined}>{r.value.toFixed(1)}%{r.note ? ` · ${r.note}` : ""}</text>
+                </g>
+              );
+            })}
+          </svg>
+        </div>
+      </div>
+      <p className="widget-caption">{caption}</p>
+    </>
+  );
+}
+
+/**
+ * C(t)/C(0) in the critical phase, log–log. Finite N: the N−1 transverse rates μ = 1 − λ/λ_N taken at the
+ * semicircle quantiles (Eq. 10), against the parameter-free prediction √(2/πt) (Eq. 11).
+ */
+export function CorrelationPlot({ sizes, caption }: { sizes: number[]; caption: React.ReactNode }) {
+  const W = 640, H = 300, PL = 54, PR = 20, PT = 14, PB = 40;
+  const T0 = 1, T1 = 1e4, Y0 = 1e-3, Y1 = 1;
+  const sx = logScale(T0, T1, PL, W - PR), sy = logScale(Y0, Y1, H - PB, PT);
+  const ts = Array.from({ length: 81 }, (_, i) => 10 ** (Math.log10(T0) + (i / 80) * Math.log10(T1 / T0)));
+  // semicircle CDF on [-1, 1], inverted by bisection; eigenvalue i sits at quantile (i + 0.5)/N
+  const cdf = (x: number) => 0.5 + (x * Math.sqrt(1 - x * x) + Math.asin(x)) / Math.PI;
+  const quantile = (q: number) => { let a = -1, b = 1; for (let k = 0; k < 50; k++) { const m = (a + b) / 2; cdf(m) < q ? (a = m) : (b = m); } return (a + b) / 2; };
+  const curve = (n: number) => {
+    const top = quantile((n - 0.5) / n);
+    const mus = Array.from({ length: n - 1 }, (_, i) => 1 - quantile((i + 0.5) / n) / top);
+    const c0 = mus.reduce((s, m) => s + 1 / m, 0);
+    return ts.map((t) => [t, mus.reduce((s, m) => s + Math.exp(-m * t) / m, 0) / c0] as [number, number]).filter(([, c]) => c > Y0);
+  };
+  const path = (pts: [number, number][]) => pts.map(([t, c], i) => `${i ? "L" : "M"}${sx(t).toFixed(1)} ${sy(c).toFixed(1)}`).join("");
+  const theory = ts.map((t) => [t, Math.sqrt(2 / (Math.PI * t))] as [number, number]).filter(([, c]) => c <= Y1);
+  const shades = ["#e4d6ca", "#c9b3a2", "#a8978a", "var(--accent)"];
+  return (
+    <>
+      <div className="widget">
+        <div className="widget-head">
+          <span><b>Correlations decay as a power law</b></span>
+          <span className="mono">C(t)/C(0), log–log</span>
+        </div>
+        <div style={{ padding: "8px 18px 12px" }}>
+          <svg className="plot" viewBox={`0 0 ${W} ${H}`} aria-label="Normalized autocorrelation against time on log–log axes: finite networks follow the t to the minus one half line up to a cutoff that grows with network size">
+            {[1e-3, 1e-2, 1e-1, 1].map((v) => (
+              <g key={v}>
+                <line className="grid" x1={PL} x2={W - PR} y1={sy(v)} y2={sy(v)} />
+                <text x={PL - 8} y={sy(v) + 3} textAnchor="end">{v >= 1 ? "1" : v.toString()}</text>
+              </g>
+            ))}
+            {[1, 10, 100, 1e3, 1e4].map((v) => (
+              <g key={v}>
+                <line className="grid" x1={sx(v)} x2={sx(v)} y1={PT} y2={H - PB} />
+                <text x={sx(v)} y={H - PB + 16} textAnchor="middle">{v >= 1e3 ? `${v / 1e3}k` : v}</text>
+              </g>
+            ))}
+            <text x={(PL + W - PR) / 2} y={H - 4} textAnchor="middle">time, in units of a single neuron’s time constant</text>
+            {sizes.map((n, i) => <path key={n} d={path(curve(n))} fill="none" stroke={shades[i % shades.length]} strokeWidth={2} />)}
+            <path d={path(theory)} fill="none" stroke="var(--ink)" strokeWidth={1.2} strokeDasharray="4 4" />
+          </svg>
+          <div className="mono" style={{ fontSize: 12, color: "var(--muted)", display: "flex", gap: 18, flexWrap: "wrap" }}>
+            {sizes.map((n, i) => <span key={n}><span style={{ color: shades[i % shades.length] }}>■</span> N = {n.toLocaleString("en-US")}</span>)}
+            <span>- - √(2/πt), no free parameters</span>
+          </div>
+        </div>
+      </div>
+      <p className="widget-caption">{caption}</p>
+    </>
+  );
+}

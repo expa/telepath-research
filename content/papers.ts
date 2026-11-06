@@ -5,7 +5,7 @@ export interface Paper {
   venue: string;
   /** Full venue name for the post header, and whether it is a conference or a journal. */
   venueFull: string;
-  venueKind: "Conference" | "Journal";
+  venueKind: "Conference" | "Journal" | "Preprint";
   /** Venue as it appears in a citation. */
   citeVenue: string;
   /** Publication date, ISO. */
@@ -61,6 +61,45 @@ export const PAPERS: Paper[] = [
     dek: "An encoder made of tuned oscillators learns from unlabeled brain recordings by forecasting them. At 110,000 parameters it rivals models thirty to three thousand times its size.",
     pdf: "/papers/rqf-self-supervised.pdf",
     tags: ["EEG", "Self-supervised learning", "Neural time series"],
+  },
+  {
+    slug: "long-timescales",
+    short: "Long timescales",
+    title: "A Minimal Mechanism to Generate Long Timescales without Fine Tuning",
+    venue: "arXiv · Preprint",
+    venueFull: "arXiv preprint 2608.21586 (cond-mat.dis-nn)",
+    venueKind: "Preprint",
+    citeVenue: "arXiv preprint arXiv:2608.21586",
+    published: "2026-08-21",
+    year: 2026,
+    authors: ["Kathryn McClain", "Shivang Rawat", "Mia Morrell", "Stefano Martiniani", "David J. Heeger", "Flaviano Morone"],
+    summary:
+      "Brains remember over seconds to years with neurons that forget in milliseconds. A linear network can do it only if its connections are tuned to the edge of stability. One extra unit that pools total activity and turns every connection down holds the network on that edge for any connection strength, and the scale-free correlations follow.",
+    hook: "One normalizing unit holds a network at the edge of stability, with no fine tuning.",
+    headline: "Long memory without the fine tuning",
+    dek: "Brains keep information for seconds to years with neurons that forget in milliseconds. A single unit that turns the whole network down when it gets busy keeps it poised to do that, however it is wired.",
+    pdf: "/papers/long-timescales.pdf",
+    tags: ["Criticality", "Normalization", "Random matrices"],
+  },
+  {
+    slug: "unconditional-stability",
+    short: "Unconditional stability",
+    title: "Unconditional Stability of a Recurrent Neural Circuit Implementing Divisive Normalization",
+    venue: "NeurIPS",
+    venueFull: "NeurIPS 2024",
+    venueKind: "Conference",
+    citeVenue: "Advances in Neural Information Processing Systems (NeurIPS)",
+    published: "2024-12-10",
+    year: 2024,
+    authors: ["Shivang Rawat", "David J. Heeger", "Stefano Martiniani"],
+    summary:
+      "We prove that an ORGaNICs circuit, which computes divisive normalization in its own dynamics, is stable for every choice of parameters and inputs when its recurrent weights are the identity, by showing that near its fixed point it is a set of coupled damped oscillators. The stability makes it trainable with plain backpropagation through time, no gradient clipping, and it performs on par with LSTMs.",
+    hook: "A brain-like circuit that can't blow up, so it trains like an LSTM.",
+    headline: "A brain-like circuit that can’t blow up",
+    dek: "Circuits modelled on the cortex are notoriously hard to train because they tip into instability. We prove one that normalizes its own activity always settles, and then train it like an ordinary neural network.",
+    pdf: "/papers/unconditional-stability.pdf",
+    code: "https://github.com/martiniani-lab/dynamic-divisive-norm",
+    tags: ["Stability", "Divisive normalization", "Recurrent networks"],
   },
   {
     slug: "organics",

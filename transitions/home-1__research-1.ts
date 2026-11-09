@@ -42,7 +42,7 @@ export default transition({
     try {
       await Promise.all(all.map((an) => an.finished));
       await flight?.land(T.handoff * d);
-    } catch { flight?.abort(); /* cancelled by a newer navigation */ }
+    } catch { flight?.abort(); /* canceled by a newer navigation */ }
     from.element.querySelector(".landing")?.classList.remove("landing"); // stop html:has(.landing) before the fills go
     // drop fills on persistent / incoming elements so nothing keeps a leftover style
     all.forEach((an) => !from.element.contains((an.effect as KeyframeEffect).target as Node) && an.cancel());

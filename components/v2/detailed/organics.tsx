@@ -21,10 +21,10 @@ export default function Page() {
     <Article paper={paper} sections={SECTIONS}>
       <Tldr
         items={[
-          <>Working memory doesn’t just <strong>hold</strong> information, it <strong>manipulates</strong> it. Real neurons show sequences, oscillations and travelling waves during memory delays, not only steady firing.</>,
-          <>ORGaNICs are recurrent circuits whose recurrent and input drives are <strong>gated by two populations of modulator neurons</strong>, a biophysically plausible generalisation of the LSTM.</>,
+          <>Working memory doesn’t just <strong>hold</strong> information, it <strong>manipulates</strong> it. Real neurons show sequences, oscillations and traveling waves during memory delays, not only steady firing.</>,
+          <>ORGaNICs are recurrent circuits whose recurrent and input drives are <strong>gated by two populations of modulator neurons</strong>, a biophysically plausible generalization of the LSTM.</>,
           <>The same circuit, <strong>with the same synaptic weights</strong>, holds a location, updates it when the eyes move, and plays out a motor command faster, slower or in reverse.</>,
-          <>Recurrent <strong>normalisation</strong> keeps it stable, and while the modulators are constant it is a linear system you can analyse exactly.</>,
+          <>Recurrent <strong>normalization</strong> keeps it stable, and while the modulators are constant it is a linear system you can analyze exactly.</>,
         ]}
       />
 
@@ -49,13 +49,13 @@ export default function Page() {
         </ul>
         <p>The modulators are neurons too, with their own dynamics driven by the inputs and, for <M>{"a"}</M>, by the outputs:</p>
         <Eq tex={String.raw`\tau_a\frac{d\mathbf a}{dt} = -\mathbf a + W_{ax}\mathbf x + f(\mathbf y),\qquad \tau_b\frac{d\mathbf b}{dt} = -\mathbf b + W_{bx}\mathbf x`} />
-        <Callout label="Why this is tractable">When the modulators are constant, which is how a behavioural task with distinct phases looks to the circuit, the equations are linear. Everything about the dynamics then follows from the eigenvalues and eigenvectors of the recurrent weights.</Callout>
+        <Callout label="Why this is tractable">When the modulators are constant, which is how a behavioral task with distinct phases looks to the circuit, the equations are linear. Everything about the dynamics then follows from the eigenvalues and eigenvectors of the recurrent weights.</Callout>
       </Section>
 
       <Section id="hold" n={3} title="Holding">
         <p>Take 36 neurons, each preferring one direction around the clock face. Build the recurrent weights so that 19 of their eigenvalues are exactly 1 and the rest are smaller. Then follow a trial:</p>
         <ol>
-          <li><strong>Target on.</strong> A cue sets <M>{"b = 1"}</M>. The responses follow the input drive: a bump of activity centred on the target.</li>
+          <li><strong>Target on.</strong> A cue sets <M>{"b = 1"}</M>. The responses follow the input drive: a bump of activity centered on the target.</li>
           <li><strong>Delay.</strong> <M>{"b"}</M> drops to 0 and <M>{"a"}</M> is 0. Now the circuit only sees itself. The part of the bump that lies in the eigenvalue-1 subspace stays exactly where it is; everything else decays away. That is sustained activity, and it is enough to read the target back out.</li>
           <li><strong>Respond.</strong> A cue raises <M>{"a"}</M>. The recurrent drive is cut, and the memory is cleared.</li>
         </ol>
@@ -63,7 +63,7 @@ export default function Page() {
       </Section>
 
       <Section id="move" n={4} title="Manipulating">
-        <p>Now add a second recurrent weight matrix shaped like a <strong>derivative</strong>: each neuron is driven by the difference between its neighbours. Gate it with its own modulator. While that modulator is on, the stored bump slides across the population as a <strong>travelling wave</strong>; when it switches off, the bump stops in its new place.</p>
+        <p>Now add a second recurrent weight matrix shaped like a <strong>derivative</strong>: each neuron is driven by the difference between its neighbors. Gate it with its own modulator. While that modulator is on, the stored bump slides across the population as a <strong>traveling wave</strong>; when it switches off, the bump stops in its new place.</p>
         <p>That is exactly what the brain needs in the double-step saccade task. Two targets flash; you look at the first. Because the brain codes locations relative to the eyes, the plan for the second saccade is now wrong by exactly the first movement. ORGaNICs fix it by running the derivative weights for as long, and as hard, as the corollary discharge of the eye movement says.</p>
       </Section>
 
@@ -75,7 +75,7 @@ export default function Page() {
       </Section>
 
       <Section id="normalization" n={6} title="Staying stable">
-        <p>A circuit with eigenvalues of exactly 1 is balanced on a knife-edge: perturb the weights a little and activity either fades or explodes. ORGaNICs fix this with <strong>recurrent normalisation</strong>. The recurrent modulator <M>{"a"}</M> also listens to the outputs through <M>{"f(\\mathbf y)"}</M>; when activity grows, <M>{"a"}</M> rises and turns the recurrent gain down, and vice versa. The circuit’s responses then follow the normalisation equation exactly, the same model that has been fitted to hundreds of datasets across sensory cortex.</p>
+        <p>A circuit with eigenvalues of exactly 1 is balanced on a knife-edge: perturb the weights a little and activity either fades or explodes. ORGaNICs fix this with <strong>recurrent normalization</strong>. The recurrent modulator <M>{"a"}</M> also listens to the outputs through <M>{"f(\\mathbf y)"}</M>; when activity grows, <M>{"a"}</M> rises and turns the recurrent gain down, and vice versa. The circuit’s responses then follow the normalization equation exactly, the same model that has been fitted to hundreds of datasets across sensory cortex.</p>
       </Section>
 
       <Section id="lineage" n={7} title="From here to RQFs">

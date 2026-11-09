@@ -126,7 +126,7 @@ export function PairedBars({ title, unit, groups, a, b, lo, hi, caption }: { tit
   );
 }
 
-/** One horizontal bar per model; ours in the accent colour. */
+/** One horizontal bar per model; ours in the accent color. */
 export function HBars({ title, unit, rows, lo, hi, caption }: { title: string; unit: string; rows: { label: string; value: number; note?: string; ours?: boolean }[]; lo: number; hi: number; caption: React.ReactNode }) {
   const W = 640, ROW = 30, PL = 230, PR = 60, H = rows.length * ROW + 8;
   const sx = lin(lo, hi, PL, W - PR);

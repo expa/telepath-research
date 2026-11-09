@@ -29,7 +29,7 @@ export function phase(f: Rqf, Omega: number) {
 export const qOf = (f: Rqf) => omega0Of(f) / (2 * alphaOf(f));
 
 /**
- * A stack of leaky integrators (the RQF with γ = 1), discretised with ZOH at step h.
+ * A stack of leaky integrators (the RQF with γ = 1), discretized with ZOH at step h.
  * Instantaneous input:  y[n+1] = A y[n] + (1 − A) z[n+1]
  * Prospective input (paper eq. 16 with γ = 1): y[n+1] = A y[n] + z[n+1] − A z[n]
  */

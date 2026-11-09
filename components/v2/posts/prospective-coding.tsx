@@ -46,7 +46,7 @@ export default function Page() {
       <p>Look-ahead improved every model we tested, and helped most in the deepest networks, exactly where lag is worst. Small networks of these units go a long way:</p>
       <Facts
         items={[
-          ["96%", "accuracy recognising spoken words straight from the raw sound wave, with a model of just 32,000 parameters"],
+          ["96%", "accuracy recognizing spoken words straight from the raw sound wave, with a model of just 32,000 parameters"],
           ["16,384", "steps long: the length of a visual puzzle a minimal six-layer stack solves, one of the hardest long-memory tests"],
           ["0", "extra parameters for the look-ahead"],
         ]}

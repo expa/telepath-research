@@ -11,12 +11,12 @@ export default function Page() {
         Neuroscientists have long built models of brain circuits from the parts real neurons have: excitation, inhibition, feedback. These models explain a lot about the brain. But try to train one on a task, the way you’d train a neural network, and it tends to fall apart. Nudge the wrong parameter and activity blows up or locks into an endless wobble, and the training goes with it.
       </p>
       <p>
-        Machine learning sidesteps this with a toolbox of fixes: layer normalization, gradient clipping and careful initialisation. They work, but they’re bolted on after the fact, and brains don’t have them.
+        Machine learning sidesteps this with a toolbox of fixes: layer normalisation, gradient clipping and careful initialisation. They work, but they’re bolted on after the fact, and brains don’t have them.
       </p>
 
-      <h2>A circuit that normalizes itself</h2>
+      <h2>A circuit that normalises itself</h2>
       <p>
-        One computation shows up all over the brain: <strong>normalization</strong>. Each neuron’s response is divided by the combined activity of its neighbours, so responses stay in a useful range however strong the input. Our circuit model, ORGaNICs, computes this as part of its own dynamics: a pool of inhibitory neurons tracks the total activity and turns down the feedback that keeps each neuron going.
+        One computation shows up all over the brain: <strong>normalisation</strong>. Each neuron’s response is divided by the combined activity of its neighbours, so responses stay in a useful range however strong the input. Our circuit model, ORGaNICs, computes this as part of its own dynamics: a pool of inhibitory neurons tracks the total activity and turns down the feedback that keeps each neuron going.
       </p>
 
       <h2>A spring and its damper</h2>
@@ -33,7 +33,7 @@ export default function Page() {
         With the damper off, a gentle push still dies away. Turn the push up past a certain point and every swing comes back bigger than the last, until the weight slams into the stops. That’s a circuit blowing up. Switch the damper on and the same shaking dies away, however hard the motor pushes.
       </p>
       <p>
-        In ORGaNICs, normalization is the damper. It divides the feedback down as activity grows, so the damping never runs out.
+        In ORGaNICs, normalisation is the damper. It divides the feedback down as activity grows, so the damping never runs out.
       </p>
       <p>
         The proof holds for <strong>any</strong> setting of the circuit’s parameters and <strong>any</strong> input, for circuits of any size, when each neuron feeds back only onto itself. With arbitrary connections between neurons we prove it for the smallest circuit, and in simulations of larger ones, with the connection strength kept within bounds, every circuit we tried was stable.
@@ -53,7 +53,7 @@ export default function Page() {
 
       <h2>Why it matters</h2>
       <p>
-        Normalization isn’t only a description of what brains compute. Built into the dynamics, it is what makes a brain-like circuit stable, and stability is what makes it trainable. The proof also gives each neuron an energy it is minimizing, so a trained circuit can be read, not just run. It is a step on the path from <a href="/research/organics">ORGaNICs</a> to the trainable oscillator networks in our <a href="/research/prospective-coding">look-ahead</a> work, and normalization returns as the stabilizer in our <a href="/research/long-timescales">long-timescales</a> paper.
+        Normalisation isn’t only a description of what brains compute. Built into the dynamics, it is what makes a brain-like circuit stable, and stability is what makes it trainable. The proof also gives each neuron an energy it is minimizing, so a trained circuit can be read, not just run. It is a step on the path from <a href="/research/organics">ORGaNICs</a> to the trainable oscillator networks in our <a href="/research/prospective-coding">look-ahead</a> work, and normalisation returns as the stabilizer in our <a href="/research/long-timescales">long-timescales</a> paper.
       </p>
     </Post>
   );

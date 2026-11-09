@@ -22,7 +22,7 @@ export default function Page() {
       <Tldr
         items={[
           <>In a linear recurrent network, long timescales and power-law correlations appear only when the top eigenvalue of the connectivity sits <strong>exactly at the edge of stability</strong>. That takes fine tuning.</>,
-          <>We add <strong>one gain unit</strong> that pools the network’s total activity and scales every recurrent synapse by <M>{"(1-a)"}</M>, the pooled feedback known as normalization.</>,
+          <>We add <strong>one gain unit</strong> that pools the network’s total activity and scales every recurrent synapse by <M>{"(1-a)"}</M>, the pooled feedback known as normalisation.</>,
           <>Above a threshold coupling, the gain settles at the value that puts the top eigenvalue of <M>{"(1-a^*)M"}</M> <strong>exactly at 1</strong>, for any coupling strength and for the particular matrix drawn.</>,
           <>The critical point of the linear model becomes a <strong>critical phase</strong>: correlations decay as <M>{"\\sqrt{2/\\pi t}"}</M>, a prediction with no free parameters, cut off at <M>{"t_{\\max}\\propto N^{2/3}"}</M>.</>,
         ]}
@@ -44,7 +44,7 @@ export default function Page() {
       <Section id="model" n={3} title="One gain unit">
         <p>We add a single unit <M>{"a"}</M> that pools the total activity <M>{"\\lVert x\\rVert^2"}</M> and feeds back by scaling every recurrent synapse by the same factor:</p>
         <Eq tex={String.raw`\tau_x\,\dot x_i = -x_i + (1-a)\sum_j M_{ij}\,x_j + \xi_i,\qquad \tau_a\,\dot a = -a + \sigma^2 + a\sum_i x_i^2`} note="0 < σ² < 1 is a small floor for the gain; we use σ² = 0.1 and τx = τa = 1." />
-        <p>The gain unit is blind to the individual weights. It senses only how active the network is and suppresses all couplings uniformly, exactly the pooled divisive feedback of normalization, a canonical computation found throughout the cortex and mediated by interneurons.</p>
+        <p>The gain unit is blind to the individual weights. It senses only how active the network is and suppresses all couplings uniformly, exactly the pooled divisive feedback of normalisation, a canonical computation found throughout the cortex and mediated by interneurons.</p>
         <p>Take <M>{"M"}</M> from the Gaussian Orthogonal Ensemble with strength <M>{"c"}</M>, so its eigenvalues fill the semicircle on <M>{"[-\\sqrt2 c,\\sqrt2 c]"}</M>. Rotating into the eigenbasis, <M>{"y = O^\\top x"}</M>, each mode relaxes at a rate that depends on the gain,</p>
         <Eq tex={String.raw`\tau_x\,\dot y_i = -\gamma_i(a)\,y_i + \tilde\xi_i,\qquad \gamma_i(a) = 1-(1-a)\lambda_i`} />
         <p>At a fixed gain this is just a linear network with matrix <M>{"(1-a)M"}</M>. But the gain is driven by the activity, and any change in it moves every decay rate at once.</p>
@@ -95,10 +95,10 @@ export default function Page() {
         <p>In the linear model, the <M>{"t^{-1/2}"}</M> decay with an <M>{"N^{2/3}"}</M> cutoff exists only at the isolated point <M>{"c=c_{\\text{crit}}"}</M>. The gain unit turns that point into a phase, with the same exponent and cutoff scaling for every coupling above threshold.</p>
         <ul>
           <li><strong>Low-dimensional attractor, high-dimensional dynamics.</strong> The fixed point lies along a single eigenmode, a pattern spread across many neurons, while the continuum of slow transverse modes gives high-dimensional critical fluctuations around it. That may reconcile the low-dimensional attractors seen throughout the brain with the complex dynamics observed at criticality.</li>
-          <li><strong>Not tied to the GOE.</strong> For any symmetric ensemble whose density vanishes at the edge as <M>{"(\\lambda_{\\text{edge}}-\\lambda)^\\alpha"}</M>, the same construction gives <M>{"C(t)\\sim t^{-\\alpha}"}</M> with cutoff <M>{"N^{1/(1+\\alpha)}"}</M>. Normalization puts the network at the edge; the ensemble sets the exponent.</li>
+          <li><strong>Not tied to the GOE.</strong> For any symmetric ensemble whose density vanishes at the edge as <M>{"(\\lambda_{\\text{edge}}-\\lambda)^\\alpha"}</M>, the same construction gives <M>{"C(t)\\sim t^{-\\alpha}"}</M> with cutoff <M>{"N^{1/(1+\\alpha)}"}</M>. Normalisation puts the network at the edge; the ensemble sets the exponent.</li>
           <li><strong>Asymmetric connections</strong> are the open question. The pinning never needed orthogonality, but non-orthogonal eigenvectors weight the correlations by their overlaps, which may change the exponent.</li>
         </ul>
-        <p>It is economical that one canonical circuit buys both normalized responses and critical collective dynamics. And it makes a testable prediction: disrupting the normalization feedback should destroy the scale-free correlations, one possible route to the loss of criticality seen in epilepsy.</p>
+        <p>It is economical that one canonical circuit buys both normalised responses and critical collective dynamics. And it makes a testable prediction: disrupting the normalisation feedback should destroy the scale-free correlations, one possible route to the loss of criticality seen in epilepsy.</p>
         <Callout label="The idea in one line">A single unit that divides by the network’s total activity holds it at the edge of stability for any wiring, and long, scale-free memory follows.</Callout>
       </Section>
     </Article>

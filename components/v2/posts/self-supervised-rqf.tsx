@@ -58,7 +58,7 @@ export default function Page() {
 
       <h2>Why it matters</h2>
       <p>
-        Bigger isn’t the only path to a general brain-signal model. Building the right structure into the model, rhythms in this case, lets something small enough to run on a device compete with models thousands of times larger. Small models are cheaper, faster, and easier to understand: you can look at any unit and see which rhythm it listens to.
+        Bigger isn’t the only path to a general brain-signal model. Building the right structure into the model, rhythms in this case, lets something small enough to run on a device compete with models thousands of times larger. Small models are cheaper, faster, and easier to understand: you can look at any unit and see which rhythm it listens to. When this one spots abnormal EEG, it leans mostly on a handful of units tuned to the alpha and beta rhythms.
       </p>
     </Post>
   );

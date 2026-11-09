@@ -25,8 +25,9 @@ export default function Page() {
         items={[
           <>Neurons integrate over time. Stack <M>{"L"}</M> of them and the top of the stack runs about <M>{"L\\tau"}</M> behind the world, while the teaching signal coming back down fades geometrically.</>,
           <>We derive the <strong>Recursive Quadrature Filter</strong> (RQF) from a theory of cortical function and prove it is a special case of a <strong>diagonal state-space model</strong>, so it trains with the same parallel scans as S4, S5 and Mamba.</>,
-          <>Driving each layer with a <strong>look-ahead of its input</strong>, <M>{"z + \\tau\\dot z"}</M>, costs no parameters and one extra tap, and improved every model and configuration we tested under full backprop.</>,
-          <>A 31.9k-parameter RQF reaches <strong>96.1%</strong> on raw-audio Speech Commands; a minimal six-layer stack solves the <strong>16,384-step</strong> Path-X at 83.6%.</>,
+          <>Driving each layer with a <strong>look-ahead of its input</strong>, <M>{"z + \\tau\\dot z"}</M>, costs no parameters and one extra tap, and matched or beat its control in every model and configuration we tested under full backprop.</>,
+          <>A 31.9k-parameter RQF reaches <strong>96.1%</strong> on raw-audio Speech Commands; a minimal six-layer stack reaches 83.4% on the <strong>16,384-step</strong> Path-X.</>,
+          <>A <strong>selective RQF</strong>, whose input gain, frequency and bandwidth can depend on the input, keeps the parallel scan: 86.3% on Path-X, and <strong>99.8%</strong> on Selective Copying with look-ahead in all five seeds.</>,
         ]}
       />
 
@@ -88,7 +89,8 @@ export default function Page() {
       <Facts
         items={[
           ["96.09%", "Raw-audio Speech Commands, 16,000 samples per clip, with a 31.9k-parameter six-layer RQF"],
-          ["83.56%", "Path-X (16,384 steps) with a minimal forward-only RQF: no gating, normalization or bidirectionality"],
+          ["83.36%", "Path-X (16,384 steps) with a minimal forward-only RQF: no gating, normalization or bidirectionality"],
+          ["86.31%", "Path-X with a selective RQF whose input gain depends on the input; 85.13% without look-ahead"],
           ["+15.2", "points of prospective advantage for a six-layer MFCC model under spatial-only backprop"],
         ]}
       />
@@ -122,8 +124,12 @@ export default function Page() {
           { label: "S5 · 2 layers", a: 94.94, b: 95.55 },
           { label: "S5 · 6 layers", a: 96.21, b: 96.37 },
         ]}
-        caption={<><b>Paper, Tables 1a and 2.</b> Prospective variants match or beat their controls in every model and configuration, including the S5 state-space model (as αP-S5) and the nonlinear, normalizing ORGaNICs.</>}
+        caption={<><b>Paper, Tables 1a and 2.</b> Prospective variants match or beat their controls in every model and configuration, including the S5 state-space model (as αP-S5) and the nonlinear, normalizing ORGaNICs, which ties at six layers. At width 32 the plain RQF beats αP-S5 at every raw-audio depth with fewer parameters: 96.09% with 31.9k versus 95.06% with 40.9k at six layers.</>}
       />
+
+      <div className="prose">
+        <p>The paper also introduces <strong>selective RQFs</strong>. As in Mamba, each filter’s input gain, and optionally its frequency and bandwidth, is computed from the previous layer’s output. That depends only on the layer below, not on the layer’s own state, so the recurrence stays diagonal and the parallel scan still applies. On Selective Copying (16 tokens scattered through 4,096 steps, recalled in order) a four-layer prospective sRQF reaches 99.83% in all five seeds; without look-ahead only two of five seeds get past chance.</p>
+      </div>
 
       <Section id="meaning" n={7} title="What it means">
         <p>Two contributions come out of this work, and they stand separately.</p>

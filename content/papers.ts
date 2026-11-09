@@ -55,7 +55,7 @@ export const PAPERS: Paper[] = [
     year: 2026,
     authors: ["Mirko Morello", "Shivang Rawat", "David J. Heeger"],
     summary:
-      "A 110k-parameter encoder made of tuned oscillators learns from unlabeled brain recordings by predicting its own future, and lands in the range of EEG foundation models 30 to 3,000 times its size.",
+      "A 110k-parameter encoder made of tuned oscillators learns from unlabeled brain recordings by predicting its own future, and performs comparably to EEG foundation models 30 to 3,000 times its size.",
     hook: "A 110k-parameter brain-signal encoder that learns by predicting its own future.",
     headline: "A tiny brain-signal model that learns by guessing what comes next",
     dek: "An encoder made of tuned oscillators learns from unlabeled brain recordings by forecasting them. At 110,000 parameters it rivals models thirty to three thousand times its size.",

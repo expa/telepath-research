@@ -43,11 +43,12 @@ export default function Page() {
       </p>
 
       <h2>What it can do</h2>
-      <p>Look-ahead improved every model we tested, and helped most in the deepest networks, exactly where lag is worst. Small networks of these units go a long way:</p>
+      <p>With standard training, look-ahead matched or beat the original in every model and setting we tested. When errors can only travel down through the layers, it helps most in the deepest networks, exactly where lag is worst. Small networks of these units go a long way:</p>
       <Facts
         items={[
           ["96%", "accuracy recognizing spoken words straight from the raw sound wave, with a model of just 32,000 parameters"],
-          ["16,384", "steps long: the length of a visual puzzle a minimal six-layer stack solves, one of the hardest long-memory tests"],
+          ["16,384", "steps long: the length of a visual puzzle a minimal six-layer stack learns, one of the hardest long-memory tests"],
+          ["99.8%", "on a selective-copying memory test, with a selective version of the unit that chooses what to let in, and look-ahead switched on"],
           ["0", "extra parameters for the look-ahead"],
         ]}
       />

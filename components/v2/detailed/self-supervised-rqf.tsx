@@ -24,7 +24,7 @@ export default function Page() {
         items={[
           <>An encoder built from <strong>Recursive Quadrature Filters</strong>, tiny oscillators that each learn one frequency and one bandwidth, is a natural fit for brain signals, whose information lives in rhythms.</>,
           <>It learns from <strong>unlabeled recordings</strong> by predicting its own future activity, tens of milliseconds to seconds ahead.</>,
-          <>With <strong>110k parameters</strong> it reaches 0.925 AUROC on abnormal-EEG detection, above a model with 9× the parameters, and sits within the range of EEG foundation models with <strong>3.2M to 369M</strong>.</>,
+          <>With <strong>110k parameters</strong> it reaches 0.925 AUROC on abnormal-EEG detection, above a model with 9× the parameters, and is comparable to EEG foundation models with <strong>3.2M to 369M</strong>.</>,
           <>On intracranial recordings, the <strong>frozen</strong> encoder beats the best published result by 2.9 points.</>,
         ]}
       />
@@ -41,7 +41,7 @@ export default function Page() {
 
       <Section id="filter" n={2} title="A filter that oscillates">
         <p>The building block is the <strong>Recursive Quadrature Filter</strong>, introduced in our companion paper on prospective coding. It is a single complex number <M>{"y(t)"}</M> that follows its input <M>{"z(t)"}</M> while rotating at a preferred rate:</p>
-        <Eq tex={String.raw`\tau\,\dot y = -y + \gamma\, z + (1-\gamma)(1 + i\omega\tau)\, y`} note="τ is a fixed base time constant; ω (phase-prior frequency) and γ (bandwidth) are learned." />
+        <Eq tex={String.raw`\tau\,\dot y = -y + \gamma\, z + (1-\gamma)(1 + i\omega\tau)\, y`} note="τ is a fixed base time constant; ω (frequency) and γ (bandwidth) are learned." />
         <p>Read it as a tug of war. The <M>{"\\gamma z"}</M> term pulls the state toward the input. The <M>{"(1-\\gamma)(1+i\\omega\\tau)y"}</M> term is the filter’s own guess of where its state is heading: the current state, rotated forward by one time constant. Collect terms and it collapses to a one-line linear system,</p>
         <Eq tex={String.raw`\dot y = \lambda y + \alpha z,\qquad \alpha = \tfrac{\gamma}{\tau},\quad \omega_0 = (1-\gamma)\,\omega,\quad \lambda = -\alpha + i\omega_0`} />
         <p>which is a <strong>band-pass filter</strong> with unit gain at <M>{"\\omega_0"}</M> and a half-power bandwidth of <M>{"2\\alpha"}</M>. Its real and imaginary parts are an in-phase and quadrature pair, so <M>{"|y|"}</M> tracks the amplitude of its band whatever the phase. Smaller γ means a longer memory and a sharper peak; larger γ trades selectivity for speed. The <a href="/research/prospective-coding/detailed#rqf">prospective-coding walkthrough</a> lets you tune one.</p>
@@ -107,6 +107,12 @@ export default function Page() {
       />
 
       <div className="prose">
+        <h3>A few rhythm filters carry the decision</h3>
+        <p>Because every unit is a tuned filter, you can read off what the model learned. Pretraining retunes the TUAB encoder: 246 of its 256 filters end up between 0.2 and 5 Hz, and of the 98 that start below 0.2 Hz only 2 stay there.</p>
+        <p>To see which ones matter, we silence every filter tuned to one EEG band and watch abnormal-EEG AUROC on the validation set. In the fine-tuned model, switching off its 5 to 7 <strong>alpha</strong> filters (8 to 13 Hz) costs 13.4 points, against 0.5 for as many random filters, and its single <strong>beta</strong> filter costs 7.7. Filters below 1 Hz matter less than random ones. The model isn’t retrained after silencing, so this measures how much it relies on those filters, not whether they are strictly necessary.</p>
+      </div>
+
+      <div className="prose">
         <h3>The prediction target shapes what is learned</h3>
         <p>On intracranial BrainTreebank we froze the pretrained encoder and trained only a readout. Predicting <strong>window summaries</strong> gives 0.882 AUROC, 5.7 points above the same frozen encoder without pretraining and 1.5 points above <strong>dense</strong> prediction. And freezing beat fine-tuning: letting the task loss reshape the encoder cost 1.2 points. The pretrained representation was already the better one.</p>
       </div>
@@ -129,7 +135,7 @@ export default function Page() {
       <Section id="meaning" n={7} title="What it means">
         <p>Three findings come out of the experiments.</p>
         <ol>
-          <li><strong>A compact oscillator encoder is a real alternative</strong> to Transformer-based models when the signal is made of rhythms.</li>
+          <li><strong>A compact oscillator encoder is a real alternative</strong> to Transformer-based models when the signal is made of rhythms. On abnormal-EEG detection, performance rests mostly on a handful of alpha and beta filters.</li>
           <li><strong>The time scale of the prediction target matters.</strong> Window summaries give stronger frozen representations than per-timestep targets.</li>
           <li><strong>Pretraining acts as a prior.</strong> Its value is largest when labels are scarce or the encoder is frozen, and shrinks when the downstream loss is free to reshape everything.</li>
         </ol>

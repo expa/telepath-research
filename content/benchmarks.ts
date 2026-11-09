@@ -1,4 +1,4 @@
-// Transcribed from the self-supervised RQF paper, Appendix Tables 2, 5, 7 and 9.
+// Transcribed from the self-supervised RQF paper, Appendix Tables 1, 5, 7 and 9.
 // Published points come from their source papers with protocols that differ from ours.
 export const BENCHES = [
   {
@@ -51,7 +51,7 @@ export const BENCHES = [
     metric: "balanced accuracy · cross-corpus",
     lo: 0.42,
     hi: 0.66,
-    note: "BCI-IV-2a, four imagined movements. Our encoder was pretrained on a different corpus (a TUEG subset), then fully fine-tuned: 9.7 points above CBraMod with 35× fewer parameters, 2.9 below REVE-Base with 612× fewer.",
+    note: "BCI-IV-2a, four imagined movements. Our encoder was pretrained on a different corpus (a TUEG subset), then fully fine-tuned with Euclidean alignment: 9.7 points above CBraMod with 35× fewer parameters, 2.9 below REVE-Base with 612× fewer.",
     points: [
       { name: "EEGNet", params: 3e3, score: 0.4482 },
       { name: "EEGConformer", params: 550e3, score: 0.4696 },

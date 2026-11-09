@@ -25,7 +25,7 @@ export function governorStep(s: Governor, c: number, dt: number) {
 // τy ẏ = −√a ⊙ y + b z,  τa ȧ = −a + b0²σ² + W (y² ⊙ a).  Here b = b0 = 1.
 export const ORG = { sigma: 0.2, tauY: 1, tauA: 3 };
 
-/** The normalisation fixed point (Eq. 4): y_s = z / √(σ² + α Σ z²). */
+/** The normalization fixed point (Eq. 4): y_s = z / √(σ² + α Σ z²). */
 export function settled(z: number[]) {
   const pool = z.reduce((t, v) => t + v * v, 0) / z.length;
   return z.map((v) => v / Math.sqrt(ORG.sigma ** 2 + pool));
@@ -46,7 +46,7 @@ export function organicsStep(y: number[], a: number[], z: number[], dt: number) 
 // ---- The stability paper as a vibration rig ----
 // Near rest the circuit is a mass on a spring with a damper, ẍ + Bẋ + Kx = 0 (Eqs. 8–11). Recurrent feedback
 // pushes along with the motion, taking damping away. A plain circuit has nothing to stop it: B = c − push, and past
-// push = c the motion grows. Normalisation is the damper: it divides the feedback down, so B stays positive for any push.
+// push = c the motion grows. Normalization is the damper: it divides the feedback down, so B stays positive for any push.
 export const SPRING = 6, FRICTION = 0.35, DAMPER = 0.5, PUSH_MAX = 1.5;
 export const dampingOf = (push: number, damper: boolean) => (damper ? FRICTION + DAMPER : FRICTION - push);
 export interface Shake { x: number; v: number }

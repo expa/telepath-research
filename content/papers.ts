@@ -75,11 +75,11 @@ export const PAPERS: Paper[] = [
     authors: ["Kathryn McClain", "Shivang Rawat", "Mia Morrell", "Stefano Martiniani", "David J. Heeger", "Flaviano Morone"],
     summary:
       "Brains remember over seconds to years with neurons that forget in milliseconds. A linear network can do it only if its connections are tuned to the edge of stability. One extra unit that pools total activity and turns every connection down holds the network on that edge for any connection strength, and the scale-free correlations follow.",
-    hook: "One normalising unit holds a network at the edge of stability, with no fine tuning.",
+    hook: "One normalizing unit holds a network at the edge of stability, with no fine tuning.",
     headline: "Long memory without the fine tuning",
     dek: "Brains keep information for seconds to years with neurons that forget in milliseconds. A single unit that turns the whole network down when it gets busy keeps it poised to do that, however it is wired.",
     pdf: "/papers/long-timescales.pdf",
-    tags: ["Criticality", "Normalisation", "Random matrices"],
+    tags: ["Criticality", "Normalization", "Random matrices"],
   },
   {
     slug: "unconditional-stability",
@@ -93,13 +93,13 @@ export const PAPERS: Paper[] = [
     year: 2024,
     authors: ["Shivang Rawat", "David J. Heeger", "Stefano Martiniani"],
     summary:
-      "We prove that an ORGaNICs circuit, which computes divisive normalisation in its own dynamics, is stable for every choice of parameters and inputs when its recurrent weights are the identity, by showing that near its fixed point it is a set of coupled damped oscillators. The stability makes it trainable with plain backpropagation through time, no gradient clipping, and it performs on par with LSTMs.",
+      "We prove that an ORGaNICs circuit, which computes divisive normalization in its own dynamics, is stable for every choice of parameters and inputs when its recurrent weights are the identity, by showing that near its fixed point it is a set of coupled damped oscillators. The stability makes it trainable with plain backpropagation through time, no gradient clipping, and it performs on par with LSTMs.",
     hook: "A brain-like circuit that can't blow up, so it trains like an LSTM.",
     headline: "A brain-like circuit that can’t blow up",
-    dek: "Circuits modelled on the cortex are notoriously hard to train because they tip into instability. We prove one that normalises its own activity always settles, and then train it like an ordinary neural network.",
+    dek: "Circuits modelled on the cortex are notoriously hard to train because they tip into instability. We prove one that normalizes its own activity always settles, and then train it like an ordinary neural network.",
     pdf: "/papers/unconditional-stability.pdf",
     code: "https://github.com/martiniani-lab/dynamic-divisive-norm",
-    tags: ["Stability", "Divisive normalisation", "Recurrent networks"],
+    tags: ["Stability", "Divisive normalization", "Recurrent networks"],
   },
   {
     slug: "organics",

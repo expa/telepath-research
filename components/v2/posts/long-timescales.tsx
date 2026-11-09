@@ -50,10 +50,10 @@ export default function Page() {
 
       <h2>Why it matters</h2>
       <p>
-        The extra unit isn’t exotic. It is <strong>normalisation</strong>, a computation neuroscientists find throughout the brain, usually credited with keeping responses in range. This paper shows the same circuit also buys long memory, for free. It predicts that disrupting normalisation should destroy these long-range correlations, a possible link to conditions like epilepsy where they are lost.
+        The extra unit isn’t exotic. It is <strong>normalization</strong>, a computation neuroscientists find throughout the brain, usually credited with keeping responses in range. This paper shows the same circuit also buys long memory, for free. It predicts that disrupting normalization should destroy these long-range correlations, a possible link to conditions like epilepsy where they are lost.
       </p>
       <p>
-        For recurrent networks in machine learning, it points to a cheap way to hold information over long stretches without hand tuning. It is the same normalising feedback at the heart of our <a href="/research/organics">ORGaNICs</a> circuits, which our <a href="/research/unconditional-stability">stability</a> paper shows also keeps them from blowing up.
+        For recurrent networks in machine learning, it points to a cheap way to hold information over long stretches without hand tuning. It is the same normalizing feedback at the heart of our <a href="/research/organics">ORGaNICs</a> circuits, which our <a href="/research/unconditional-stability">stability</a> paper shows also keeps them from blowing up.
       </p>
     </Post>
   );

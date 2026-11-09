@@ -9,7 +9,7 @@ import { Range, useRange } from "@/components/widgets/slider";
 import { dampingOf, PUSH_MAX, SPRING, shakeStep } from "@/lib/gain";
 
 // ---- truth: a mass on a spring, ẍ + Bẋ + Kx = 0, the form the paper reduces the circuit to near rest ----
-// The motor pushes along with the motion (feedback); the damper is the normalisation. See dampingOf in lib/gain.
+// The motor pushes along with the motion (feedback); the damper is the normalization. See dampingOf in lib/gain.
 const RATE = 1.4; // model time units per second
 const STOP = 1; // end stops, in units of travel
 const statusOf = (B: number, hitting: boolean, energy: number) =>

@@ -186,7 +186,7 @@ export function CorrelationPlot({ sizes, caption }: { sizes: number[]; caption: 
           <span className="mono">C(t)/C(0), log–log</span>
         </div>
         <div style={{ padding: "8px 18px 12px" }}>
-          <svg className="plot" viewBox={`0 0 ${W} ${H}`} aria-label="Normalised autocorrelation against time on log–log axes: finite networks follow the t to the minus one half line up to a cutoff that grows with network size">
+          <svg className="plot" viewBox={`0 0 ${W} ${H}`} aria-label="Normalized autocorrelation against time on log–log axes: finite networks follow the t to the minus one half line up to a cutoff that grows with network size">
             {[1e-3, 1e-2, 1e-1, 1].map((v) => (
               <g key={v}>
                 <line className="grid" x1={PL} x2={W - PR} y1={sy(v)} y2={sy(v)} />

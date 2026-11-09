@@ -58,7 +58,7 @@ export default function Page() {
         <Eq tex={String.raw`\mathcal{L}_{\text{NCE}} = -\frac{1}{|\mathcal A|}\sum_{a\in\mathcal A}\log\frac{\exp(\beta\,\mathrm{sim}^+_a)}{\exp(\beta\,\mathrm{sim}^+_a)+\sum_{k=1}^{K}\exp(\beta\,\mathrm{sim}^-_{a,k})}`} note="Targets are detached (stop-gradient). The head is thrown away after pretraining." />
         <h3>Two ways to set the horizon</h3>
         <ul>
-          <li><strong>Windowed.</strong> Cut the state sequence into fixed windows, summarise each one (a mean for speech; a learned pooler of the mean and final state for EEG), and predict the summary of the window <M>{"h_w"}</M> steps later.</li>
+          <li><strong>Windowed.</strong> Cut the state sequence into fixed windows, summarize each one (a mean for speech; a learned pooler of the mean and final state for EEG), and predict the summary of the window <M>{"h_w"}</M> steps later.</li>
           <li><strong>Dense.</strong> At a single timestep, predict the future log-power of the encoder’s states over an interval starting <M>{"\\Delta"}</M> samples ahead: <M>{"g_n = \\log\\big(\\epsilon + \\tfrac{1}{N_w}\\sum_u |y_u|^2\\big)"}</M>.</li>
         </ul>
         <p>The gradient of this loss reaches every filter’s <M>{"\\omega"}</M> and <M>{"\\gamma"}</M>, so pretraining moves the filters themselves toward the rhythms that make the future predictable.</p>
@@ -86,7 +86,7 @@ export default function Page() {
 
       <div className="prose">
         <h3>Pretraining helps most when labels are scarce</h3>
-        <p>To isolate pretraining, we start two copies of the same encoder from identical random weights, pretrain one, then train both on the same labelled subset. With every label available they finish level. With 1% of the labels, the pretrained copy is 4.9 points ahead. With the encoder frozen, pretraining is worth 2.3 to 3.4 points at every budget.</p>
+        <p>To isolate pretraining, we start two copies of the same encoder from identical random weights, pretrain one, then train both on the same labeled subset. With every label available they finish level. With 1% of the labels, the pretrained copy is 4.9 points ahead. With the encoder frozen, pretraining is worth 2.3 to 3.4 points at every budget.</p>
       </div>
 
       <PairedBars
@@ -133,7 +133,7 @@ export default function Page() {
           <li><strong>The time scale of the prediction target matters.</strong> Window summaries give stronger frozen representations than per-timestep targets.</li>
           <li><strong>Pretraining acts as a prior.</strong> Its value is largest when labels are scarce or the encoder is frozen, and shrinks when the downstream loss is free to reshape everything.</li>
         </ol>
-        <p>The limits are stated plainly in the paper: apart from the cross-corpus BCI result, each dataset has its own pretrained weights; and the comparisons with foundation models don’t separate the oscillatory prior from tokenisation, masking or scale. Those are the next experiments.</p>
+        <p>The limits are stated plainly in the paper: apart from the cross-corpus BCI result, each dataset has its own pretrained weights; and the comparisons with foundation models don’t separate the oscillatory prior from tokenization, masking or scale. Those are the next experiments.</p>
         <Callout label="The idea in one line">A small recurrent encoder learns competitive representations when its dynamics and its objective share a model of time.</Callout>
       </Section>
     </Article>

@@ -53,7 +53,7 @@ export default function Page() {
         ]}
       />
       <p>
-        The gain from forecasting is largest when labelled data is scarce, which is the usual situation with brain recordings: hours of signal, very few annotations.
+        The gain from forecasting is largest when labeled data is scarce, which is the usual situation with brain recordings: hours of signal, very few annotations.
       </p>
 
       <h2>Why it matters</h2>

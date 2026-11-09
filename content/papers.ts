@@ -96,7 +96,7 @@ export const PAPERS: Paper[] = [
       "We prove that an ORGaNICs circuit, which computes divisive normalization in its own dynamics, is stable for every choice of parameters and inputs when its recurrent weights are the identity, by showing that near its fixed point it is a set of coupled damped oscillators. The stability makes it trainable with plain backpropagation through time, no gradient clipping, and it performs on par with LSTMs.",
     hook: "A brain-like circuit that can't blow up, so it trains like an LSTM.",
     headline: "A brain-like circuit that can’t blow up",
-    dek: "Circuits modelled on the cortex are notoriously hard to train because they tip into instability. We prove one that normalizes its own activity always settles, and then train it like an ordinary neural network.",
+    dek: "Circuits modeled on the cortex are notoriously hard to train because they tip into instability. We prove one that normalizes its own activity always settles, and then train it like an ordinary neural network.",
     pdf: "/papers/unconditional-stability.pdf",
     code: "https://github.com/martiniani-lab/dynamic-divisive-norm",
     tags: ["Stability", "Divisive normalization", "Recurrent networks"],
@@ -113,7 +113,7 @@ export const PAPERS: Paper[] = [
     year: 2019,
     authors: ["David J. Heeger", "Wayne E. Mackey"],
     summary:
-      "The circuit theory our recurrent models grow from: one family of gated, oscillatory neural circuits that holds a memory, sends it travelling across the cortex, and plays it back as movement, fast, slow or in reverse.",
+      "The circuit theory our recurrent models grow from: one family of gated, oscillatory neural circuits that holds a memory, sends it traveling across the cortex, and plays it back as movement, fast, slow or in reverse.",
     hook: "One gated circuit that remembers, manipulates and moves.",
     headline: "Memory that you can move",
     dek: "A brain-inspired circuit that holds a memory without any input, updates it as the world shifts, and stays stable while it does both.",

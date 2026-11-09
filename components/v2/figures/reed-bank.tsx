@@ -10,7 +10,7 @@ import { Range, useRange } from "@/components/widgets/slider";
 
 const HZ_U = (hz: number) => Math.log(hz) / Math.log(40);
 
-// ---- truth: 16 RQFs, constant Q, centres log-spaced over the EEG range ----
+// ---- truth: 16 RQFs, constant Q, centers log-spaced over the EEG range ----
 const COUNT = 16;
 const TAU = 0.01;
 const Q = 3;

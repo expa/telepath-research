@@ -92,7 +92,7 @@ export function GradientDepth() {
         </div>
       </div>
       <p className="widget-caption">
-        Log scale. With instantaneous input, the error reaching layer 1 is about {(gnp ** (L - 1)).toExponential(0)} of what arrives at the top; with prospective input it is about {(gp ** (L - 1)).toExponential(0)}. Only the discretisation factor is shown: weights and activation slopes scale both the same way.
+        Log scale. With instantaneous input, the error reaching layer 1 is about {(gnp ** (L - 1)).toExponential(0)} of what arrives at the top; with prospective input it is about {(gp ** (L - 1)).toExponential(0)}. Only the discretization factor is shown: weights and activation slopes scale both the same way.
       </p>
     </>
   );

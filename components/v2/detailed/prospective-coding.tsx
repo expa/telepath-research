@@ -25,8 +25,8 @@ export default function Page() {
         items={[
           <>Neurons integrate over time. Stack <M>{"L"}</M> of them and the top of the stack runs about <M>{"L\\tau"}</M> behind the world, while the teaching signal coming back down fades geometrically.</>,
           <>We derive the <strong>Recursive Quadrature Filter</strong> (RQF) from a theory of cortical function and prove it is a special case of a <strong>diagonal state-space model</strong>, so it trains with the same parallel scans as S4, S5 and Mamba.</>,
-          <>Driving each layer with a <strong>look-ahead of its input</strong>, <M>{"z + \\tau\\dot z"}</M>, costs no parameters and one extra tap, and improved every model and configuration we tested under full backprop.</>,
-          <>A 31.9k-parameter RQF reaches <strong>96.1%</strong> on raw-audio Speech Commands; a minimal six-layer stack solves the <strong>16,384-step</strong> Path-X at 83.4%.</>,
+          <>Driving each layer with a <strong>look-ahead of its input</strong>, <M>{"z + \\tau\\dot z"}</M>, costs no parameters and one extra tap, and matched or beat its control in every model and configuration we tested under full backprop.</>,
+          <>A 31.9k-parameter RQF reaches <strong>96.1%</strong> on raw-audio Speech Commands; a minimal six-layer stack reaches 83.4% on the <strong>16,384-step</strong> Path-X.</>,
           <>A <strong>selective RQF</strong>, whose input gain, frequency and bandwidth can depend on the input, keeps the parallel scan: 86.3% on Path-X, and <strong>99.8%</strong> on Selective Copying with look-ahead in all five seeds.</>,
         ]}
       />

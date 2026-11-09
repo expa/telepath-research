@@ -11,12 +11,12 @@ export default function Page() {
         Neuroscientists have long built models of brain circuits from the parts real neurons have: excitation, inhibition, feedback. These models explain a lot about the brain. But try to train one on a task, the way you’d train a neural network, and it tends to fall apart. Nudge the wrong parameter and activity blows up or locks into an endless wobble, and the training goes with it.
       </p>
       <p>
-        Machine learning sidesteps this with a toolbox of fixes: layer normalization, gradient clipping and careful initialisation. They work, but they’re bolted on after the fact, and brains don’t have them.
+        Machine learning sidesteps this with a toolbox of fixes: layer normalization, gradient clipping and careful initialization. They work, but they’re bolted on after the fact, and brains don’t have them.
       </p>
 
       <h2>A circuit that normalizes itself</h2>
       <p>
-        One computation shows up all over the brain: <strong>normalization</strong>. Each neuron’s response is divided by the combined activity of its neighbours, so responses stay in a useful range however strong the input. Our circuit model, ORGaNICs, computes this as part of its own dynamics: a pool of inhibitory neurons tracks the total activity and turns down the feedback that keeps each neuron going.
+        One computation shows up all over the brain: <strong>normalization</strong>. Each neuron’s response is divided by the combined activity of its neighbors, so responses stay in a useful range however strong the input. Our circuit model, ORGaNICs, computes this as part of its own dynamics: a pool of inhibitory neurons tracks the total activity and turns down the feedback that keeps each neuron going.
       </p>
 
       <h2>A spring and its damper</h2>

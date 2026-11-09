@@ -64,7 +64,7 @@ export default function Page() {
       <Section id="energy" n={4} title="An energy for the circuit">
         <p>Because the proof constructs a Lyapunov function directly, it gives an energy that ORGaNICs minimize near the fixed point. For one excitatory and one inhibitory neuron it reads</p>
         <Eq tex={String.raw`V(y,a) = \frac{\tau_y}{\tau_a}\sqrt{b_0^2\sigma^2 + w b^2z^2}\;\Big(y - \frac{bz}{\sqrt{b_0^2\sigma^2+wb^2z^2}}\Big)^2 + \big(\sqrt a\,y - bz\big)^2`} />
-        <p>The second term asks the gated response to reconstruct the input drive; the first asks the response to reach its normalized value. Their balance is set by the ratio <M>{"\\tau_y/\\tau_a"}</M> and by the input: weak inputs favour matching the input, strong ones increasingly engage normalization. In a trained circuit, this assigns each neuron a readable role.</p>
+        <p>The second term asks the gated response to reconstruct the input drive; the first asks the response to reach its normalized value. Their balance is set by the ratio <M>{"\\tau_y/\\tau_a"}</M> and by the input: weak inputs favor matching the input, strong ones increasingly engage normalization. In a trained circuit, this assigns each neuron a readable role.</p>
         <p>In the special case of uniform normalization weights and scalar parameters, the eigenvalues have closed forms, linking the circuit’s parameters to the strength and frequency of its oscillations.</p>
       </Section>
 

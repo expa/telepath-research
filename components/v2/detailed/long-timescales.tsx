@@ -30,7 +30,7 @@ export default function Page() {
 
       <Section id="problem" n={1} title="Slow memory from fast parts">
         <p className="lead">Neurons integrate over milliseconds, yet the brain holds and uses information over seconds, hours and years, from working memory to motor learning.</p>
-        <p>The minimal model of how fast parts produce slow behaviour is a linear stochastic network of <M>{"N"}</M> recurrently connected neurons,</p>
+        <p>The minimal model of how fast parts produce slow behavior is a linear stochastic network of <M>{"N"}</M> recurrently connected neurons,</p>
         <Eq tex={String.raw`\tau_x\,\dot x_i = -x_i + \sum_{j=1}^{N} M_{ij}\,x_j + \xi_i`} note="ξ is weak white noise." />
         <p>Each eigenmode of <M>{"M"}</M> relaxes with its own time constant <M>{"\\tau_\\lambda = \\tau_x/(1-\\lambda)"}</M>, so a large network already has a whole spectrum of timescales. But it is a spectrum of <em>short</em> ones: any mode with <M>{"\\lambda"}</M> well below 1 relaxes within a few <M>{"\\tau_x"}</M>. Long timescales only appear as eigenvalues approach the stability edge, <M>{"\\lambda\\to1^-"}</M>, where <M>{"\\tau_\\lambda"}</M> diverges.</p>
       </Section>

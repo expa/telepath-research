@@ -49,7 +49,7 @@ function Spiral({ f, span }: { f: Rqf; span: number }) {
   return (
     <div>
       <div className="panel-title"><span>State in the complex plane</span><span className="mono">y(t)/α</span></div>
-      <svg className="plot" viewBox={`0 0 ${W} ${H}`} aria-label="Impulse response spiralling into the origin of the complex plane">
+      <svg className="plot" viewBox={`0 0 ${W} ${H}`} aria-label="Impulse response spiraling into the origin of the complex plane">
         <line className="axis" x1={s(-1.1)} x2={s(1.1)} y1={sy(0)} y2={sy(0)} />
         <line className="axis" x1={s(0)} x2={s(0)} y1={sy(-1.1)} y2={sy(1.1)} />
         <circle cx={s(0)} cy={sy(0)} r={(s(1) - s(0))} fill="none" className="grid" strokeDasharray="2 3" />

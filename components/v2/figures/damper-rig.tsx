@@ -19,7 +19,7 @@ const readoutOf = (push: number, on: boolean, status: string) => `push ${push.to
 // ---- world: the rail runs along x; +y is toward the viewer ----
 const WIDTH = 620, HEIGHT = 400;
 const BASE: Plan = { x: -132, y: -56, w: 264, d: 116, r: 9 };
-const RY = -18, RZ = 4; // rail centre line and top
+const RY = -18, RZ = 4; // rail center line and top
 const X0 = -14, AMP = 34; // carriage rest position and travel per unit
 const CAR = { w: 20, d: 16, h: 12 };
 const CZ = RZ + CAR.h / 2; // spring, rod and dashpot axis height

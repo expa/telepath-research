@@ -32,7 +32,7 @@ export default function Page() {
       />
 
       <Section id="tradeoff" n={1} title="Memory versus reactivity">
-        <p className="lead">A biological neuron is well modelled as a leaky integrator. Its membrane time constant τ gives it memory, a little window of the past. It also makes it late.</p>
+        <p className="lead">A biological neuron is well modeled as a leaky integrator. Its membrane time constant τ gives it memory, a little window of the past. It also makes it late.</p>
         <p>One integrator lags its input a little. A deep stack of them lags a lot: the delays add, and the effective response time grows roughly as <M>{"L\\tau"}</M>. Worse, the problem runs in both directions. When a teaching signal arrives at the top, the activity it should correct in the early layers is already about <M>{"L\\tau"}</M> out of date. Signals that change on time scales comparable to τ are served badly on the way up and on the way down.</p>
         <p>Cortex has an answer. Pyramidal neurons driven by a sinusoidal current can fire at a phase that <em>leads</em> their input, and similar prospective responses show up in retina, cerebellum and muscle spindles. This paper turns that observation into an architectural fix for deep recurrent networks.</p>
       </Section>
@@ -51,14 +51,14 @@ export default function Page() {
 
       <FilterLab initialHz={12} initialGamma={0.1} />
       <p className="widget-caption">
-        Computed from the closed form. Left: the state spiralling into the origin. Middle: the impulse response <M>{"y(t) = \\alpha e^{\\lambda t}"}</M>. Right: the frequency response, peaking at ω₀. Raise γ and memory shortens while the band widens.
+        Computed from the closed form. Left: the state spiraling into the origin. Middle: the impulse response <M>{"y(t) = \\alpha e^{\\lambda t}"}</M>. Right: the frequency response, peaking at ω₀. Raise γ and memory shortens while the band widens.
       </p>
 
       <Section id="ssm" n={3} title="A state-space model in disguise">
         <p>A layer of <M>{"n"}</M> RQFs is a diagonal complex linear system, and a deep network stacks layers with a complex mixing matrix and a split-ReLU between them:</p>
         <Eq tex={String.raw`\dot{\mathbf y}^{(\ell)} = \mathrm{diag}(\boldsymbol\lambda^{(\ell)})\,\mathbf y^{(\ell)} + \mathrm{diag}(\boldsymbol\alpha^{(\ell)})\,W^{(\ell)}\rho\big(\mathbf y^{(\ell-1)}\big)`} />
         <p>That is exactly the form of a diagonal state-space model, the family behind S4D, S5, the LRU and Mamba, with one extra constraint: each channel’s input gain is tied to its own decay rate, <M>{"\\alpha = \\gamma/\\tau"}</M>, and its pole has the RQF form. The inclusion is one-way: every RQF layer is a diagonal SSM, not every diagonal SSM is an RQF.</p>
-        <p>The practical upshot is large. Discretised with a zero-order hold, an RQF layer is a first-order complex recurrence, <M>{"y_{n+1} = \\bar A\\, y_n + \\bar B\\, z_{n+1}"}</M>, which runs in <M>{"O(\\log T)"}</M> parallel depth with an associative scan. A biologically motivated unit can train on sequences of tens of thousands of steps.</p>
+        <p>The practical upshot is large. Discretized with a zero-order hold, an RQF layer is a first-order complex recurrence, <M>{"y_{n+1} = \\bar A\\, y_n + \\bar B\\, z_{n+1}"}</M>, which runs in <M>{"O(\\log T)"}</M> parallel depth with an associative scan. A biologically motivated unit can train on sequences of tens of thousands of steps.</p>
       </Section>
 
       <Section id="lookahead" n={4} title="Looking ahead">
@@ -70,7 +70,7 @@ export default function Page() {
       <LookAhead />
 
       <div className="prose">
-        <p>Discretised with the same zero-order hold, the prospective layer is still a single-pole recurrence. It just reads its input through two taps instead of one:</p>
+        <p>Discretized with the same zero-order hold, the prospective layer is still a single-pole recurrence. It just reads its input through two taps instead of one:</p>
         <Eq tex={String.raw`y_{n+1} = \bar A\, y_n + \big[\bar B + \gamma \bar A\big]\, z_{n+1} - \gamma\bar A\, z_n`} note="No new parameters, the same diagonal transition and parallel scan, plus an O(n) buffer for the previous drive." />
         <p>It looks like the exponential-trapezoidal rule of Mamba-3, but it isn’t one: matching even the previous-input coefficient would need an interpolation weight above 1, outside Mamba-3’s admissible range. This is the rule that drives the bench in the first figure when look-ahead is on.</p>
       </div>
@@ -83,13 +83,13 @@ export default function Page() {
       <GradientDepth />
 
       <Section id="results" n={6} title="Results">
-        <p>Every comparison holds everything fixed (architecture, optimiser, schedule, seeds and parameter count) and changes only the input path. Five seeds each.</p>
+        <p>Every comparison holds everything fixed (architecture, optimizer, schedule, seeds and parameter count) and changes only the input path. Five seeds each.</p>
       </Section>
 
       <Facts
         items={[
           ["96.09%", "Raw-audio Speech Commands, 16,000 samples per clip, with a 31.9k-parameter six-layer RQF"],
-          ["83.36%", "Path-X (16,384 steps) with a minimal forward-only RQF: no gating, normalisation or bidirectionality"],
+          ["83.36%", "Path-X (16,384 steps) with a minimal forward-only RQF: no gating, normalization or bidirectionality"],
           ["86.31%", "Path-X with a selective RQF whose input gain depends on the input; 85.13% without look-ahead"],
           ["+15.2", "points of prospective advantage for a six-layer MFCC model under spatial-only backprop"],
         ]}
@@ -124,7 +124,7 @@ export default function Page() {
           { label: "S5 · 2 layers", a: 94.94, b: 95.55 },
           { label: "S5 · 6 layers", a: 96.21, b: 96.37 },
         ]}
-        caption={<><b>Paper, Tables 1a and 2.</b> Prospective variants match or beat their controls in every model and configuration, including the S5 state-space model (as αP-S5) and the nonlinear, normalising ORGaNICs, which ties at six layers. At width 32 the plain RQF beats αP-S5 at every raw-audio depth with fewer parameters: 96.09% with 31.9k versus 95.06% with 40.9k at six layers.</>}
+        caption={<><b>Paper, Tables 1a and 2.</b> Prospective variants match or beat their controls in every model and configuration, including the S5 state-space model (as αP-S5) and the nonlinear, normalizing ORGaNICs, which ties at six layers. At width 32 the plain RQF beats αP-S5 at every raw-audio depth with fewer parameters: 96.09% with 31.9k versus 95.06% with 40.9k at six layers.</>}
       />
 
       <div className="prose">

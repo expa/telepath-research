@@ -89,7 +89,7 @@ export default transition({
     run(b.content, [SLIDE * dir, 0], [0, 1], 460, 240, IN);
     await Promise.all(all.map((an) => an.finished)).catch(() => {});
     // Drop the incoming page's fills so it keeps no leftover transform (it would break position: sticky/fixed inside).
-    // Leave the outgoing page's alone: cancelling them would flash it back to full opacity for a frame before it unmounts.
+    // Leave the outgoing page's alone: canceling them would flash it back to full opacity for a frame before it unmounts.
     all.forEach((an) => to.element.contains((an.effect as KeyframeEffect).target as Node) && an.cancel());
   },
 });

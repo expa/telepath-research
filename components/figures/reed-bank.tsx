@@ -7,7 +7,7 @@ import { useReadout } from "../iso/react/live";
 import { gain, phase, type Rqf } from "@/lib/rqf";
 import { basePlate, bindingPost, knob, labelPlate } from "./parts";
 
-// ---- truth: 16 RQFs, constant Q, centres log-spaced over the EEG range ----
+// ---- truth: 16 RQFs, constant Q, centers log-spaced over the EEG range ----
 const COUNT = 16;
 const TAU = 0.01;
 const Q = 3;

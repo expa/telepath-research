@@ -16,7 +16,7 @@ export default function Page() {
 
       <h2>A circuit with gates</h2>
       <p>
-        ORGaNICs are circuits of neurons with two kinds of gates, themselves made of neurons. One decides when to let new information in. The other decides how much the circuit keeps listening to itself, and when to let go. AI researchers will recognise the idea: it’s the trick that made LSTMs work, rebuilt from parts the brain actually has.
+        ORGaNICs are circuits of neurons with two kinds of gates, themselves made of neurons. One decides when to let new information in. The other decides how much the circuit keeps listening to itself, and when to let go. AI researchers will recognize the idea: it’s the trick that made LSTMs work, rebuilt from parts the brain actually has.
       </p>
 
       <h2>Hold it, move it, clear it</h2>
@@ -32,7 +32,7 @@ export default function Page() {
 
       <h2>Stable on its own</h2>
       <p>
-        A circuit that holds activity forever is balanced on a knife-edge: nudge it and the activity fades away or blows up. ORGaNICs stay balanced by themselves. When activity grows, a gate turns the circuit’s gain down, and when it shrinks the gain comes back up, the same kind of normalisation seen throughout the cortex.
+        A circuit that holds activity forever is balanced on a knife-edge: nudge it and the activity fades away or blows up. ORGaNICs stay balanced by themselves. When activity grows, a gate turns the circuit’s gain down, and when it shrinks the gain comes back up, the same kind of normalization seen throughout the cortex.
       </p>
 
       <h2>Why it matters</h2>

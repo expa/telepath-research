@@ -46,7 +46,7 @@ export async function titleFlight({ from, to, shared }: TransitionRunContext) {
   const fadeIn = to.element.animate([{ opacity: 0 }, { opacity: 1 }], { duration: T.in * d, delay: (T.out * 0.6 + T.move) * d, easing: "ease-out", fill: "backwards" }).finished;
   try {
     await Promise.all([out, fadeIn, ...flights.map((f) => f.landed)]);
-  } catch { /* cancelled by a newer navigation */ }
+  } catch { /* canceled by a newer navigation */ }
   flights.forEach((f) => f.done());
   await wait(0);
 }

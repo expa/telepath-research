@@ -647,7 +647,7 @@ requestAnimationFrame(frame);
    So the ring ends each loop fuller than it started. Drawn in slide pixels (1920×1080). */
 var slide=document.querySelector('.deck .pg.sl.tt'); if(!slide) return;
 var cv=document.createElement('canvas'); cv.className='cvflow'; cv.setAttribute('aria-hidden','true'); slide.appendChild(cv);
-var W=1920,H=1080,CX=1330,CY=540,R0=318,STEP=8,X0=780, INK='rgba(31,23,18,.82)', HOT='#E8693A', HOTRGB='232,105,58', SERIF='Newsreader, Georgia, serif';
+var W=1920,H=1080,CX=1330,CY=540,R0=318,STEP=8,X0=780, INK='rgba(31,23,18,.82)', HOT='#E8693A', HOTRGB='232,105,58', SANS='Geist, system-ui, sans-serif';
 function hash(i,j){var n=Math.sin(i*127.1+j*311.7)*43758.5453;return n-Math.floor(n);}
 var cl=function(v,a,b){return Math.min(b,Math.max(a,v));}, ease=function(v){v=cl(v,0,1);return v<.5?4*v*v*v:1-Math.pow(-2*v+2,3)/2;};
 /* grid points on the right-hand side of the slide */
@@ -719,7 +719,7 @@ function frame(now){
     for(q=0;q<hst.nodes.length;q++){var nd2=hst.nodes[q], age=k-nd2.t; if(age<0) continue; var sz=(q?4.6:7)+7*Math.exp(-age/0.28); disc(x,nd2.x,nd2.y,sz*0.56);}
     if(k<1){x.strokeStyle='rgba('+HOTRGB+','+(0.7*Math.pow(1-k,2)*fade)+')'; x.lineWidth=1.2; x.beginPath(); x.arc(hst.x,hst.y,8+70*k,0,7); x.stroke();}
     /* the word stays beside its dot, on the outside of the ring */
-    x.font='italic 300 21px '+SERIF; var al=hst.al, lx=hst.lx, ly=hst.ly, tw=x.measureText(hst.w).width, bx=al==='left'?lx:(al==='right'?lx-tw:lx-tw/2);
+    x.font='400 21px '+SANS; var al=hst.al, lx=hst.lx, ly=hst.ly, tw=x.measureText(hst.w).width, bx=al==='left'?lx:(al==='right'?lx-tw:lx-tw/2);
     x.globalAlpha=cl(k*3,0,1)*fade; x.fillStyle='#FAF9F6'; x.fillRect(bx-7,ly-19,tw+14,27);   /* a small paper-coloured plate fades in, so the word reads over the dots */
     x.globalAlpha=fade; x.fillStyle='#1F1712'; x.textAlign=al; x.fillText(hst.w,lx,ly); x.textAlign='left'; x.globalAlpha=1;});
 
@@ -728,7 +728,7 @@ function frame(now){
   HOSTS.forEach(function(hst,n){var v=(c-(0.6+n*GAP))/FLY; if(v<0||v>=1) return; var s=ease(v), p=qb(hst.path,s);
     x.fillStyle=HOT; for(var q=1;q<=14;q++){var sq=s-q*0.024; if(sq<=0) break; var tp=qb(hst.path,sq), ts=4.4*(1-q/15); x.globalAlpha=(1-q/15)*fade; disc(x,tp[0],tp[1],ts*0.56);}
     if(v<0.35){var cp=7+16*(v/0.35); x.globalAlpha=(1-v/0.35)*fade; disc(x,CX,CY,cp*0.56);}             /* the centre pulses as a word leaves it */
-    x.globalAlpha=cl(v*4,0,1)*fade; x.font='italic 300 '+(7+14*s)+'px '+SERIF; x.fillStyle='#1F1712'; x.textAlign=hst.al;
+    x.globalAlpha=cl(v*4,0,1)*fade; x.font='400 '+(7+14*s)+'px '+SANS; x.fillStyle='#1F1712'; x.textAlign=hst.al;
     x.fillText(hst.w,p[0],p[1]); x.textAlign='left'; x.globalAlpha=1;});
 
   /* learned words fire together and a connection joins them across the ring */

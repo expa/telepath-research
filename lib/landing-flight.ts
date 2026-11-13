@@ -42,10 +42,10 @@ export function landingFlight(landing: HTMLElement, header: HTMLElement, t: { de
   const discs = landing.querySelector<HTMLElement>(".landing-discs"), word = landing.querySelector<HTMLElement>(".landing-logo b");
 
   if (brand && mark && discs && word) {
-    // symbol: projected disc box → the drawn ellipses of the 24-unit mark (x 2–22, y 2–21)
+    // symbol: projected disc box → the drawn mark in its 24-unit box (pill and circles span x 0.34–23.66, y 0–24)
     const a = symbolBox(discs), m = mark.getBoundingClientRect(), u = m.width / 24;
-    const fly = lift(discs), c = fly.getBoundingClientRect(), s = (20 * u) / a.width;
-    const tx = m.left + 2 * u - c.left - (a.left - c.left) * s, ty = m.top + 2 * u - c.top - (a.top - c.top) * s;
+    const fly = lift(discs), c = fly.getBoundingClientRect(), s = (23.32 * u) / a.width;
+    const tx = m.left + 0.34 * u - c.left - (a.left - c.left) * s, ty = m.top - c.top - (a.top - c.top) * s;
     clones.push(fly);
     anims.push(fly.animate([{ transform: "none" }, { transform: `translate(${tx}px, ${ty}px) scale(${s})` }], opts));
     // each disc gains a layer in the mark's gradient that fades up on the way: cream → orange

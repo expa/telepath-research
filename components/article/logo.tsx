@@ -1,4 +1,4 @@
-/** Telepath's mark: three stacked glass discs, narrowing downward. */
+/** Telepath's mark, as in the deck: a pill over two circles (68×70 in the source, here in a 24-unit box). */
 export function Logo() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -8,9 +8,9 @@ export function Logo() {
           <stop offset="1" stopColor="#ed6300" />
         </linearGradient>
       </defs>
-      <ellipse cx="12" cy="5" rx="10" ry="3" fill="url(#tp-g)" />
-      <ellipse cx="12" cy="12" rx="5.6" ry="2.4" fill="url(#tp-g)" />
-      <circle cx="12" cy="18.6" r="2.4" fill="url(#tp-g)" />
+      <rect x="0.34" y="0" width="23.32" height="6.86" rx="3.43" fill="url(#tp-g)" />
+      <circle cx="12" cy="12" r="3.43" fill="url(#tp-g)" />
+      <circle cx="12" cy="20.57" r="3.43" fill="url(#tp-g)" />
     </svg>
   );
 }

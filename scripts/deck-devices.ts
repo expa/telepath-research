@@ -5,13 +5,12 @@ import * as k from "../components/iso/iso-kit.ts";
 import type { Flat, Plan, Plane, Point3, Projection } from "../components/iso/iso-kit.ts";
 
 const DECK = new URL("../public/deck/index.html", import.meta.url).pathname;
-const W = 400, H = 236, AZ = 52;
+const W = 400, H = 190, AZ = 52;
 
 // ---------- helpers ----------
 const S = k.solidSvg, L = k.lineSvg;
 const r1 = (v: number) => Math.round(v * 10) / 10;
 const at = (p: Point3, P: Projection) => k.iso(p, P);
-const halo = (plan: Plan, z: number, h: number, P: Projection) => `<path class="iso-halo" d="${k.haloOf(plan, z, h, P)}"/>`;
 const poly = (pts: Point3[], P: Projection, cls: string, extra = "") => `<path class="${cls}"${extra} d="${k.pathOf(pts.map((p) => at(p, P)), true)}"/>`;
 const dots = (pts: Point3[], P: Projection, size = 0.55, tone: k.Tone = "mid") => k.dotsSvg(k.pointsAt(pts, P), { size, tone });
 const litDot = (p: Point3, P: Projection, r = 1.4) => { const [x, y] = at(p, P); return `<circle class="litf" cx="${r1(x)}" cy="${r1(y)}" r="${r}"/>`; };
@@ -85,7 +84,6 @@ const earbuds: Device = {
     const b1: Plane = [8, -22], b2: Plane = [34, 12];
     let s = "";
     for (const [i, r] of [16, 23, 30].entries()) s += L(arcTop(b2[0], b2[1], r, -0.35, 1.55, 0, P), { tone: "lit", dotted: true, className: `w${i}` });
-    s += halo(CASE, 0, 22, P);
     s += S(k.slabOf(CASE, 0, 22, P, 10, 1.4), { tone: "hi", crease: "lo", inner: L(k.sideSeam(CASE, 15, P, 10), { tone: "mid" }) });
     s += L(k.planOutline(k.insetPlan(CASE, 5), 22, P, 10), { tone: "faint" });
     s += poly(onFace("y", CASE.y + CASE.d + 0.05, { x: -39, y: 3.4, w: 8, d: 2.4, r: 1.2 }), P, "inkf");
@@ -103,7 +101,7 @@ const watch: Device = {
   bounds: [[-14, -76, 0], [14, -76, 0], [-14, 76, 0], [14, 76, 0], ...k.boxCorners(WCASE, 0, 16), [26, 0, 10]],
   draw(P) {
     const z0 = 3, z1 = 14;
-    let s = halo({ x: -14, y: -72, w: 28, d: 144, r: 6 }, 0, 3, P);
+    let s = "";
     // back strap with its buckle
     const back: Plan = { x: -12.5, y: -74, w: 25, d: 56, r: 5 };
     s += S(k.slabOf(back, 0, 3, P, 6, 0.4), { tone: "mid", crease: "faint" });
@@ -197,7 +195,7 @@ const glasses: Device = {
   bounds: [[-56, ARM_BACK, 0], [56, ARM_BACK, 0], [-56, 2, 0], [56, 2, 0], [-56, 2, 32], [56, 2, 32], [-56, ARM_BACK, ARM_Z + 4], [56, ARM_BACK, ARM_Z + 4]],
   pad: 12,
   draw(P, id) {
-    let s = `<g style="opacity:.5">${halo({ x: -52, y: ARM_BACK, w: 104, d: -ARM_BACK, r: 10 }, 0, 1, P)}</g>`;
+    let s = "";
     // temples, back to front; the right one carries the electronics in a thicker pod
     s += temple(-50, P) + temple(50.5, P);
     const pod: Plan = { x: 47.2, y: -48, w: 6.6, d: 40, r: 3 };
@@ -228,7 +226,7 @@ const phone: Device = {
   pad: 12,
   draw(P) {
     const z = 5.4;
-    let s = halo(PH, 0, z, P);
+    let s = "";
     s += S(k.slabOf(PH, 0, z, P, 10, 1.1), { tone: "hi", crease: "lo" });
     for (const [y, d] of [[-30, 11], [-15, 7]] as const) s += S(k.slabOf({ x: 25, y, w: 1.2, d, r: 0.6 }, 1.6, 2.2, P, 3), { tone: "hi", crease: "none" });
     const scr = k.insetPlan(PH, 2.4);
@@ -265,7 +263,7 @@ const ARM = 44, PROP = 19;
 const MOTORS: Plane[] = [[-1, 0], [0, -1], [1, 0], [0, 1]];
 const drone: Device = {
   name: "Drone", line: "Learns the terrain", label: "A quadcopter hovering above its shadow, a camera slung under its nose",
-  bounds: [...MOTORS.flatMap(([dx, dy]) => Array.from({ length: 12 }, (_, i) => [dx * ARM + PROP * Math.cos(i * 0.52), dy * ARM + PROP * Math.sin(i * 0.52), 23] as Point3)), [0, 0, -6], [14, 14, -6], [-14, 14, -6], [14, -14, -6]],
+  bounds: [...MOTORS.flatMap(([dx, dy]) => Array.from({ length: 12 }, (_, i) => [dx * ARM + PROP * Math.cos(i * 0.52), dy * ARM + PROP * Math.sin(i * 0.52), 23] as Point3)), [0, 0, -3], [18, 12, -3], [-12, 12, 0], [12, -12, 0]],
   pad: 10,
   draw(P) {
     const zb = 10, hb = 10, zt = zb + hb, zp = zt + 2.4;
@@ -286,7 +284,7 @@ const drone: Device = {
       s += S(k.cylinder(mx, my, 2.4, zt - 0.4, 3.6, P, 20, 0.3), { tone: "hi", crease: "lo" });
       return s;
     };
-    let s = `<g style="opacity:.55">${halo({ x: -22, y: -22, w: 44, d: 44, r: 22 }, -6, 2, P)}</g>`;
+    let s = "";
     s += MOTORS.slice(0, 2).map(arm).join("");
     // body
     s += S(k.slabOf(DB, zb, hb, P, 10, 1.4), { tone: "hi", crease: "lo", inner: L(k.sideSeam(DB, zb + 4, P, 10), { tone: "faint" }) });
@@ -311,12 +309,12 @@ const CC: Plan = { x: -30, y: -18, w: 54, d: 36, r: 11 };
 const car: Device = {
   name: "Car", line: "Learns your roads", label: "A car on a stretch of road, a lidar sensor lit on its roof",
   bounds: [[-70, -38, 0], [70, -38, 0], [-70, 38, 0], [70, 38, 0], [0, 0, 42]],
+  pad: 20,
   draw(P) {
     const zr = 0;
     let s = S(k.slabOf({ x: -70, y: -38, w: 140, d: 76, r: 6 }, -2.4, 2.4, P, 6), { tone: "lo", crease: "none" });
     s += L(k.lineOnTop([-64, -30], [64, -30], zr, P), { tone: "mid", dashed: true });
     s += L(k.lineOnTop([-64, 33], [64, 33], zr, P), { tone: "faint" });
-    s += halo({ x: -50, y: -24, w: 100, d: 48, r: 12 }, 0, 6, P);
     const wheel = (x: number, y: number) => lying([x, y, 9.5], 9.5, 7.5, "y", P, { tone: "hi", hub: 0.6 });
     s += wheel(-29, -18.5) + wheel(29, -18.5);
     // lower body
@@ -357,7 +355,7 @@ const robot: Device = {
   bounds: [[-26, -26, 0], [26, 26, 0], [-26, 26, 0], [26, -26, 0], [0, 0, 74], [26, 0, 40]],
   pad: 10,
   draw(P) {
-    let s = halo({ x: -24, y: -24, w: 48, d: 48, r: 24 }, 0, 10, P);
+    let s = "";
     // far arm
     s += S(k.slabOf({ x: -23.5, y: -3.5, w: 6, d: 7, r: 3 }, 17, 17, P, 4, 0.5), { tone: "mid", crease: "faint" });
     // base
@@ -432,7 +430,7 @@ const DEVICES = [earbuds, watch, glasses, phone, drone, car, robot, satellite];
 
 // ---------- page ----------
 function card(dev: Device, i: number) {
-  const P = k.fitProjection(dev.bounds, W, H, { pad: dev.pad ?? 16, azimuth: AZ });
+  const P = k.fitProjection(dev.bounds, W, H, { pad: dev.pad ?? 8, azimuth: AZ });
   const id = `dv${i}`;
   return `<figure class="bx u" style="--i:${i + 2}"><figcaption><p class="t">${dev.name}</p><p class="s">${dev.line}</p></figcaption>`
     + `<svg class="iso-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="${dev.label}">${dev.draw(P, id)}</svg></figure>`;
@@ -445,14 +443,16 @@ const SLIDE = `<section class="pg sl" aria-label="Slide 10: Telepath on eight de
   + `</div><div class="dfolio">10</div></section>`;
 
 const CSS = `/* devices:start */
-.bento{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:24px;min-height:0;
+.bento{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:0;min-height:0;border-top:1px solid var(--rule);
  --anatomy-paper:#fffcf8;--anatomy-face:#fff;--anatomy-top:#fffdfa;--anatomy-shade-0:#e3d9cf;--anatomy-shade-1:#ebe2d9;--anatomy-shade-2:#f2eae2;--anatomy-shade-3:#f8f2ec;
- --anatomy-lit-top:#fff3e6;--anatomy-lit-shade:#ffe0c2;--anatomy-hi:#2a211b;--anatomy-mid:#93857a;--anatomy-lo:#bfb2a7;--anatomy-faint:#ddd2c8;--anatomy-lit:var(--hot);
- --anatomy-halo:#8a6a50;--anatomy-halo-opacity:.3;--anatomy-dot:#3a2e26;--anatomy-weight:.75px}
-.bx{position:relative;min-height:0;border-radius:24px;background:#F3EEE7;overflow:hidden}
-.bx figcaption{position:absolute;left:32px;right:32px;bottom:26px;display:flex;align-items:baseline;gap:16px;z-index:1}
+ --anatomy-lit-top:#fff3e6;--anatomy-lit-shade:#ffe0c2;--anatomy-hi:#6f6157;--anatomy-mid:#93857a;--anatomy-lo:#bfb2a7;--anatomy-faint:#ddd2c8;--anatomy-lit:var(--hot);
+ --anatomy-dot:#3a2e26;--anatomy-weight:.75px}
+.bx{position:relative;min-height:0;border-bottom:1px solid var(--rule);border-right:1px solid var(--rule)}
+.bx:nth-child(4n){border-right:0}
+.bx figcaption{position:absolute;left:32px;right:24px;bottom:24px;display:flex;flex-direction:column;gap:2px;z-index:1}
+.bx figcaption .t{line-height:1.15}
 .bx figcaption .s{white-space:nowrap}
-.bx .iso-svg{position:absolute;left:12px;top:14px;width:calc(100% - 24px);height:calc(100% - 82px);overflow:visible}
+.bx .iso-svg{position:absolute;left:16px;top:12px;width:calc(100% - 32px);height:calc(100% - 100px);overflow:visible}
 .iso-svg path,.iso-svg circle{vector-effect:non-scaling-stroke}
 .iso-fill{fill:var(--anatomy-paper);stroke:none}
 .iso-solid[data-lit]>.iso-fill{fill:var(--anatomy-face)}
@@ -462,7 +462,6 @@ const CSS = `/* devices:start */
 .iso-top{fill:var(--anatomy-top)}
 .iso-solid[data-lit]>.iso-top{fill:var(--anatomy-lit-top)}.iso-solid[data-lit]>.iso-shade{fill:var(--anatomy-lit-shade)}
 .iso-solid[data-lit]>.iso-edge,.iso-solid[data-lit]>.iso-line{stroke:var(--anatomy-lit)}
-.iso-halo{fill:var(--anatomy-halo);stroke:none;filter:blur(9px);opacity:var(--anatomy-halo-opacity);transform:translateY(3px)}
 .iso-line{fill:none;stroke:var(--anatomy-lo);stroke-width:var(--anatomy-weight);stroke-linecap:round;stroke-linejoin:round}
 .iso-line[data-tone="hi"]{stroke:var(--anatomy-hi)}.iso-line[data-tone="mid"]{stroke:var(--anatomy-mid)}
 .iso-line[data-tone="lo"]{stroke:var(--anatomy-lo)}.iso-line[data-tone="faint"]{stroke:var(--anatomy-faint)}
@@ -474,7 +473,7 @@ const CSS = `/* devices:start */
 .iso-dots circle{fill:var(--anatomy-dot);stroke:none;opacity:.32}
 .iso-dots[data-tone="hi"] circle{opacity:.85}.iso-dots[data-tone="mid"] circle{opacity:.45}
 .iso-dots[data-tone="lo"] circle{opacity:.22}.iso-dots[data-tone="faint"] circle{opacity:.5;fill:#8a7a6f}
-.bx .inkf{fill:var(--anatomy-hi);stroke:none}
+.bx .inkf{fill:#2a211b;stroke:none}
 .bx .litf{fill:var(--anatomy-lit);stroke:none}
 .bx .bub{fill:var(--anatomy-shade-1);stroke:none}
 .bx .glass{fill:#efe6dd;stroke:none}
@@ -485,7 +484,7 @@ const preview = process.argv.indexOf("--preview");
 if (preview > 0) {
   const page = `<!doctype html><meta charset="utf-8"><style>:root{--hot:#E8693A;--paper:#FAF9F6}body{margin:0;background:#FAF9F6;font:20px Geist,system-ui,sans-serif}
 ${CSS}
-.bento{display:block}.bx{width:780px;height:470px;margin:8px auto}.bx .iso-svg{height:calc(100% - 82px)}figcaption .t{font-size:28px}figcaption .s{color:#8A7A6F}p{margin:0}</style>
+.bento{display:block}.bx{width:780px;height:470px;margin:0 auto}.bx .iso-svg{height:calc(100% - 100px)}figcaption .t{font-size:28px}figcaption .s{color:#8A7A6F}p{margin:0}</style>
 <div class="bento">${DEVICES.map(card).join("")}</div>`;
   writeFileSync(process.argv[preview + 1], page);
   console.log("preview written");

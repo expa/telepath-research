@@ -1,5 +1,8 @@
-// Draws deck slide 10: a 2×4 bento of isometric devices, in the anatomy style of the site's figures.
-// Usage: `node scripts/deck-devices.ts` rewrites slide 10 and its styles inside public/deck/index.html.
+// Draws the deck's isometric figures, in the anatomy style of the site's figures:
+// slide 10's 2×4 grid of devices, slide 2's 20-watt bench (a lamp wired to a wattmeter)
+// and the four drawings above slide 9's columns.
+// It also lays out slide 3's flat grid of 2,000 houses.
+// Usage: `node scripts/deck-devices.ts` rewrites them, and their styles, inside public/deck/index.html.
 import { readFileSync, writeFileSync } from "node:fs";
 import * as k from "../components/iso/iso-kit.ts";
 import type { Flat, Plan, Plane, Point3, Projection } from "../components/iso/iso-kit.ts";
@@ -428,6 +431,232 @@ const satellite: Device = {
 
 const DEVICES = [earbuds, watch, glasses, phone, drone, car, robot, satellite];
 
+// ---------- slide 2: the 20-watt bench ----------
+// A lamp on an instrument bench, wired to a wattmeter whose needle sits low on the dial.
+const BW = 900, BH = 520;
+const PLATE: Plan = { x: -96, y: -54, w: 192, d: 108, r: 9 };
+const LAMP: Plane = [-38, -6], METER: Plan = { x: 22, y: -30, w: 58, d: 46, r: 5 };
+
+/** A surface of revolution about a vertical axis: profile is [z, r] pairs. Returns its silhouette and rings. */
+function lathe(cx: number, cy: number, profile: [number, number][], P: Projection, steps = 56) {
+  const rings = profile.map(([z, r]) => Array.from({ length: steps }, (_, i) => { const a = (i / steps) * Math.PI * 2; return at([cx + r * Math.cos(a), cy + r * Math.sin(a), z], P); }));
+  return { outline: k.pathOf(hull(rings.flat()), true), rings };
+}
+
+function plate(P: Projection, base: Plan = PLATE, lab: Plan = { x: -70, y: 34, w: 52, d: 11, r: 1.5 }) {
+  const h = 8, foot = 4, z0 = -h - foot;
+  let s = "";
+  for (const [x, y] of k.corners(base, 16).sort((a, b) => k.depthOf([a[0], a[1], 0], P) - k.depthOf([b[0], b[1], 0], P))) {
+    s += S(k.cylinder(x, y, 6.5, z0, 1.4, P, 24), { tone: "lo" });
+    s += S(k.cylinder(x, y, 5, z0 + 1.4, foot - 1.4, P, 24), { tone: "mid", crease: "none" });
+  }
+  s += S(k.slabOf(base, -h, h, P, 8, 1.4), { tone: "mid" });
+  s += L(k.planOutline(k.insetPlan(base, 4.5), 0, P), { tone: "faint" });
+  const screws = k.corners(base, 7);
+  s += L(screws.map(([x, y]) => k.ring(x, y, 2, 0, P, 16)).join(""), { tone: "lo" });
+  s += k.dotsSvg(k.pointsAt(screws.map(([x, y]) => [x, y, 0] as Point3), P), { size: 0.55 });
+  // a label plate on the front edge
+  s += S(k.slabOf(lab, 0, 0.8, P, 4), { tone: "lo" });
+  s += L([0.62, 0.38].map((len, i) => k.lineOnTop([lab.x + 6, lab.y + 3.6 + i * 3.8], [lab.x + 6 + (lab.w - 12) * len, lab.y + 3.6 + i * 3.8], 0.8, P)).join(""), { tone: "lo" });
+  s += dots([[lab.x + 2.8, lab.y + lab.d / 2, 0.8], [lab.x + lab.w - 2.8, lab.y + lab.d / 2, 0.8]], P, 0.45);
+  return s;
+}
+
+function post(x: number, y: number, z: number, P: Projection) {
+  let s = S(k.cylinder(x, y, 3.4, z, 1.2, P, 6), { tone: "lo" });
+  s += S(k.cylinder(x, y, 1.4, z + 1.2, 3, P, 14), { tone: "mid", crease: "none" });
+  s += S(k.cylinder(x, y, 2.6, z + 4.2, 3.2, P, 20, 0.3), { tone: "hi", crease: "lo" });
+  s += L(k.knurl(x, y, 2.6, z + 4.2, z + 7.4, 16, P), { tone: "lo" });
+  return s;
+}
+
+function lamp(P: Projection) {
+  const [cx, cy] = LAMP;
+  let s = "";
+  // socket: a collar, a knurled body and the brass-like screw base with its threads
+  s += S(k.cylinder(cx, cy, 17, 0, 3, P, 56, 0.5), { tone: "mid", crease: "faint" });
+  s += S(k.cylinder(cx, cy, 13, 3, 13, P, 56, 0.8), { tone: "hi", crease: "lo", inner: L(k.sideArc(cx, cy, 13, 7, P, 40), { tone: "faint" }) });
+  s += L(k.knurl(cx, cy, 13, 9, 15.4, 44, P, 0.6), { tone: "faint" });
+  s += S(k.cylinder(cx, cy, 9.6, 16, 11, P, 48, 0.4), { tone: "mid", crease: "lo" });
+  s += L([18, 20.4, 22.8, 25.2].map((z) => k.sideArc(cx, cy, 9.6, z, P, 32)).join(""), { tone: "lo" });
+  // glass: a sphere on a short neck
+  const R = 21, zc = 50;
+  const prof: [number, number][] = [[27, 9.2], [30, 9.6]];
+  for (let z = 33; z <= zc + R; z += 1.5) prof.push([z, Math.sqrt(Math.max(0, R * R - (z - zc) ** 2))]);
+  const g = lathe(cx, cy, prof, P);
+  const [fx, fy] = at([cx, cy, 47], P), kk = Math.hypot(...k.axisVector(P, [1, 0, 0]));
+  s += `<defs><radialGradient id="bulbGlow"><stop offset="0" stop-color="var(--hot)" stop-opacity=".42"/><stop offset=".45" stop-color="var(--hot)" stop-opacity=".14"/><stop offset="1" stop-color="var(--hot)" stop-opacity="0"/></radialGradient></defs>`;
+  s += `<path class="bulbglass" d="${g.outline}"/>`;
+  s += `<circle cx="${r1(fx)}" cy="${r1(fy)}" r="${r1(R * 1.25 * kk)}" fill="url(#bulbGlow)"/>`;
+  // inside: the glass stem, two lead wires and the coiled filament
+  s += S(k.cylinder(cx, cy, 3.6, 27, 9, P, 24, 0.3), { tone: "lo", crease: "none" });
+  s += L(k.pathOf([at([cx - 1.6, cy, 36], P), at([cx - 6, cy, 47], P)]) + k.pathOf([at([cx + 1.6, cy, 36], P), at([cx + 6, cy, 47], P)]), { tone: "mid" });
+  const coil = k.coil(cx - 6, cx + 6, [cy, 47], 1.5, 8, "x", P, 14);
+  s += L(coil.back, { tone: "lit" }) + L(coil.front, { tone: "lit", className: "thick" });
+  // the glass outline and a soft highlight
+  s += L(g.outline, { tone: "mid" });
+  const [sx, sy] = at([cx, cy, zc], P), hr = R * 0.74 * kk;
+  const arc = Array.from({ length: 13 }, (_, i) => { const a = Math.PI * (1.08 + i * 0.026); return [sx + hr * Math.cos(a), sy + hr * Math.sin(a)] as Flat; });
+  s += L(k.pathOf(arc), { tone: "lo" });
+  return s;
+}
+
+function meter(P: Projection) {
+  const m = METER, top = 18;
+  let s = S(k.slabOf(m, 0, top, P, 6, 1.2), { tone: "hi", crease: "lo", inner: L(k.sideSeam(m, 13, P, 6), { tone: "faint" }) });
+  s += L(k.planOutline(k.insetPlan(m, 3.5), top, P, 4), { tone: "faint" });
+  // the dial: a raised disc with ticks, and the needle resting low
+  const dx = m.x + 32, dy = m.y + 20, from = -2.3, span = 4.6;
+  s += S(k.cylinder(dx, dy, 17, top, 0.8, P, 48, 0.2), { tone: "lo", crease: "none" });
+  const t = k.radialTicks(dx, dy, 15.5, 20, 5, top + 0.8, [1.6, 3.4], P, from, span);
+  s += L(t.minor, { tone: "lo" }) + L(t.major, { tone: "mid" });
+  s += L(k.onTop(Array.from({ length: 41 }, (_, i) => { const a = from + (span * i) / 40; return [dx + 11.6 * Math.sin(a), dy - 11.6 * Math.cos(a)] as Plane; }), top + 0.8, P), { tone: "faint" });
+  const a = from + span * 0.2;
+  s += L(k.lineOnTop([dx, dy], [dx + 13 * Math.sin(a), dy - 13 * Math.cos(a)], top + 1.2, P), { tone: "lit", className: "thick" });
+  s += S(k.cylinder(dx, dy, 1.8, top + 0.8, 1, P, 16), { tone: "hi", crease: "none" });
+  // terminals on the front of the lid
+  s += post(m.x + 8, m.y + 12, top, P) + post(m.x + 8, m.y + 30, top, P);
+  return s;
+}
+
+function bench(P: Projection) {
+  let s = plate(P);
+  // two leads from the lamp's socket to the meter's terminals, lying on the bench
+  const [lx, ly] = LAMP;
+  const lead = (dy: number, tx: number, ty: number) => k.onTop([[lx + 16, ly + dy], [lx + 30, ly + dy * 1.6], [tx - 18, ty + 6], [tx - 9, ty + 2]], 0.6, P);
+  s += L(lead(-3, METER.x + 8, METER.y + 12), { tone: "mid" }) + L(lead(4, METER.x + 8, METER.y + 30), { tone: "mid" });
+  s += k.lineSvg(k.segment([METER.x + 8 - 9, METER.y + 14, 0.6], [METER.x + 8, METER.y + 12, 24], P) + k.segment([METER.x + 8 - 9, METER.y + 32, 0.6], [METER.x + 8, METER.y + 30, 24], P), { tone: "mid" });
+  s += lamp(P) + meter(P);
+  return s;
+}
+
+const BENCH_P = k.fitProjection([...k.boxCorners(PLATE, -12, 0), [LAMP[0], LAMP[1], 74], [LAMP[0] - 22, LAMP[1], 50], [LAMP[0], LAMP[1] - 22, 50]], BW, BH, { pad: 12, azimuth: AZ });
+const FIG2 = `<!--fig2--><div class="isofig u" style="--c:1/8;--r:2;align-self:end;--i:2"><svg class="iso-svg" viewBox="0 0 ${BW} ${BH}" role="img" aria-label="A light bulb glowing on an instrument bench, wired to a wattmeter whose needle rests low on its dial">${bench(BENCH_P)}</svg></div><!--/fig2-->`;
+
+// ---------- slide 9: four places it learns ----------
+// One drawing above each column, in the slide 10 style: a robot arm, a desk microphone, a laptop agent and the satellite.
+const sub3 = (a: V3, b: V3): V3 => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+const unit3 = (a: V3): V3 => { const l = Math.hypot(...a) || 1; return [a[0] / l, a[1] / l, a[2] / l]; };
+const cross3 = (a: V3, b: V3): V3 => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+
+/** A rounded bar from a to b, w wide (along y) and t thick. */
+function link(a: V3, b: V3, w: number, t: number, P: Projection, tone: k.Tone = "hi") {
+  const n = unit3(sub3(b, a)), u: V3 = [0, 1, 0], v = unit3(cross3(n, u));
+  return prism(k.roundedPlan({ x: -w / 2, y: -t / 2, w, d: t, r: Math.min(w, t) / 2.4 }, 5), a, u, v, n, Math.hypot(...sub3(b, a)), P, { tone, crease: "lo" });
+}
+
+const arm: Device = {
+  name: "Robotics", line: "", label: "A robot arm lowering its gripper towards a dish, a camera lit on its wrist",
+  bounds: [[-22, -22, 0], [22, 22, 0], [-22, 22, 0], [62, -16, 0], [62, 16, 0], [26, 0, 66], [-22, 0, 30]],
+  draw(P) {
+    const SH: V3 = [0, 0, 24], EL: V3 = [24, 0, 58], WR: V3 = [48, 0, 40], DX = 50;
+    let s = "";
+    // the dish waiting below
+    s += S(k.cylinder(DX, 0, 13, 0, 1.6, P, 48, 0.4), { tone: "hi", crease: "lo" });
+    s += L(k.ring(DX, 0, 8.5, 1.6, P, 40), { tone: "lo" });
+    s += S(k.cylinder(DX - 2, 1, 9, 1.6, 1.2, P, 40, 0.3), { tone: "mid", crease: "faint" });
+    // base and turret
+    s += S(k.cylinder(0, 0, 20, 0, 4, P, 56, 0.6), { tone: "mid", crease: "faint" });
+    s += L(k.knurl(0, 0, 20, 0, 4, 64, P, 0.8), { tone: "faint" });
+    s += S(k.cylinder(0, 0, 13, 4, 12, P, 48, 0.8), { tone: "hi", crease: "lo", inner: L(k.sideArc(0, 0, 13, 10, P, 32), { tone: "faint" }) });
+    // links, then the joints over their ends
+    s += link(SH, EL, 9, 7.5, P) + lying(SH, 8.5, 15, "y", P, { tone: "hi", hub: 0.45 });
+    s += link(EL, WR, 7.5, 6.5, P) + lying(EL, 6.2, 12, "y", P, { tone: "hi", hub: 0.45 });
+    for (const y of [-2.6, 2.6]) s += S(k.slabOf({ x: WR[0] - 1.4, y: y - 1, w: 2.8, d: 2, r: 0.8 }, WR[2] - 13, 9, P, 2), { tone: "hi", crease: "none" });
+    s += S(k.cylinder(WR[0], WR[1], 4.6, WR[2] - 6, 4, P, 28, 0.4), { tone: "mid", crease: "faint" });
+    s += lying(WR, 4.6, 9, "y", P, { tone: "hi" });
+    s += L(k.sideRing([WR[0], WR[1] + 4.55, WR[2]], 2.6, "y", P, 24), { tone: "lit" }) + `<path class="litf" d="${k.sideRing([WR[0], WR[1] + 4.6, WR[2]], 1.3, "y", P, 20)}"/>`;
+    return s;
+  },
+};
+
+const mic: Device = {
+  name: "Speech", line: "", label: "A desk microphone, rings of sound spreading across the desk around it",
+  bounds: [[-40, -40, 0], [40, 40, 0], [-40, 40, 0], [40, -40, 0], [0, 0, 66]],
+  draw(P) {
+    let s = "";
+    for (const [i, r] of [24, 31, 38].entries()) s += L(arcTop(0, 0, r, -0.35, 1.9, 0, P), { tone: "lit", dotted: true, className: `w${i}` });
+    s += S(k.cylinder(0, 0, 17, 0, 3.4, P, 56, 0.8), { tone: "hi", crease: "lo" });
+    s += S(k.cylinder(0, 0, 13, 3.4, 1.2, P, 48, 0.3), { tone: "mid", crease: "faint" });
+    s += S(k.cylinder(0, 0, 2, 4.6, 22, P, 20, 0.2), { tone: "mid", crease: "none" });
+    s += S(k.cylinder(0, 0, 5.6, 25, 4, P, 32, 0.4), { tone: "hi", crease: "lo" });
+    // the capsule: a body, a grille band and a domed top
+    s += S(k.cylinder(0, 0, 9, 29, 24, P, 48, 0.6), { tone: "hi", crease: "lo" });
+    s += L([37, 39.5, 42, 44.5, 47, 49.5].map((z) => k.sideArc(0, 0, 9, z, P, 36)).join(""), { tone: "faint" });
+    s += L(k.knurl(0, 0, 9, 35, 52, 40, P, 0.6), { tone: "faint" });
+    const prof: [number, number][] = [];
+    for (let a = 0; a <= 90; a += 6) prof.push([53 + 9 * Math.sin((a * Math.PI) / 180), 9 * Math.cos((a * Math.PI) / 180)]);
+    const dome = lathe(0, 0, prof, P, 48);
+    s += `<path class="iso-fill" d="${dome.outline}"/><path class="iso-top" d="${dome.outline}"/>` + L(dome.outline, { tone: "hi" });
+    s += L(k.ring(0, 0, 9, 53, P, 48), { tone: "lo" });
+    s += `<path class="litf" d="${k.sideRing([0, 9.05, 31.5], 1.1, "y", P, 16)}"/>`;
+    return s;
+  },
+};
+
+const laptop: Device = {
+  name: "Agents", line: "", label: "An open laptop showing an agent's task list, the finished tasks ticked and the current one lit",
+  bounds: [[-34, -26, 0], [34, -26, 0], [-34, 24, 0], [34, 24, 3], [-34, -34, 42], [34, -34, 42]],
+  draw(P) {
+    const tilt = 0.24, back = -22, z0 = 3.2;
+    const v: V3 = [0, -Math.sin(tilt), Math.cos(tilt)], n: V3 = [0, Math.cos(tilt), Math.sin(tilt)], o: V3 = [0, back, z0];
+    const on = (a: number, b: number): Flat => at([o[0] + a, o[1] + b * v[1] + 1.65 * n[1], o[2] + b * v[2] + 1.65 * n[2]], P);
+    const seg = (pts: [number, number][]) => k.pathOf(pts.map(([a, b]) => on(a, b)));
+    // the lid, its screen and the agent's task list
+    let s = prism(k.roundedPlan({ x: -32, y: 0, w: 64, d: 42, r: 3 }, 5), o, [1, 0, 0], v, n, 1.6, P, { tone: "hi", crease: "lo" });
+    s += L(k.pathOf(k.roundedPlan({ x: -29, y: 3, w: 58, d: 36.5, r: 1.6 }, 4).map(([a, b]) => on(a, b)), true), { tone: "mid" });
+    s += L(seg([[-21, 4], [-21, 38.5]]), { tone: "faint" });
+    s += L(seg([[-27, 35], [-24, 35]]) + seg([[-27, 31], [-24, 31]]) + seg([[-27, 27], [-24, 27]]), { tone: "lo" });
+    const rows = [33, 26, 19, 12];
+    rows.forEach((b, i) => {
+      const done = i < 3;
+      s += L(k.pathOf(k.roundedPlan({ x: -17, y: b - 1.8, w: 3.6, d: 3.6, r: 0.8 }, 3).map(([a, c]) => on(a, c)), true), { tone: done ? "mid" : "lit" });
+      if (done) s += L(seg([[-16.2, b], [-15.3, b - 1], [-13.9, b + 1.1]]), { tone: "mid" });
+      s += L(seg([[-10, b + 0.6], [-10 + [26, 18, 22, 20][i], b + 0.6]]), { tone: done ? "lo" : "lit", className: done ? undefined : "thick" });
+      s += L(seg([[-10, b - 1.2], [-10 + [14, 20, 10, 12][i], b - 1.2]]), { tone: "faint" });
+    });
+    // the base with its keyboard and trackpad
+    const B: Plan = { x: -32, y: back, w: 64, d: 44, r: 3 };
+    s += S(k.slabOf(B, 0, z0, P, 5, 0.6), { tone: "hi", crease: "lo" });
+    let keys = "";
+    for (let r = 0; r < 4; r++) for (let c = 0; c < 12; c++) keys += k.planOutline({ x: -27 + c * 4.6, y: back + 4 + r * 4.4, w: 3.8, d: 3.6, r: 0.6 }, z0, P, 2);
+    s += L(keys, { tone: "faint" });
+    s += L(k.planOutline({ x: -11, y: back + 23, w: 22, d: 14, r: 1.6 }, z0, P, 3), { tone: "lo" });
+    return s;
+  },
+};
+
+const NINE_ITEMS: [Device, string, string][] = [
+  [arm, "01", "A home robot that learns your kitchen, your dishes and your dog."],
+  [mic, "02", "An assistant that learns how you speak: your accent, your words, the way you pause."],
+  [laptop, "03", "An agent that learns your work on the job. You would never hire someone who couldn’t."],
+  [{ ...satellite, name: "Satellites" }, "04", "A satellite that learns a changing planet from orbit, without waiting for a new model from the ground."],
+];
+const NW = 400, NH = 330;
+const FIG9 = `<!--fig9--><div class="grp cols dcols" style="--r:2;align-self:end;--n:4">${NINE_ITEMS.map(([dev, num, text], i) => {
+  const P = k.fitProjection(dev.bounds, NW, NH, { pad: dev.pad ?? 12, azimuth: AZ });
+  return `<div class="dcol"><svg class="iso-svg u" style="--i:${i + 1}" viewBox="0 0 ${NW} ${NH}" role="img" aria-label="${dev.label}">${dev.draw(P, `n9${i}`)}</svg><div class="st rule"><p class="s">${num}</p><p class="t">${dev.name}</p><p class="s">${text}</p></div></div>`;
+}).join("")}</div><!--/fig9-->`;
+
+// ---------- slide 3: 2,000 homes ----------
+// One flat house per US home that a single training run could power for a year, 50 across and 40 down.
+const COLS = 50, ROWS = 40, CW = 20, CH = 23.5; // cells a touch taller than wide, so the grid fills its 945×888 slot
+// A minimal filled house; its window takes the <use>'s fill, which the slide animates from unlit to lit.
+const HOUSE = `<g id="hs"><path class="hbody" d="M2.5 10.2 10 3.6l7.5 6.6v10.6h-15Z"/><path d="M8.2 12.6h3.6v3.6H8.2Z"/></g>`;
+
+/** Each house switches on in a wave from the top-left, with a little jitter so it feels like a grid coming alive. */
+function town() {
+  let seed = 11;
+  const rand = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  let s = `<defs>${HOUSE}</defs>`;
+  for (let j = 0; j < ROWS; j++) {
+    for (let i = 0; i < COLS; i++) s += `<use href="#hs" x="${i * CW}" y="${r1(j * CH)}" style="--d:${Math.round(350 + (i + j) * 24 + rand() * 260)}"/>`;
+  }
+  return s;
+}
+
+const FIG3 = `<!--fig3--><div class="townfig" style="--c:6/13;--r:1/4"><svg viewBox="0 0 ${COLS * CW} ${ROWS * CH}" preserveAspectRatio="xMaxYMid meet" role="img" aria-label="2,000 small houses in a grid of 50 by 40, one for each US home powered for a year">${town()}</svg></div><!--/fig3-->`;
+
 // ---------- page ----------
 function card(dev: Device, i: number) {
   const P = k.fitProjection(dev.bounds, W, H, { pad: dev.pad ?? 8, azimuth: AZ });
@@ -436,14 +665,17 @@ function card(dev: Device, i: number) {
     + `<svg class="iso-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="${dev.label}">${dev.draw(P, id)}</svg></figure>`;
 }
 
-const SLIDE = `<section class="pg sl" aria-label="Slide 10: Telepath on eight devices, from earbuds, watch, glasses and phone to drone, car, robot and satellite"><div class="in">`
-  + `<div class="hd" style="--c:1/8;--r:1"><p class="k">The vision</p><h2>From the data center <em>to every device.</em></h2></div>`
+// The top bar matches the one on every other slide (see the "top bar" styles in the deck).
+const BAR = `<header class="tbar" aria-hidden="true"><svg class="tbm" viewBox="0 0 19 20" aria-hidden="true"><rect width="19" height="5.7" rx="2.85"/><rect x="6.7" y="7.15" width="5.6" height="5.7" rx="2.8"/><rect x="6.7" y="14.3" width="5.6" height="5.7" rx="2.8"/></svg><span class="tbn">Telepath</span><span class="tbt">The vision</span><span class="tbc">Private &amp; Confidential</span><span class="tbf">10</span></header>`;
+const SLIDE = `<section class="pg sl" data-title="The vision" aria-label="Slide 10: Telepath on eight devices, from earbuds, watch, glasses and phone to drone, car, robot and satellite">${BAR}<div class="in">`
+  + `<div class="hd" style="--c:1/8;--r:1"><h2>From the data center <em>to every device.</em></h2></div>`
   + `<p class="l" style="--c:8/13;--r:1;align-self:end">Small enough to run on a phone, an earbud or a robot, and to keep learning there from the person using it.</p>`
   + `<div class="bento" style="--r:2">${DEVICES.map(card).join("")}</div>`
   + `</div><div class="dfolio">10</div></section>`;
 
 const CSS = `/* devices:start */
-.bento{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:0;min-height:0;border-top:1px solid var(--rule);
+.bento{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:0;min-height:0;border-top:1px solid var(--rule)}
+.bento,.isofig,.dcols{
  --anatomy-paper:#fffcf8;--anatomy-face:#fff;--anatomy-top:#fffdfa;--anatomy-shade-0:#e3d9cf;--anatomy-shade-1:#ebe2d9;--anatomy-shade-2:#f2eae2;--anatomy-shade-3:#f8f2ec;
  --anatomy-lit-top:#fff3e6;--anatomy-lit-shade:#ffe0c2;--anatomy-hi:#6f6157;--anatomy-mid:#93857a;--anatomy-lo:#bfb2a7;--anatomy-faint:#ddd2c8;--anatomy-lit:var(--hot);
  --anatomy-dot:#3a2e26;--anatomy-weight:.75px}
@@ -474,7 +706,19 @@ const CSS = `/* devices:start */
 .iso-dots[data-tone="hi"] circle{opacity:.85}.iso-dots[data-tone="mid"] circle{opacity:.45}
 .iso-dots[data-tone="lo"] circle{opacity:.22}.iso-dots[data-tone="faint"] circle{opacity:.5;fill:#8a7a6f}
 .bx .inkf{fill:#2a211b;stroke:none}
-.bx .litf{fill:var(--anatomy-lit);stroke:none}
+.litf{fill:var(--anatomy-lit);stroke:none} /* unscoped: reused <use> copies can't match a parent selector */
+.isofig{min-height:0;display:flex;align-items:flex-end}
+.isofig .iso-svg{display:block;width:100%;height:auto;max-height:100%;overflow:visible}
+.isofig .bulbglass{fill:#fffcf8;fill-opacity:.6;stroke:none}
+.dcol{display:flex;flex-direction:column;gap:40px;min-width:0}
+.dcol .iso-svg{display:block;width:100%;height:auto;max-height:340px;overflow:visible}
+.townfig{min-height:0;display:flex}
+.townfig svg{display:block;width:100%;height:100%}
+/* unscoped: reused <use> copies can't match a parent selector */
+.hbody{fill:#ddd5cd;stroke:#ddd5cd;stroke-width:.8;stroke-linejoin:round}
+.townfig use{fill:var(--hot)}
+@keyframes power{from{fill:var(--paper)}60%{fill:#ffb183}to{fill:var(--hot)}}
+.sl.on .townfig use{animation:power .7s ease both;animation-delay:calc(var(--d)*1ms)}
 .bx .bub{fill:var(--anatomy-shade-1);stroke:none}
 .bx .glass{fill:#efe6dd;stroke:none}
 .bx .glass2{fill:var(--anatomy-shade-1);stroke:none}
@@ -485,19 +729,28 @@ if (preview > 0) {
   const page = `<!doctype html><meta charset="utf-8"><style>:root{--hot:#E8693A;--paper:#FAF9F6}body{margin:0;background:#FAF9F6;font:20px Geist,system-ui,sans-serif}
 ${CSS}
 .bento{display:block}.bx{width:780px;height:470px;margin:0 auto}.bx .iso-svg{height:calc(100% - 100px)}figcaption .t{font-size:28px}figcaption .s{color:#8A7A6F}p{margin:0}</style>
-<div class="bento">${DEVICES.map(card).join("")}</div>`;
+<div class="bento">${DEVICES.map(card).join("")}</div><div class="isofig" style="width:900px;margin:40px auto">${FIG2}</div><div style="width:900px;height:720px;margin:40px auto;--gray:#CFC6BD;--paper:#FAF9F6">${FIG3}</div>`;
   writeFileSync(process.argv[preview + 1], page);
   console.log("preview written");
   process.exit(0);
 }
 
 let html = readFileSync(DECK, "utf8");
-const slide = /<section class="pg sl ?" aria-label="Slide 10:[\s\S]*?<\/section>/;
+const slide = /<section class="pg sl ?"(?: data-title="[^"]*")? aria-label="Slide 10:[\s\S]*?<\/section>/;
 if (!slide.test(html)) throw new Error("slide 10 not found");
 html = html.replace(slide, SLIDE);
 html = html.replace(".reach{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}\n", "").replace(".fig .tx.nm2{font-size:28px;letter-spacing:-.01em}\n", "");
 const block = /\/\* devices:start \*\/[\s\S]*?\/\* devices:end \*\//;
 html = block.test(html) ? html.replace(block, CSS) : html.replace(/\n<\/style>\s*\n<main class="deck">/, (m) => `\n${CSS}${m}`);
 if (!html.includes("/* devices:start */")) throw new Error("could not place the device styles");
+const two = /(<section class="pg sl ?"(?: data-title="[^"]*")? aria-label="Slide 2">[\s\S]*?)(?:<!--fig2-->[\s\S]*?<!--\/fig2-->)?(<\/div><div class="dfolio">02<\/div><\/section>)/;
+if (!two.test(html)) throw new Error("slide 2 not found");
+html = html.replace(two, (_, head, tail) => head + FIG2 + tail);
+const three = /<!--fig3-->[\s\S]*?<!--\/fig3-->|<div class="homes"[^>]*>(?:<i[^>]*><\/i>)*<\/div>/;
+if (!three.test(html)) throw new Error("slide 3's figure not found");
+const nine = /<!--fig9-->[\s\S]*?<!--\/fig9-->|<div class="grp cols" style="--r:2;align-self:end;--n:4"><div class="st rule"><p class="s">01<\/p><p class="t">Robotics<\/p>[\s\S]*?<\/p><\/div><\/div>(?=<\/div><div class="dfolio">09)/;
+if (!nine.test(html)) throw new Error("slide 9's columns not found");
+html = html.replace(nine, () => FIG9);
+html = html.replace(three, () => FIG3).replace("Each square is one US home for a year.", "Each house is one US home for a year.");
 writeFileSync(DECK, html);
 console.log(`slide 10: ${DEVICES.length} devices, ${(SLIDE.length / 1024).toFixed(0)} KB`);

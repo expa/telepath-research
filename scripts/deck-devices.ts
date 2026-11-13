@@ -1,6 +1,6 @@
 // Draws the deck's isometric figures, in the anatomy style of the site's figures:
 // slide 10's 2×4 grid of devices, slide 2's 20-watt bench (a lamp wired to a wattmeter)
-// and the four drawings above slide 9's columns.
+// and the drawings above the columns of slides 9, 28 and 31.
 // It also lays out slide 3's flat grid of 2,000 houses.
 // Usage: `node scripts/deck-devices.ts` rewrites them, and their styles, inside public/deck/index.html.
 import { readFileSync, writeFileSync } from "node:fs";
@@ -581,9 +581,9 @@ const mic: Device = {
     s += S(k.cylinder(0, 0, 2, 4.6, 22, P, 20, 0.2), { tone: "mid", crease: "none" });
     s += S(k.cylinder(0, 0, 5.6, 25, 4, P, 32, 0.4), { tone: "hi", crease: "lo" });
     // the capsule: a body, a grille band and a domed top
-    s += S(k.cylinder(0, 0, 9, 29, 24, P, 48, 0.6), { tone: "hi", crease: "lo" });
-    s += L([37, 39.5, 42, 44.5, 47, 49.5].map((z) => k.sideArc(0, 0, 9, z, P, 36)).join(""), { tone: "faint" });
-    s += L(k.knurl(0, 0, 9, 35, 52, 40, P, 0.6), { tone: "faint" });
+    // the grille is drawn inside the capsule, before its outline, so the side edges stay crisp
+    const grille = L([37, 39.5, 42, 44.5, 47, 49.5].map((z) => k.sideArc(0, 0, 9, z, P, 36)).join("") + k.knurl(0, 0, 9, 35, 52, 40, P, 0.6), { tone: "faint" });
+    s += S(k.cylinder(0, 0, 9, 29, 24, P, 48, 0.6), { tone: "hi", crease: "lo", inner: grille });
     const prof: [number, number][] = [];
     for (let a = 0; a <= 90; a += 6) prof.push([53 + 9 * Math.sin((a * Math.PI) / 180), 9 * Math.cos((a * Math.PI) / 180)]);
     const dome = lathe(0, 0, prof, P, 48);
@@ -633,10 +633,206 @@ const NINE_ITEMS: [Device, string, string][] = [
   [{ ...satellite, name: "Satellites" }, "04", "A satellite that learns a changing planet from orbit, without waiting for a new model from the ground."],
 ];
 const NW = 400, NH = 330;
-const FIG9 = `<!--fig9--><div class="grp cols dcols" style="--r:2;align-self:end;--n:4">${NINE_ITEMS.map(([dev, num, text], i) => {
-  const P = k.fitProjection(dev.bounds, NW, NH, { pad: dev.pad ?? 12, azimuth: AZ });
-  return `<div class="dcol"><svg class="iso-svg u" style="--i:${i + 1}" viewBox="0 0 ${NW} ${NH}" role="img" aria-label="${dev.label}">${dev.draw(P, `n9${i}`)}</svg><div class="st rule"><p class="s">${num}</p><p class="t">${dev.name}</p><p class="s">${text}</p></div></div>`;
-}).join("")}</div><!--/fig9-->`;
+/** A row of columns, each with an iso drawing above its rule and caption, like slide 9's. */
+function figCols(marker: string, items: [Device, string, string, string][], pad = 12) {
+  return `<!--${marker}--><div class="grp cols dcols" style="--r:2;align-self:end;--n:${items.length}">${items.map(([dev, label, labelClass, text], i) => {
+    const P = k.fitProjection(dev.bounds, NW, NH, { pad: dev.pad ?? pad, azimuth: AZ });
+    return `<div class="dcol"><svg class="iso-svg u" style="--i:${i + 1}" viewBox="0 0 ${NW} ${NH}" role="img" aria-label="${dev.label}">${dev.draw(P, `${marker}${i}`)}</svg><div class="st rule"><p class="${labelClass}">${label}</p><p class="t">${dev.name}</p><p class="s">${text}</p></div></div>`;
+  }).join("")}</div><!--/${marker}-->`;
+}
+const FIG9 = figCols("fig9", NINE_ITEMS.map(([dev, num, text]) => [dev, num, "s", text] as [Device, string, string, string]));
+
+// ---------- slide 31: three phases ----------
+// One drawing above each phase, in the slide 10 style: racks proving it at scale, an edge board, and a frozen model with a learning layer on top.
+function rackAt(cx: number, H: number, P: Projection, litAt: number[]) {
+  const R: Plan = { x: cx - 18, y: -15, w: 36, d: 30, r: 2 };
+  let s = S(k.slabOf(R, 0, H, P, 3, 1), { tone: "hi", crease: "lo" });
+  s += L(k.planOutline(k.insetPlan(R, 3), H, P, 3), { tone: "faint" });
+  s += L([-8, -4, 0, 4, 8].map((x) => k.lineOnTop([cx + x, -9], [cx + x, 9], H, P)).join(""), { tone: "faint" });
+  const yf = R.y + R.d + 0.05, units = Math.floor((H - 4) / 8);
+  let seams = "", vents = "";
+  for (let n = 0; n < units; n++) {
+    const z = 3 + n * 8;
+    if (n) seams += k.segment([R.x + 2, yf, z], [R.x + R.w - 2, yf, z], P);
+    for (let v = 0; v < 5; v++) vents += k.segment([R.x + 5 + v * 2.2, yf, z + 2.4], [R.x + 5 + v * 2.2, yf, z + 5.6], P);
+  }
+  s += L(seams, { tone: "lo" }) + L(vents, { tone: "faint" });
+  for (let n = 0; n < units; n++) {
+    const z = 3 + n * 8 + 4;
+    s += litAt.includes(n) ? `<path class="litf" d="${k.sideRing([R.x + R.w - 6, yf, z], 1.1, "y", P, 14)}"/>` : dots([[R.x + R.w - 6, yf, z]], P, 0.8, "mid");
+    s += dots([[R.x + R.w - 10, yf, z]], P, 0.7, "lo");
+  }
+  return s;
+}
+const racks: Device = {
+  name: "Prove it at scale", line: "", label: "Two server racks of stacked units, a few status lights lit orange",
+  bounds: [[-60, -16, 0], [60, 16, 0], [-60, 16, 0], [60, -16, 0], [-22, 0, 84], [22, 0, 70]],
+  draw(P) { return rackAt(-21, 82, P, [2, 7]) + rackAt(21, 66, P, [1, 5]); },
+};
+
+const board: Device = {
+  name: "Put it on devices", line: "", label: "A small edge computing board with a chip whose die is lit orange",
+  bounds: [[-42, -30, 0], [42, -30, 0], [-42, 30, 0], [42, 30, 0], [0, 0, 12]],
+  draw(P) {
+    const B: Plan = { x: -40, y: -28, w: 80, d: 56, r: 3 }, z = 2.4;
+    let s = S(k.slabOf(B, 0, z, P, 4, 0.4), { tone: "mid", crease: "faint" });
+    s += L(k.corners(B, 4).map(([x, y]) => k.ring(x, y, 1.6, z, P, 16)).join(""), { tone: "lo" });
+    // traces from the chip out to the parts
+    s += L(k.onTop([[14, -4], [24, -4], [28, -12], [34, -12]], z, P) + k.onTop([[14, 4], [22, 4], [26, 12], [34, 12]], z, P) + k.onTop([[-14, 6], [-24, 6], [-28, 18]], z, P) + k.onTop([[4, -14], [4, -22], [10, -24]], z, P), { tone: "faint" });
+    // pins along the chip's edges
+    let pins = "";
+    for (let i = -10; i <= 10; i += 2.5) pins += k.lineOnTop([i, -14], [i, -16.4], z, P) + k.lineOnTop([i, 14], [i, 16.4], z, P) + k.lineOnTop([-14, i], [-16.4, i], z, P) + k.lineOnTop([14, i], [16.4, i], z, P);
+    s += L(pins, { tone: "lo" });
+    // small parts, a pin header and a port
+    for (const [x, y] of [[24, -20], [24, 20], [-26, -20], [30, 0]] as const) s += S(k.slabOf({ x: x - 2.4, y: y - 1.4, w: 4.8, d: 2.8, r: 0.6 }, z, 2, P, 2), { tone: "mid", crease: "none" });
+    for (let i = 0; i < 7; i++) s += S(k.cylinder(-30 + i * 4, 22, 1.1, z, 3.2, P, 10), { tone: "mid", crease: "none" });
+    s += S(k.slabOf({ x: -42, y: -8, w: 9, d: 16, r: 1 }, z, 5, P, 2, 0.3), { tone: "hi", crease: "lo" });
+    // the chip, its die lit
+    s += S(k.slabOf({ x: -14, y: -14, w: 28, d: 28, r: 1.5 }, z, 3.4, P, 3, 0.5), { tone: "hi", crease: "lo" });
+    s += S(k.slabOf({ x: -6.5, y: -6.5, w: 13, d: 13, r: 1 }, z + 3.4, 0.8, P, 3), { tone: "hi", crease: "none", lit: true });
+    s += dots([[-10.5, -10.5, z + 3.4]], P, 0.8, "hi");
+    return s;
+  },
+};
+
+const stack: Device = {
+  name: "Bring it to today’s models", line: "", label: "A stack of grey layers, the frozen model, with a thin orange learning layer on top",
+  bounds: [[-38, -28, 0], [38, 28, 0], [-38, 28, 0], [38, -28, 0], [0, 0, 44]],
+  draw(P) {
+    const L0: Plan = { x: -36, y: -26, w: 72, d: 52, r: 3 };
+    let s = "";
+    for (let n = 0; n < 5; n++) {
+      const z = n * 7;
+      s += S(k.slabOf(L0, z, 4.4, P, 4, 0.5), { tone: "mid", crease: "faint" });
+      let grid = "";
+      for (let x = -28; x <= 28; x += 8) grid += k.lineOnTop([x, -22], [x, 22], z + 4.4, P);
+      s += L(grid, { tone: "faint" });
+      if (n < 4) for (const [x, y] of k.corners(L0, 5)) s += S(k.cylinder(x, y, 1.2, z + 4.4, 2.6, P, 10), { tone: "lo", crease: "none" });
+    }
+    // the learning layer: thin, lit, set slightly in
+    const top = k.insetPlan(L0, 3), zt = 5 * 7 + 1.2;
+    for (const [x, y] of k.corners(L0, 5)) s += S(k.cylinder(x, y, 1.2, 4 * 7 + 4.4, zt - (4 * 7 + 4.4), P, 10), { tone: "lo", crease: "none" });
+    s += S(k.slabOf(top, zt, 2.2, P, 4, 0.4), { tone: "hi", crease: "none", lit: true });
+    s += k.dotsSvg(k.dotGrid(-24, -16, 7, 5, 8, zt + 2.2, P).map(([x, y]) => [x, y] as Flat), { size: 0.9, tone: "hi" }).replace('class="iso-dots"', 'class="iso-dots litdots"');
+    return s;
+  },
+};
+
+const PHASES: [Device, string, string][] = [
+  [racks, "Phase 1", "Scale local learning on the speech model, and reach 100% accuracy on new speech, learned live."],
+  [board, "Phase 2", "Live learning on phone- and edge-class hardware, and a local-learning decision model."],
+  [stack, "Phase 3", "Cambium: continuous learning on top of frozen open-source models, with first design partners."],
+];
+const FIG31 = figCols("fig31", PHASES.map(([dev, label, text]) => [dev, label, "k", text] as [Device, string, string, string]), 14);
+
+// ---------- slide 28: what zero error makes possible ----------
+const implant: Device = {
+  name: "Her voice, back", line: "", label: "A brain-computer interface: an implant puck joined by a ribbon cable to a small electrode array, a few electrodes lit orange",
+  bounds: [[-36, -24, 0], [40, -24, 0], [-36, 30, 0], [40, 30, 0], [-18, -6, 10], [28, 16, 8]],
+  draw(P) {
+    const PX = -16, PY = -6, AX = 26, AY = 14;
+    // a flat ribbon cable from the puck to the array, in a gentle S
+    const path: Plane[] = [];
+    for (let t = 0; t <= 1.0001; t += 0.04) {
+      const x = PX + 15 + (AX - 10 - PX - 15) * t, y = PY + (AY - PY) * (3 * t * t - 2 * t * t * t);
+      path.push([x, y]);
+    }
+    const edge = (o: number) => path.map(([x, y], i) => {
+      const [x2, y2] = path[Math.min(path.length - 1, i + 1)], [x1, y1] = path[Math.max(0, i - 1)];
+      const dx = x2 - x1, dy = y2 - y1, l = Math.hypot(dx, dy) || 1;
+      return [x - (dy / l) * o, y + (dx / l) * o] as Plane;
+    });
+    const left = edge(3.2), right = edge(-3.2);
+    let s = poly([...left, ...[...right].reverse()].map(([x, y]) => [x, y, 0.6] as Point3), P, "iso-shade", ' data-shade="1"');
+    s += L(k.onTop(left, 0.6, P) + k.onTop(right, 0.6, P), { tone: "hi" });
+    s += L(k.onTop(edge(1.1), 0.6, P) + k.onTop(edge(-1.1), 0.6, P), { tone: "lo" });
+    // the implant puck: a flange, a body and a cap with a coil ring
+    s += S(k.cylinder(PX, PY, 17, 0, 2.4, P, 64, 0.5), { tone: "mid", crease: "faint" });
+    s += S(k.cylinder(PX, PY, 13.5, 2.4, 5.6, P, 64, 1.4), { tone: "hi", crease: "lo", inner: L(k.sideArc(PX, PY, 13.5, 5, P, 40), { tone: "faint" }) });
+    s += L(k.ring(PX, PY, 10, 8, P, 56) + k.ring(PX, PY, 8.4, 8, P, 56), { tone: "faint" });
+    s += S(k.cylinder(PX, PY, 4.6, 8, 1, P, 32, 0.2), { tone: "mid", crease: "none" });
+    // the electrode array: a small die with a grid of fine pins, a few of them firing
+    const A: Plan = { x: AX - 10, y: AY - 10, w: 20, d: 20, r: 1.2 };
+    s += S(k.slabOf(A, 0, 2.6, P, 3, 0.4), { tone: "hi", crease: "lo" });
+    const lit = new Set(["1,3", "2,2", "3,3", "2,4", "4,1"]);
+    const pins: [number, number, boolean][] = [];
+    for (let j = 0; j < 6; j++) for (let i = 0; i < 6; i++) pins.push([A.x + 2.5 + i * 3, A.y + 2.5 + j * 3, lit.has(`${i},${j}`)]);
+    pins.sort((p, q) => k.depthOf([p[0], p[1], 0], P) - k.depthOf([q[0], q[1], 0], P));
+    for (const [x, y, on] of pins) s += S(k.cylinder(x, y, 0.75, 2.6, 4.6, P, 8), { tone: on ? "hi" : "mid", crease: "none", lit: on });
+    for (const [x, y, on] of pins) if (on) s += litDot([x, y, 7.2], P, 1.3);
+    return s;
+  },
+};
+
+const speaker: Device = {
+  name: "His words, after a stroke", line: "", label: "A smart speaker with a fabric body, its light ring lit orange on top",
+  bounds: [[-17, -17, 0], [17, 17, 0], [-17, 17, 0], [17, -17, 0], [0, 0, 30]],
+  pad: 44,
+  draw(P) {
+    let s = S(k.cylinder(0, 0, 13.5, 0, 1.6, P, 56, 0.3), { tone: "mid", crease: "none" });
+    // the fabric body: rounded at the top edge, with a fine vertical weave
+    s += S(k.cylinder(0, 0, 16, 1.6, 24.4, P, 72, 2.2), { tone: "hi", crease: "lo" });
+    s += L(k.knurl(0, 0, 16, 2.4, 25, 120, P, 0.2), { tone: "faint" });
+    // the top: a rim, a recessed touch surface, the light ring and four controls
+    s += S(k.cylinder(0, 0, 14.6, 26, 1.4, P, 64, 0.6), { tone: "hi", crease: "lo" });
+    s += L(k.ring(0, 0, 12.4, 27.4, P, 64), { tone: "lo" });
+    s += L(k.ring(0, 0, 10.6, 27.4, P, 64), { tone: "lit", className: "thick" });
+    s += dots([[0, -5.2, 27.4], [5.2, 0, 27.4], [0, 5.2, 27.4], [-5.2, 0, 27.4]], P, 0.9, "mid");
+    s += dots([[0, 0, 27.4]], P, 0.6, "lo");
+    return s;
+  },
+};
+
+const book: Device = {
+  name: "Every child understood", line: "", label: "An open picture book with an orange ribbon bookmark",
+  bounds: [[-40, -26, 0], [40, -26, 0], [-40, 26, 0], [40, 26, 0], [0, 0, 8], [0, 38, 0]],
+  draw(P) {
+    let s = S(k.slabOf({ x: -40, y: -26, w: 80, d: 52, r: 2 }, 0, 1.6, P, 3, 0.3), { tone: "mid", crease: "faint" });
+    for (const x0 of [-37, 1]) {
+      const pg: Plan = { x: x0, y: -23, w: 36, d: 46, r: 1 };
+      s += S(k.slabOf(pg, 1.6, 4, P, 2, 0.2), { tone: "hi", crease: "lo", inner: L(k.sideSeam(pg, 2.6, P, 2) + k.sideSeam(pg, 3.6, P, 2) + k.sideSeam(pg, 4.6, P, 2), { tone: "faint" }) });
+      let lines = "";
+      for (let r = 0; r < 6; r++) lines += k.lineOnTop([x0 + 4, -14 + r * 6], [x0 + 4 + [28, 24, 27, 18, 26, 21][r], -14 + r * 6], 5.6, P);
+      s += L(lines, { tone: "lo" });
+      s += L(k.planOutline({ x: x0 + 4, y: -20, w: 14, d: 3.6, r: 0.5 }, 5.6, P, 2), { tone: "mid" });
+    }
+    s += L(k.lineOnTop([0, -23], [0, 23], 5.6, P), { tone: "mid" });
+    // the ribbon lies in the gutter, folds over the page edge and the cover's lip, and ends on the table in a notched tail
+    const w = 1.3, fold = ' style="fill:#c9552c"';
+    s += poly([[-w, -6, 5.65], [w, -6, 5.65], [w, 23, 5.65], [-w, 23, 5.65]], P, "litf");
+    s += poly([[-w, 23.05, 5.65], [w, 23.05, 5.65], [w, 23.05, 1.65], [-w, 23.05, 1.65]], P, "litf", fold);
+    s += poly([[-w, 23, 1.65], [w, 23, 1.65], [w, 26, 1.65], [-w, 26, 1.65]], P, "litf");
+    s += poly([[-w, 26.05, 1.65], [w, 26.05, 1.65], [w, 26.05, 0], [-w, 26.05, 0]], P, "litf", fold);
+    s += poly([[-w, 26, 0], [w, 26, 0], [w, 37, 0], [0, 34.4, 0], [-w, 37, 0]], P, "litf");
+    return s;
+  },
+};
+
+const clipboard: Device = {
+  name: "Every word in the room", line: "", label: "A clipboard of notes, one line highlighted in orange",
+  bounds: [[-28, -40, 0], [28, -40, 0], [-28, 36, 0], [28, 36, 0], [0, -38, 7]],
+  draw(P) {
+    let s = S(k.slabOf({ x: -27, y: -35, w: 54, d: 70, r: 3 }, 0, 2, P, 4, 0.4), { tone: "mid", crease: "faint" });
+    const paper: Plan = { x: -22, y: -27, w: 44, d: 58, r: 0.6 };
+    s += S(k.slabOf(paper, 2, 0.7, P, 2), { tone: "hi", crease: "none" });
+    const z = 2.7, lens = [30, 22, 34, 26, 32, 18, 28, 24];
+    let lines = "";
+    lens.forEach((l, r) => { if (r !== 4) lines += k.lineOnTop([-17, -16 + r * 6], [-17 + l, -16 + r * 6], z, P); });
+    s += L(k.lineOnTop([-17, -22], [-2, -22], z, P), { tone: "mid" }) + L(lines, { tone: "lo" });
+    s += L(k.planOutline({ x: -19, y: 5.4, w: 36, d: 5.2, r: 1.4 }, z, P, 3), { tone: "lit" }) + L(k.lineOnTop([-17, 8], [15, 8], z, P), { tone: "lit", className: "thick" });
+    const clip: Plan = { x: -11, y: -39, w: 22, d: 10, r: 2.5 };
+    s += S(k.slabOf(clip, 2, 4.6, P, 4, 0.6), { tone: "hi", crease: "lo" });
+    s += L(k.ring(0, -36, 2.2, 6.6, P, 20), { tone: "lo" });
+    return s;
+  },
+};
+
+const FIG28 = figCols("fig28", [
+  [implant, "01", "s", "A woman with ALS speaks to her kids through a BCI that never mishears her, and understands her better every week."],
+  [speaker, "02", "s", "An assistant that learns a stroke survivor’s changed speech in days, not the months a new model would take."],
+  [book, "03", "s", "A reading tutor that understands a four-year-old’s speech, lisp and all, and grows up alongside them."],
+  [clipboard, "04", "s", "Clinical notes, cockpits, factory floors: places where a single wrong word matters, and the speaker never changes."],
+]);
 
 // ---------- slide 3: 2,000 homes ----------
 // One flat house per US home that a single training run could power for a year, 50 across and 40 down.
@@ -661,8 +857,8 @@ const FIG3 = `<!--fig3--><div class="townfig" style="--c:6/13;--r:1/4"><svg view
 function card(dev: Device, i: number) {
   const P = k.fitProjection(dev.bounds, W, H, { pad: dev.pad ?? 8, azimuth: AZ });
   const id = `dv${i}`;
-  return `<figure class="bx u" style="--i:${i + 2}"><figcaption><p class="t">${dev.name}</p><p class="s">${dev.line}</p></figcaption>`
-    + `<svg class="iso-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="${dev.label}">${dev.draw(P, id)}</svg></figure>`;
+  return `<figure class="bx u" style="--i:${i + 2}"><svg class="iso-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="${dev.label}">${dev.draw(P, id)}</svg>`
+    + `<figcaption><p class="t">${dev.name}</p><p class="s">${dev.line}</p></figcaption></figure>`;
 }
 
 // The top bar matches the one on every other slide (see the "top bar" styles in the deck).
@@ -674,17 +870,17 @@ const SLIDE = `<section class="pg sl" data-title="The vision" aria-label="Slide 
   + `</div><div class="dfolio">10</div></section>`;
 
 const CSS = `/* devices:start */
-.bento{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:0;min-height:0;border-top:1px solid var(--rule)}
+/* cells read like slide 9's columns: drawing, then a short top rule, then the caption; space between columns, no grid lines */
+.bento{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));column-gap:64px;row-gap:48px;min-height:0}
 .bento,.isofig,.dcols{
  --anatomy-paper:#fffcf8;--anatomy-face:#fff;--anatomy-top:#fffdfa;--anatomy-shade-0:#e3d9cf;--anatomy-shade-1:#ebe2d9;--anatomy-shade-2:#f2eae2;--anatomy-shade-3:#f8f2ec;
  --anatomy-lit-top:#fff3e6;--anatomy-lit-shade:#ffe0c2;--anatomy-hi:#6f6157;--anatomy-mid:#93857a;--anatomy-lo:#bfb2a7;--anatomy-faint:#ddd2c8;--anatomy-lit:var(--hot);
  --anatomy-dot:#3a2e26;--anatomy-weight:.75px}
-.bx{position:relative;min-height:0;border-bottom:1px solid var(--rule);border-right:1px solid var(--rule)}
-.bx:nth-child(4n){border-right:0}
-.bx figcaption{position:absolute;left:32px;right:24px;bottom:24px;display:flex;flex-direction:column;gap:2px;z-index:1}
+.bx{display:flex;flex-direction:column;gap:24px;min-height:0;min-width:0}
+.bx figcaption{border-top:1px solid var(--rule);padding-top:24px;display:flex;flex-direction:column;gap:2px}
 .bx figcaption .t{line-height:1.15}
 .bx figcaption .s{white-space:nowrap}
-.bx .iso-svg{position:absolute;left:16px;top:12px;width:calc(100% - 32px);height:calc(100% - 100px);overflow:visible}
+.bx .iso-svg{flex:1 1 0;min-height:0;width:100%;overflow:visible}
 .iso-svg path,.iso-svg circle{vector-effect:non-scaling-stroke}
 .iso-fill{fill:var(--anatomy-paper);stroke:none}
 .iso-solid[data-lit]>.iso-fill{fill:var(--anatomy-face)}
@@ -711,6 +907,7 @@ const CSS = `/* devices:start */
 .isofig .iso-svg{display:block;width:100%;height:auto;max-height:100%;overflow:visible}
 .isofig .bulbglass{fill:#fffcf8;fill-opacity:.6;stroke:none}
 .dcol{display:flex;flex-direction:column;gap:40px;min-width:0}
+.litdots circle{fill:var(--anatomy-lit);opacity:.9}
 .dcol .iso-svg{display:block;width:100%;height:auto;max-height:340px;overflow:visible}
 .townfig{min-height:0;display:flex}
 .townfig svg{display:block;width:100%;height:100%}
@@ -728,7 +925,7 @@ const preview = process.argv.indexOf("--preview");
 if (preview > 0) {
   const page = `<!doctype html><meta charset="utf-8"><style>:root{--hot:#E8693A;--paper:#FAF9F6}body{margin:0;background:#FAF9F6;font:20px Geist,system-ui,sans-serif}
 ${CSS}
-.bento{display:block}.bx{width:780px;height:470px;margin:0 auto}.bx .iso-svg{height:calc(100% - 100px)}figcaption .t{font-size:28px}figcaption .s{color:#8A7A6F}p{margin:0}</style>
+.bento{display:block}.bx{width:780px;height:470px;margin:0 auto}figcaption .t{font-size:28px}figcaption .s{color:#8A7A6F}p{margin:0}</style>
 <div class="bento">${DEVICES.map(card).join("")}</div><div class="isofig" style="width:900px;margin:40px auto">${FIG2}</div><div style="width:900px;height:720px;margin:40px auto;--gray:#CFC6BD;--paper:#FAF9F6">${FIG3}</div>`;
   writeFileSync(process.argv[preview + 1], page);
   console.log("preview written");
@@ -751,6 +948,12 @@ if (!three.test(html)) throw new Error("slide 3's figure not found");
 const nine = /<!--fig9-->[\s\S]*?<!--\/fig9-->|<div class="grp cols" style="--r:2;align-self:end;--n:4"><div class="st rule"><p class="s">01<\/p><p class="t">Robotics<\/p>[\s\S]*?<\/p><\/div><\/div>(?=<\/div><div class="dfolio">09)/;
 if (!nine.test(html)) throw new Error("slide 9's columns not found");
 html = html.replace(nine, () => FIG9);
+const thirtyone = /<!--fig31-->[\s\S]*?<!--\/fig31-->|<div class="grp cols" style="--r:2;align-self:end;--n:3"><div class="st rule"><p class="k">Phase 1<\/p>[\s\S]*?<\/p><\/div><\/div>(?=<p class="ft">Each phase)/;
+if (!thirtyone.test(html)) throw new Error("slide 31's columns not found");
+html = html.replace(thirtyone, () => FIG31);
+const twentyeight = /<!--fig28-->[\s\S]*?<!--\/fig28-->|<div class="grp cols" style="--r:2;align-self:end;--n:4"><div class="st rule"><p class="s">01<\/p><p class="t">Her voice, back<\/p>[\s\S]*?<\/p><\/div><\/div>(?=<p class="ft">Product visions)/;
+if (!twentyeight.test(html)) throw new Error("slide 28's columns not found");
+html = html.replace(twentyeight, () => FIG28);
 html = html.replace(three, () => FIG3).replace("Each square is one US home for a year.", "Each house is one US home for a year.");
 writeFileSync(DECK, html);
 console.log(`slide 10: ${DEVICES.length} devices, ${(SLIDE.length / 1024).toFixed(0)} KB`);

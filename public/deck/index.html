@@ -403,12 +403,16 @@ var lastKey='';
 function fit(){var vw=innerWidth,vh=innerHeight,k=Math.min(vw/1920,vh/1080),cp=k<.55,pt=cp&&vw<vh*1.1,R=document.documentElement,key=vw+'x'+vh+(window.fontsOK?'f':'');
  if(key===lastKey)return;lastKey=key;R.classList.toggle('cp',cp);R.classList.toggle('pt',pt);
  var k0=cp?Math.min((pt?vw:vh)/640,.8):k,w0=cp?vw/k0:1920,h0=cp?vh/k0:1080;
- sl.forEach(function(s){var d=s.style.display,v=s.style.visibility,f=1;s.style.display='block';s.style.visibility='hidden';
-  var size=function(){s.style.width=Math.round(w0*f)+'px';s.style.height=Math.round(h0*f)+'px';};
-  window.deckFix.unfix(s);size();
-  if(cp)while(!fits(s)&&f<3){f*=1.05;size();}
-  if(window.fontsOK){window.deckFix.fix(s);if(cp)while(!fits(s)&&f<3){f*=1.05;size();}}
-  s.dataset.fit=(k0/f).toFixed(3);s.style.transform='translate(-50%,-50%) scale('+k0/f+')';s.style.display=d;s.style.visibility=v;});}
+ /* every slide shares one scale, so moving between slides never changes the size of the type: measure what each slide
+    needs, then lay them all out at the smallest of those (more room never breaks a slide that already fit) */
+ var F=1,each=function(cb){sl.forEach(function(s){var d=s.style.display,v=s.style.visibility;s.style.display='block';s.style.visibility='hidden';cb(s);s.style.display=d;s.style.visibility=v;});},
+  size=function(s,f){s.style.width=Math.round(w0*f)+'px';s.style.height=Math.round(h0*f)+'px';};
+ if(cp)each(function(s){var f=1;window.deckFix.unfix(s);size(s,f);
+  while(!fits(s)&&f<3){f*=1.05;size(s,f);}
+  if(window.fontsOK){window.deckFix.fix(s);while(!fits(s)&&f<3){f*=1.05;size(s,f);}}
+  s.dataset.need=(k0/f).toFixed(3);F=Math.max(F,f);});
+ each(function(s){window.deckFix.unfix(s);size(s,F);if(window.fontsOK)window.deckFix.fix(s);
+  s.dataset.fit=(k0/F).toFixed(3);s.style.transform='translate(-50%,-50%) scale('+k0/F+')';});}
 (document.fonts?document.fonts.load('20px Geist').then(function(){return document.fonts.ready;}):Promise.resolve()).then(function(){window.fontsOK=1;fit();});
 function count(el){var to=+el.dataset.cnt,pre=el.dataset.pre||'',suf=el.dataset.suf||'',bar=el.dataset.sync==='bar',i=+(getComputedStyle(el).getPropertyValue('--i')||0),
  t0=performance.now()+(bar?600+i*90:600),dur=bar?1600:3200,fmt=function(v){return pre+v.toLocaleString('en-US')+suf;};

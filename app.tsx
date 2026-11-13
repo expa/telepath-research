@@ -10,7 +10,7 @@ export default function App() {
   const id = (nav.to ?? route).id;
   // Chrome shows as soon as we head away from the landing, and stays (lifted out of flow) while heading
   // back to it, so the research → home transition can fade it out.
-  const landing = route.id === "home-1" && id === "home-1", leaving = nav.to?.id === "home-1";
+  const landing = (route.id === "home-1" && id === "home-1") || id === "deck", leaving = nav.to?.id === "home-1";
   const v2 = [route.id, id].some(value => value === "home" || value.startsWith("research/"));
   const research = id.startsWith("research");
   return (

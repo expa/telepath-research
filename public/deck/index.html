@@ -313,7 +313,7 @@ acc:function(f,t){var x=f.x,W=f.w,H=f.h,L=72,R=W-4,Tp=56,B=H-56;var y=function(v
  var u=eio((t-.8)/4.2),A=function(q){return 61.8+38.2*(1-Math.pow(1-q,2.4));};
  x.strokeStyle=C.hot;x.lineWidth=2;x.beginPath();for(var i=0;i<=160;i++){var q=u*i/160;i?x.lineTo(X(q),y(A(q))):x.moveTo(X(q),y(A(q)));}x.stroke();
  var v=A(u);x.fillStyle=C.hot;x.beginPath();x.arc(X(u),y(v),4,0,7);x.fill();
- T(x,v.toFixed(1)+'%',X(u)+(u>.8?-16:16),y(v)-16,C.hot,u>.8?'right':'left');
+ var lb=v.toFixed(1)+'%';x.font=F;var lw=x.measureText(lb).width;T(x,lb,X(u)+16-u*(lw+32),y(v)-16,C.hot);
  T(x,'Telepath, learning live',X(0),y(61.8)+32,C.hot);},
 fleet:function(f,t){var x=f.x,W=f.w,H=f.h,cols=40,rows=25,g=Math.min(W/cols,H/rows),ox=(W-g*cols)/2,oy=(H-g*rows)/2,r=g*.16;
  for(var j=0;j<rows;j++)for(var i=0;i<cols;i++){var k=j*cols+i,on=cl((t-.4)*1.2-(i+j)/(cols+rows)*1.6);if(on<=0)continue;

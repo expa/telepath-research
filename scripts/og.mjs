@@ -1,6 +1,7 @@
 // Renders the Open Graph cards into public/og/ with headless Chrome.
-// Usage: pnpm dev (running), then `node scripts/og.mjs [http://localhost:3206]`.
+// Usage: pnpm dev (running), then `node scripts/og.mjs [http://localhost:3206] [deck]`.
 // Each post card takes a live frame of that post's isometric figure from the research index.
+// The deck card is a frame of the deck's own cover slide; pass `deck` to render only that one.
 import { execFileSync } from "node:child_process";
 import { mkdtempSync, writeFileSync, mkdirSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -10,7 +11,17 @@ const BASE = process.argv[2] ?? "http://localhost:3206";
 const CHROME = process.env.CHROME ?? "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 const OUT = new URL("../public/og/", import.meta.url).pathname;
 const tmp = mkdtempSync(join(tmpdir(), "og-"));
+const ONLY = process.argv[3];
 const chrome = (...args) => execFileSync(CHROME, ["--headless", "--disable-gpu", "--hide-scrollbars", ...args], { encoding: "utf8", maxBuffer: 1 << 26, stdio: ["ignore", "pipe", "ignore"] });
+
+/** The deck's cover at 1200×630: the slide letterboxes on its own dark background.
+    Reduced motion shows the text at once and draws the ring's settled frame, with its words in place. */
+function deckCard() {
+  mkdirSync(OUT, { recursive: true });
+  chrome("--window-size=1200,630", "--force-prefers-reduced-motion", "--virtual-time-budget=4000", `--screenshot=${join(OUT, "deck.png")}`, BASE + "/deck/index.html#1");
+  console.log("public/og/deck.png");
+}
+if (ONLY === "deck") { deckCard(); process.exit(0); }
 
 // Let the figures animate a few seconds so the still isn't the resting first frame.
 const dom = chrome("--window-size=1400,5000", "--virtual-time-budget=3500", "--dump-dom", BASE + "/research-1");
@@ -64,3 +75,4 @@ shot("research", page(`<div class="og home">${glow}${LOGO(120)}<h1>Telepath Rese
 slugs.forEach((slug, i) => shot(slug, page(
   `<div class="og og-post">${glow}<div><div class="og-brand">${LOGO(30)}Telepath Research</div><h1>${titles[i]}</h1></div><div class="iso" data-theme="light">${figs[i]}</div></div>`,
 )));
+deckCard();

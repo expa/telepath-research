@@ -1,6 +1,6 @@
 // Draws the deck's isometric figures, in the anatomy style of the site's figures:
 // slide 10's 2×4 grid of devices, slide 2's 20-watt bench (a lamp wired to a wattmeter)
-// and the drawings above the columns of slides 9, 28 and 31.
+// the drawings above the columns of slides 9, 28 and 31, and slide 29's voice-to-every-device scene.
 // It also lays out slide 3's flat grid of 2,000 houses.
 // Usage: `node scripts/deck-devices.ts` rewrites them, and their styles, inside public/deck/index.html.
 import { readFileSync, writeFileSync } from "node:fs";
@@ -313,11 +313,14 @@ const car: Device = {
   name: "Car", line: "Learns your roads", label: "A car on a stretch of road, a lidar sensor lit on its roof",
   bounds: [[-70, -38, 0], [70, -38, 0], [-70, 38, 0], [70, 38, 0], [0, 0, 42]],
   pad: 20,
-  draw(P) {
+  draw(P, id) {
     const zr = 0;
-    let s = S(k.slabOf({ x: -70, y: -38, w: 140, d: 76, r: 6 }, -2.4, 2.4, P, 6), { tone: "lo", crease: "none" });
-    s += L(k.lineOnTop([-64, -30], [64, -30], zr, P), { tone: "mid", dashed: true });
-    s += L(k.lineOnTop([-64, 33], [64, 33], zr, P), { tone: "faint" });
+    let s = "";
+    if (id !== "bare") { // "bare" draws the car without its stretch of road
+      s += S(k.slabOf({ x: -70, y: -38, w: 140, d: 76, r: 6 }, -2.4, 2.4, P, 6), { tone: "lo", crease: "none" });
+      s += L(k.lineOnTop([-64, -30], [64, -30], zr, P), { tone: "mid", dashed: true });
+      s += L(k.lineOnTop([-64, 33], [64, 33], zr, P), { tone: "faint" });
+    }
     const wheel = (x: number, y: number) => lying([x, y, 9.5], 9.5, 7.5, "y", P, { tone: "hi", hub: 0.6 });
     s += wheel(-29, -18.5) + wheel(29, -18.5);
     // lower body
@@ -765,20 +768,38 @@ const implant: Device = {
 };
 
 const speaker: Device = {
-  name: "His words, after a stroke", line: "", label: "A smart speaker with a fabric body, its light ring lit orange on top",
-  bounds: [[-17, -17, 0], [17, 17, 0], [-17, 17, 0], [17, -17, 0], [0, 0, 30]],
-  pad: 44,
+  name: "His words, after a stroke", line: "", label: "A tablet on a stand turning an uneven speech waveform into a clean transcript, beside a calendar with only its first three days marked orange",
+  bounds: [[-34, -24, 0], [42, -24, 0], [-34, 14, 0], [42, 14, 0], [-34, -30, 40], [6, -30, 40]],
   draw(P) {
-    let s = S(k.cylinder(0, 0, 13.5, 0, 1.6, P, 56, 0.3), { tone: "mid", crease: "none" });
-    // the fabric body: rounded at the top edge, with a fine vertical weave
-    s += S(k.cylinder(0, 0, 16, 1.6, 24.4, P, 72, 2.2), { tone: "hi", crease: "lo" });
-    s += L(k.knurl(0, 0, 16, 2.4, 25, 120, P, 0.2), { tone: "faint" });
-    // the top: a rim, a recessed touch surface, the light ring and four controls
-    s += S(k.cylinder(0, 0, 14.6, 26, 1.4, P, 64, 0.6), { tone: "hi", crease: "lo" });
-    s += L(k.ring(0, 0, 12.4, 27.4, P, 64), { tone: "lo" });
-    s += L(k.ring(0, 0, 10.6, 27.4, P, 64), { tone: "lit", className: "thick" });
-    s += dots([[0, -5.2, 27.4], [5.2, 0, 27.4], [0, 5.2, 27.4], [-5.2, 0, 27.4]], P, 0.9, "mid");
-    s += dots([[0, 0, 27.4]], P, 0.6, "lo");
+    // the tablet: leaning back on a small stand, its screen facing out
+    const tilt = 0.3, back = -10, z0 = 1.6, X0 = -32, TW = 38, TH = 30;
+    const v: V3 = [0, -Math.sin(tilt), Math.cos(tilt)], n: V3 = [0, Math.cos(tilt), Math.sin(tilt)], o: V3 = [0, back, z0];
+    const on = (a: number, b: number): Flat => at([o[0] + a, o[1] + b * v[1] + 1.45 * n[1], o[2] + b * v[2] + 1.45 * n[2]], P);
+    const seg = (pts: [number, number][]) => k.pathOf(pts.map(([a, b]) => on(a, b)));
+    let s = S(k.slabOf({ x: X0 + 6, y: back - 12, w: TW - 12, d: 16, r: 2 }, 0, z0, P, 3, 0.3), { tone: "mid", crease: "faint" });
+    s += prism(k.roundedPlan({ x: X0 + 10, y: 2, w: TW - 20, d: TH * 0.55, r: 1 }, 3), [0, back - 1.6, z0], [1, 0, 0], v, [0, -Math.cos(tilt), -Math.sin(tilt)], 1.2, P, { tone: "mid", crease: "faint" });
+    s += prism(k.roundedPlan({ x: X0, y: 0, w: TW, d: TH, r: 2.4 }, 5), o, [1, 0, 0], v, n, 1.4, P, { tone: "hi", crease: "lo" });
+    s += L(k.pathOf(k.roundedPlan({ x: X0 + 2, y: 2, w: TW - 4, d: TH - 4, r: 1.2 }, 4).map(([a, b]) => on(a, b)), true), { tone: "mid" });
+    // the changed speech: an uneven waveform...
+    const wave: [number, number][] = [];
+    for (let i = 0; i <= 60; i++) { const t = i / 60, a = X0 + 5 + t * (TW - 10), amp = (0.6 + 2.6 * Math.abs(Math.sin(t * 7.3 + 1.2)) * (0.5 + 0.5 * Math.sin(t * 2.1))) * Math.sin(t * 61); wave.push([a, 22 + amp]); }
+    s += L(seg(wave), { tone: "hi" });
+    // ...turned into clean text, one word learned and underlined
+    s += L(seg([[X0 + 5, 14], [X0 + 24, 14]]) + seg([[X0 + 5, 10], [X0 + 30, 10]]) + seg([[X0 + 5, 6], [X0 + 17, 6]]), { tone: "lo" });
+    s += L(seg([[X0 + 26, 14], [X0 + 33, 14]]), { tone: "lit", className: "thick" }) + L(seg([[X0 + 26, 12.4], [X0 + 33, 12.4]]), { tone: "lit" });
+    // the calendar: a month, and only its first three days marked
+    const C: Plan = { x: 14, y: -13, w: 26, d: 22, r: 1.6 }, zc = 3.2;
+    s += S(k.slabOf(C, 0, zc, P, 3, 0.4), { tone: "hi", crease: "lo", inner: L(k.sideSeam(C, 1.1, P, 3) + k.sideSeam(C, 2.2, P, 3), { tone: "faint" }) });
+    for (const x of [18, 24, 30, 36]) s += S(k.cylinder(x, C.y + 1.6, 0.9, zc, 1.6, P, 10), { tone: "mid", crease: "none" });
+    s += L(k.lineOnTop([C.x + 2, C.y + 4.4], [C.x + C.w - 2, C.y + 4.4], zc, P), { tone: "lo" });
+    let grid = "";
+    const cw = 3.1, ch = 3.4;
+    for (let r = 0; r < 4; r++) for (let c = 0; c < 7; c++) {
+      const x = C.x + 2.2 + c * (cw + 0.2), y = C.y + 6 + r * (ch + 0.4), day = r * 7 + c;
+      if (day < 3) s += poly([[x, y, zc + 0.02], [x + cw, y, zc + 0.02], [x + cw, y + ch, zc + 0.02], [x, y + ch, zc + 0.02]], P, "litf");
+      else grid += k.planOutline({ x, y, w: cw, d: ch, r: 0.3 }, zc, P, 1);
+    }
+    s += L(grid, { tone: "faint" });
     return s;
   },
 };
@@ -833,6 +854,55 @@ const FIG28 = figCols("fig28", [
   [book, "03", "s", "A reading tutor that understands a four-year-old’s speech, lisp and all, and grows up alongside them."],
   [clipboard, "04", "s", "Clinical notes, cockpits, factory floors: places where a single wrong word matters, and the speaker never changes."],
 ]);
+
+// ---------- slide 29: the interface to every device ----------
+// Voice as the input to everything: the microphone in the middle, linked to a car, a home, glasses and an agent's laptop.
+// The implant sits faded above on a fainter line: thought is next. Each piece keeps its own drawing, placed at its own spot.
+const house: Device = {
+  name: "Home", line: "", label: "A small house",
+  bounds: [[-20, -16, 0], [20, 16, 0], [-20, 16, 0], [20, -16, 0], [0, 0, 34]],
+  draw(P) {
+    const B: Plan = { x: -18, y: -14, w: 36, d: 28, r: 1 }, h = 18, H = 32;
+    let s = S(k.slabOf(B, 0, h, P, 2, 0.4), { tone: "hi", crease: "lo" });
+    // a gable roof: the far slope, the near slope and the gable end
+    const f = (pts: Point3[], cls: string, extra = "") => poly(pts, P, cls, extra);
+    s += f([[-20, -16, h], [20, -16, h], [20, 0, H], [-20, 0, H]], "iso-shade", ' data-shade="2"');
+    s += f([[-20, 16, h], [20, 16, h], [20, 0, H], [-20, 0, H]], "iso-top");
+    s += f([[18, -14, h], [18, 14, h], [18, 0, H - 1.6]], "iso-shade", ' data-shade="0"');
+    s += L(k.pathOf(([[-20, 16, h], [20, 16, h], [20, 0, H], [-20, 0, H]] as Point3[]).map((q) => at(q, P)), true) + k.pathOf(([[20, -16, h], [20, 0, H], [20, 16, h]] as Point3[]).map((q) => at(q, P))), { tone: "hi" });
+    s += L(k.pathOf(([[18, -14, h], [18, 0, H - 1.6], [18, 14, h]] as Point3[]).map((q) => at(q, P))), { tone: "lo" });
+    // a door and two windows on the front, a chimney on the roof
+    const yf = B.y + B.d + 0.05;
+    s += L(k.pathOf(onFace("y", yf, { x: -3, y: 0, w: 6, d: 10, r: 0.6 }).map((q) => at(q, P)), true), { tone: "mid" });
+    s += L(k.pathOf(onFace("y", yf, { x: -14, y: 8, w: 6, d: 5, r: 0.4 }).map((q) => at(q, P)), true) + k.pathOf(onFace("y", yf, { x: 8, y: 8, w: 6, d: 5, r: 0.4 }).map((q) => at(q, P)), true), { tone: "lo" });
+    s += S(k.slabOf({ x: 8, y: -8, w: 5, d: 5, r: 0.5 }, H - 9, 9, P, 2), { tone: "hi", crease: "lo" });
+    return s;
+  },
+};
+
+const HW = 400, HH = 300;
+function hubScene() {
+  // place a device so its drawing fills a w×h box centred on (cx, cy)
+  const place = (dev: Device, cx: number, cy: number, w: number, h: number, id: string) => {
+    const P = k.fitProjection(dev.bounds, w, h, { pad: 2, azimuth: AZ });
+    const Q: Projection = { ...P, origin: [P.origin[0] + cx - w / 2, P.origin[1] + cy - h / 2] };
+    return { svg: dev.draw(Q, id), base: at([0, 0, 0], Q) };
+  };
+  const hub = place({ ...mic, bounds: [[-17, -17, 0], [17, 17, 0], [-17, 17, 0], [17, -17, 0], [0, 0, 64]] }, 200, 160, 70, 118, "hubmic"); // sized to the mic itself; its sound rings spread past
+  const spots: [Device, number, number, number, number, string][] = [
+    [car, 76, 98, 146, 86, "bare"], [house, 326, 92, 104, 92, "hubhouse"],
+    [glasses, 76, 238, 142, 80, "hubglasses"], [laptop, 326, 234, 124, 92, "hublaptop"],
+  ];
+  const placed = spots.map(([d, x, y, w, h, id]) => place(d, x, y, w, h, id));
+  const thought = place(implant, 200, 30, 92, 58, "hubimplant");
+  const line = (a: Flat, b: Flat) => k.pathOf([a, b]);
+  let s = L(placed.map((p) => line(hub.base, p.base)).join(""), { tone: "lit", dotted: true });
+  s += `<g opacity=".45">${L(line(hub.base, thought.base), { tone: "mid", dashed: true })}</g>`;
+  s += `<g opacity=".45">${thought.svg}</g>`;
+  s += placed.map((p) => p.svg).join("") + hub.svg;
+  return s;
+}
+const FIG29 = `<!--fig29--><div class="isofig hubfig"><svg class="iso-svg" viewBox="0 0 ${HW} ${HH}" role="img" aria-label="A microphone at the centre, linked by dotted lines to a car, a house, glasses and a laptop; a faded brain implant above on a dashed line">${hubScene()}</svg></div><!--/fig29-->`;
 
 // ---------- slide 3: 2,000 homes ----------
 // One flat house per US home that a single training run could power for a year, 50 across and 40 down.
@@ -901,12 +971,13 @@ const CSS = `/* devices:start */
 .iso-dots circle{fill:var(--anatomy-dot);stroke:none;opacity:.32}
 .iso-dots[data-tone="hi"] circle{opacity:.85}.iso-dots[data-tone="mid"] circle{opacity:.45}
 .iso-dots[data-tone="lo"] circle{opacity:.22}.iso-dots[data-tone="faint"] circle{opacity:.5;fill:#8a7a6f}
-.bx .inkf{fill:#2a211b;stroke:none}
+.bx .inkf,.isofig .inkf{fill:#2a211b;stroke:none}
 .litf{fill:var(--anatomy-lit);stroke:none} /* unscoped: reused <use> copies can't match a parent selector */
 .isofig{min-height:0;display:flex;align-items:flex-end}
 .isofig .iso-svg{display:block;width:100%;height:auto;max-height:100%;overflow:visible}
 .isofig .bulbglass{fill:#fffcf8;fill-opacity:.6;stroke:none}
 .dcol{display:flex;flex-direction:column;gap:40px;min-width:0}
+.hubfig{display:block;margin-top:24px;--anatomy-weight:.6px}.hubfig .iso-svg{display:block;width:100%;height:auto;max-height:290px;overflow:visible}
 .litdots circle{fill:var(--anatomy-lit);opacity:.9}
 .dcol .iso-svg{display:block;width:100%;height:auto;max-height:340px;overflow:visible}
 .townfig{min-height:0;display:flex}
@@ -916,9 +987,9 @@ const CSS = `/* devices:start */
 .townfig use{fill:var(--hot)}
 @keyframes power{from{fill:var(--paper)}60%{fill:#ffb183}to{fill:var(--hot)}}
 .sl.on .townfig use{animation:power .7s ease both;animation-delay:calc(var(--d)*1ms)}
-.bx .bub{fill:var(--anatomy-shade-1);stroke:none}
-.bx .glass{fill:#efe6dd;stroke:none}
-.bx .glass2{fill:var(--anatomy-shade-1);stroke:none}
+.bx .bub,.isofig .bub{fill:var(--anatomy-shade-1);stroke:none}
+.bx .glass,.isofig .glass{fill:#efe6dd;stroke:none}
+.bx .glass2,.isofig .glass2{fill:var(--anatomy-shade-1);stroke:none}
 /* devices:end */`;
 
 const preview = process.argv.indexOf("--preview");
@@ -954,6 +1025,9 @@ html = html.replace(thirtyone, () => FIG31);
 const twentyeight = /<!--fig28-->[\s\S]*?<!--\/fig28-->|<div class="grp cols" style="--r:2;align-self:end;--n:4"><div class="st rule"><p class="s">01<\/p><p class="t">Her voice, back<\/p>[\s\S]*?<\/p><\/div><\/div>(?=<p class="ft">Product visions)/;
 if (!twentyeight.test(html)) throw new Error("slide 28's columns not found");
 html = html.replace(twentyeight, () => FIG28);
+const twentynine = /(Whoever gets to zero error owns the input\.<\/p>)(?:<!--fig29-->[\s\S]*?<!--\/fig29-->)?/;
+if (!twentynine.test(html)) throw new Error("slide 29's larger-prize column not found");
+html = html.replace(twentynine, (_, p) => p + FIG29);
 html = html.replace(three, () => FIG3).replace("Each square is one US home for a year.", "Each house is one US home for a year.");
 writeFileSync(DECK, html);
 console.log(`slide 10: ${DEVICES.length} devices, ${(SLIDE.length / 1024).toFixed(0)} KB`);

@@ -436,8 +436,10 @@ function card(dev: Device, i: number) {
     + `<svg class="iso-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="${dev.label}">${dev.draw(P, id)}</svg></figure>`;
 }
 
-const SLIDE = `<section class="pg sl" aria-label="Slide 10: Telepath on eight devices, from earbuds, watch, glasses and phone to drone, car, robot and satellite"><div class="in">`
-  + `<div class="hd" style="--c:1/8;--r:1"><p class="k">The vision</p><h2>From the data center <em>to every device.</em></h2></div>`
+// The top bar matches the one on every other slide (see the "top bar" styles in the deck).
+const BAR = `<header class="tbar" aria-hidden="true"><svg class="tbm" viewBox="0 0 19 20" aria-hidden="true"><rect width="19" height="5.7" rx="2.85"/><rect x="6.7" y="7.15" width="5.6" height="5.7" rx="2.8"/><rect x="6.7" y="14.3" width="5.6" height="5.7" rx="2.8"/></svg><span class="tbn">Telepath</span><span class="tbt">The vision</span><span class="tbc">Private &amp; Confidential</span><span class="tbf">10</span></header>`;
+const SLIDE = `<section class="pg sl" data-title="The vision" aria-label="Slide 10: Telepath on eight devices, from earbuds, watch, glasses and phone to drone, car, robot and satellite">${BAR}<div class="in">`
+  + `<div class="hd" style="--c:1/8;--r:1"><h2>From the data center <em>to every device.</em></h2></div>`
   + `<p class="l" style="--c:8/13;--r:1;align-self:end">Small enough to run on a phone, an earbud or a robot, and to keep learning there from the person using it.</p>`
   + `<div class="bento" style="--r:2">${DEVICES.map(card).join("")}</div>`
   + `</div><div class="dfolio">10</div></section>`;
@@ -492,7 +494,7 @@ ${CSS}
 }
 
 let html = readFileSync(DECK, "utf8");
-const slide = /<section class="pg sl ?" aria-label="Slide 10:[\s\S]*?<\/section>/;
+const slide = /<section class="pg sl ?"(?: data-title="[^"]*")? aria-label="Slide 10:[\s\S]*?<\/section>/;
 if (!slide.test(html)) throw new Error("slide 10 not found");
 html = html.replace(slide, SLIDE);
 html = html.replace(".reach{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}\n", "").replace(".fig .tx.nm2{font-size:28px;letter-spacing:-.01em}\n", "");

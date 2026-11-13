@@ -5,13 +5,14 @@ export function riseDiscs(root: HTMLDivElement | null, at: number, skip = false,
   const els = [...root.children] as HTMLElement[];
   const P = 600; // perspective on .landing-discs, px; its vanishing point sits on the bottom spot
   const START = 16; // apparent size when a disc first pops in, far away, px
-  // size: real diameter at rest; rise: resting height above the bottom spot; tilt: resting angle, solved through
-  // the 600px perspective so the visible ellipses match the mark (top ≈ 0.30 of its width, middle ≈ 0.5)
+  // The mark, as in the deck: a pill over two circles, 68×70 units (each part 20 tall, 5 apart), drawn 88 wide here.
+  // w, h: real size at rest; rise: resting height above the bottom spot; tilt: resting angle (face-on).
+  const U = 88 / 68;
   const discs = [
-    { size: 88, rise: 56.5, tilt: 67, delay: 0 },
-    { size: 44, rise: 26.5, tilt: 57.5, delay: 420 },
-    { size: 22, rise: 0, tilt: 0, delay: 840 },
-  ].map((d) => ({ ...d, far: P * (d.size / START - 1) })); // start this far back so every disc pops in at the same small size
+    { w: 68 * U, h: 20 * U, rise: 50 * U, tilt: 0, delay: 0 },
+    { w: 20 * U, h: 20 * U, rise: 25 * U, tilt: 0, delay: 420 },
+    { w: 20 * U, h: 20 * U, rise: 0, tilt: 0, delay: 840 },
+  ].map((d) => ({ ...d, far: P * (d.h / START - 1) })); // start this far back so every part pops in at the same small size
   const NEAR = 140; // how close the path's control point pulls toward the camera, px
   const POP = 200, FLOAT = 700, TURN = 780, TURN_AT = 0.1; // ms; the tilt starts 10% into the float and finishes after it
 
@@ -32,8 +33,9 @@ export function riseDiscs(root: HTMLDivElement | null, at: number, skip = false,
   els.forEach((el, i) => {
     const d = discs[i];
     Object.assign(el.style, {
-      width: `calc(${d.size}px * var(--disc-scale))`, height: `calc(${d.size}px * var(--disc-scale))`,
-      marginLeft: `calc(${-d.size / 2}px * var(--disc-scale))`, marginTop: `calc(${-d.size / 2}px * var(--disc-scale))`,
+      width: `calc(${d.w}px * var(--disc-scale))`, height: `calc(${d.h}px * var(--disc-scale))`,
+      marginLeft: `calc(${-d.w / 2}px * var(--disc-scale))`, marginTop: `calc(${-d.h / 2}px * var(--disc-scale))`,
+      borderRadius: `calc(${d.h / 2}px * var(--disc-scale))`,
     });
   });
 

@@ -495,11 +495,11 @@ main { background: var(--paper); }
   .landing-footer { width: calc(100% - 48px); font-size: 11px; }
 }
 
-/* Logo: three discs, sized, posed and animated per frame by riseDiscs() in pages/home/page.tsx.
-   Each disc is centered on the bottom spot; JS moves it in 3D (perspective below) to its resting place. */
+/* Logo: the deck's mark (a pill over two circles), sized, posed and animated per frame by riseDiscs() in lib/logo-bubbles.ts.
+   Each part is centered on the bottom spot; JS moves it in 3D (perspective below) to its resting place. */
 .landing-logo { position: absolute; top: 40px; left: 0; display: flex; align-items: center; gap: 14px; width: fit-content; max-width: 100%; }
-.landing-discs { --disc-scale: calc(32 / 88); position: relative; flex-shrink: 0; width: calc(88px * var(--disc-scale)); height: calc(82px * var(--disc-scale)); perspective: calc(600px * var(--disc-scale)); perspective-origin: 50% calc(100% - 11px * var(--disc-scale)); }
-.landing-discs span { position: absolute; left: 50%; top: calc(100% - 11px * var(--disc-scale)); width: calc(22px * var(--disc-scale)); height: calc(22px * var(--disc-scale)); border-radius: 50%; opacity: 0; will-change: transform, opacity;
+.landing-discs { --disc-scale: calc(32 / 88); position: relative; flex-shrink: 0; width: calc(88px * var(--disc-scale)); height: calc(90.6px * var(--disc-scale)); perspective: calc(600px * var(--disc-scale)); perspective-origin: 50% calc(100% - 12.9px * var(--disc-scale)); }
+.landing-discs span { position: absolute; left: 50%; top: calc(100% - 12.9px * var(--disc-scale)); width: calc(25.9px * var(--disc-scale)); height: calc(25.9px * var(--disc-scale)); border-radius: 50%; opacity: 0; will-change: transform, opacity;
   background: radial-gradient(70% 70% at 40% 30%, #fff8ec, #ffe4c2 55%, #ffd2a1); box-shadow: inset 0 -4px 12px #f7b77a80, 0 6px 18px #c8541433; }
 .landing-discs span:nth-child(1) { z-index: 1; }
 .landing-discs span:nth-child(2) { z-index: 2; }
@@ -547,10 +547,10 @@ main { background: var(--paper); }
 /* Touch devices (iOS Safari): masked backdrop-filter layers over the scrolling page starve its tile painting,
    so content scrolled into view right after opening a post stayed blank for seconds. The color fade alone stays. */
 @media (hover: none) { .post-topfade span { display: none; } }
-.post-brand { position: fixed; top: 40px; left: clamp(20px, 4vw, 40px); z-index: 3; font-size: 24px; line-height: 1; letter-spacing: -0.03em; gap: 14px; height: calc(82px * 32 / 88); }
+.post-brand { position: fixed; top: 40px; left: clamp(20px, 4vw, 40px); z-index: 3; font-size: 24px; line-height: 1; letter-spacing: -0.03em; gap: 14px; height: calc(90.6px * 32 / 88); }
 .post-brand svg { width: 32px; height: 32px; }
 @media (max-width: 700px) { .post-head { padding-top: 116px; } .post-body { font-size: 17px; } .post-body > p:first-child { font-size: 19px; } }
-@media (max-width: 700px) { .post-brand { top: 28px; font-size: 20px; gap: 12px; height: calc(82px * 27 / 88); } .post-brand svg { width: 27px; height: 27px; } }
+@media (max-width: 700px) { .post-brand { top: 28px; font-size: 20px; gap: 12px; height: calc(90.6px * 27 / 88); } .post-brand svg { width: 27px; height: 27px; } }
 
 /* A translucent invitation with a shared dot-to-arrow control. */
 .landing-form { width: min(208px, 100%); height: 44px; cursor: pointer; background: rgb(0 0 0 / .85); border-color: #ffffff20; box-shadow: 0 6px 22px #0003, inset 0 1px 0 #ffffff0a; backdrop-filter: blur(6px) saturate(1.15); -webkit-backdrop-filter: blur(6px) saturate(1.15); transition: width 300ms cubic-bezier(.34, 1.25, .45, 1), height 300ms cubic-bezier(.34, 1.25, .45, 1), outline-color 220ms ease; }

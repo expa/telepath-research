@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 -1 72 72">
+  <!-- Telepath's mark: a pill over two circles (68×70). Black on light tab bars; Telepath orange on dark ones,
+       which stays visible even if a browser pairs the dark variant with a light tab bar. -->
+  <style>.m{fill:#000}@media (prefers-color-scheme:dark){.m{fill:#E8693A}}</style>
+  <rect class="m" width="68" height="20" rx="10"/>
+  <circle class="m" cx="34" cy="35" r="10"/>
+  <circle class="m" cx="34" cy="60" r="10"/>
+</svg>

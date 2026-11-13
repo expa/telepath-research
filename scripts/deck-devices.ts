@@ -1,5 +1,6 @@
-// Draws deck slide 10: a 2×4 bento of isometric devices, in the anatomy style of the site's figures.
-// Usage: `node scripts/deck-devices.ts` rewrites slide 10 and its styles inside public/deck/index.html.
+// Draws the deck's isometric figures, in the anatomy style of the site's figures:
+// slide 10's 2×4 grid of devices and slide 2's 20-watt bench (a lamp wired to a wattmeter).
+// Usage: `node scripts/deck-devices.ts` rewrites both, and their styles, inside public/deck/index.html.
 import { readFileSync, writeFileSync } from "node:fs";
 import * as k from "../components/iso/iso-kit.ts";
 import type { Flat, Plan, Plane, Point3, Projection } from "../components/iso/iso-kit.ts";
@@ -428,6 +429,109 @@ const satellite: Device = {
 
 const DEVICES = [earbuds, watch, glasses, phone, drone, car, robot, satellite];
 
+// ---------- slide 2: the 20-watt bench ----------
+// A lamp on an instrument bench, wired to a wattmeter whose needle sits low on the dial.
+const BW = 900, BH = 520;
+const PLATE: Plan = { x: -96, y: -54, w: 192, d: 108, r: 9 };
+const LAMP: Plane = [-38, -6], METER: Plan = { x: 22, y: -30, w: 58, d: 46, r: 5 };
+
+/** A surface of revolution about a vertical axis: profile is [z, r] pairs. Returns its silhouette and rings. */
+function lathe(cx: number, cy: number, profile: [number, number][], P: Projection, steps = 56) {
+  const rings = profile.map(([z, r]) => Array.from({ length: steps }, (_, i) => { const a = (i / steps) * Math.PI * 2; return at([cx + r * Math.cos(a), cy + r * Math.sin(a), z], P); }));
+  return { outline: k.pathOf(hull(rings.flat()), true), rings };
+}
+
+function plate(P: Projection) {
+  const h = 8, foot = 4, z0 = -h - foot;
+  let s = "";
+  for (const [x, y] of k.corners(PLATE, 16).sort((a, b) => k.depthOf([a[0], a[1], 0], P) - k.depthOf([b[0], b[1], 0], P))) {
+    s += S(k.cylinder(x, y, 6.5, z0, 1.4, P, 24), { tone: "lo" });
+    s += S(k.cylinder(x, y, 5, z0 + 1.4, foot - 1.4, P, 24), { tone: "mid", crease: "none" });
+  }
+  s += S(k.slabOf(PLATE, -h, h, P, 8, 1.4), { tone: "mid" });
+  s += L(k.planOutline(k.insetPlan(PLATE, 4.5), 0, P), { tone: "faint" });
+  const screws = k.corners(PLATE, 7);
+  s += L(screws.map(([x, y]) => k.ring(x, y, 2, 0, P, 16)).join(""), { tone: "lo" });
+  s += k.dotsSvg(k.pointsAt(screws.map(([x, y]) => [x, y, 0] as Point3), P), { size: 0.55 });
+  // a label plate on the front edge
+  const lab: Plan = { x: -70, y: 34, w: 52, d: 11, r: 1.5 };
+  s += S(k.slabOf(lab, 0, 0.8, P, 4), { tone: "lo" });
+  s += L([0.62, 0.38].map((len, i) => k.lineOnTop([lab.x + 6, lab.y + 3.6 + i * 3.8], [lab.x + 6 + (lab.w - 12) * len, lab.y + 3.6 + i * 3.8], 0.8, P)).join(""), { tone: "lo" });
+  s += dots([[lab.x + 2.8, lab.y + lab.d / 2, 0.8], [lab.x + lab.w - 2.8, lab.y + lab.d / 2, 0.8]], P, 0.45);
+  return s;
+}
+
+function post(x: number, y: number, z: number, P: Projection) {
+  let s = S(k.cylinder(x, y, 3.4, z, 1.2, P, 6), { tone: "lo" });
+  s += S(k.cylinder(x, y, 1.4, z + 1.2, 3, P, 14), { tone: "mid", crease: "none" });
+  s += S(k.cylinder(x, y, 2.6, z + 4.2, 3.2, P, 20, 0.3), { tone: "hi", crease: "lo" });
+  s += L(k.knurl(x, y, 2.6, z + 4.2, z + 7.4, 16, P), { tone: "lo" });
+  return s;
+}
+
+function lamp(P: Projection) {
+  const [cx, cy] = LAMP;
+  let s = "";
+  // socket: a collar, a knurled body and the brass-like screw base with its threads
+  s += S(k.cylinder(cx, cy, 17, 0, 3, P, 56, 0.5), { tone: "mid", crease: "faint" });
+  s += S(k.cylinder(cx, cy, 13, 3, 13, P, 56, 0.8), { tone: "hi", crease: "lo", inner: L(k.sideArc(cx, cy, 13, 7, P, 40), { tone: "faint" }) });
+  s += L(k.knurl(cx, cy, 13, 9, 15.4, 44, P, 0.6), { tone: "faint" });
+  s += S(k.cylinder(cx, cy, 9.6, 16, 11, P, 48, 0.4), { tone: "mid", crease: "lo" });
+  s += L([18, 20.4, 22.8, 25.2].map((z) => k.sideArc(cx, cy, 9.6, z, P, 32)).join(""), { tone: "lo" });
+  // glass: a sphere on a short neck
+  const R = 21, zc = 50;
+  const prof: [number, number][] = [[27, 9.2], [30, 9.6]];
+  for (let z = 33; z <= zc + R; z += 1.5) prof.push([z, Math.sqrt(Math.max(0, R * R - (z - zc) ** 2))]);
+  const g = lathe(cx, cy, prof, P);
+  const [fx, fy] = at([cx, cy, 47], P), kk = Math.hypot(...k.axisVector(P, [1, 0, 0]));
+  s += `<defs><radialGradient id="bulbGlow"><stop offset="0" stop-color="var(--hot)" stop-opacity=".42"/><stop offset=".45" stop-color="var(--hot)" stop-opacity=".14"/><stop offset="1" stop-color="var(--hot)" stop-opacity="0"/></radialGradient></defs>`;
+  s += `<path class="bulbglass" d="${g.outline}"/>`;
+  s += `<circle cx="${r1(fx)}" cy="${r1(fy)}" r="${r1(R * 1.25 * kk)}" fill="url(#bulbGlow)"/>`;
+  // inside: the glass stem, two lead wires and the coiled filament
+  s += S(k.cylinder(cx, cy, 3.6, 27, 9, P, 24, 0.3), { tone: "lo", crease: "none" });
+  s += L(k.pathOf([at([cx - 1.6, cy, 36], P), at([cx - 6, cy, 47], P)]) + k.pathOf([at([cx + 1.6, cy, 36], P), at([cx + 6, cy, 47], P)]), { tone: "mid" });
+  const coil = k.coil(cx - 6, cx + 6, [cy, 47], 1.5, 8, "x", P, 14);
+  s += L(coil.back, { tone: "lit" }) + L(coil.front, { tone: "lit", className: "thick" });
+  // the glass outline and a soft highlight
+  s += L(g.outline, { tone: "mid" });
+  const [sx, sy] = at([cx, cy, zc], P), hr = R * 0.74 * kk;
+  const arc = Array.from({ length: 13 }, (_, i) => { const a = Math.PI * (1.08 + i * 0.026); return [sx + hr * Math.cos(a), sy + hr * Math.sin(a)] as Flat; });
+  s += L(k.pathOf(arc), { tone: "lo" });
+  return s;
+}
+
+function meter(P: Projection) {
+  const m = METER, top = 18;
+  let s = S(k.slabOf(m, 0, top, P, 6, 1.2), { tone: "hi", crease: "lo", inner: L(k.sideSeam(m, 13, P, 6), { tone: "faint" }) });
+  s += L(k.planOutline(k.insetPlan(m, 3.5), top, P, 4), { tone: "faint" });
+  // the dial: a raised disc with ticks, and the needle resting low
+  const dx = m.x + 32, dy = m.y + 20, from = -2.3, span = 4.6;
+  s += S(k.cylinder(dx, dy, 17, top, 0.8, P, 48, 0.2), { tone: "lo", crease: "none" });
+  const t = k.radialTicks(dx, dy, 15.5, 20, 5, top + 0.8, [1.6, 3.4], P, from, span);
+  s += L(t.minor, { tone: "lo" }) + L(t.major, { tone: "mid" });
+  s += L(k.onTop(Array.from({ length: 41 }, (_, i) => { const a = from + (span * i) / 40; return [dx + 11.6 * Math.sin(a), dy - 11.6 * Math.cos(a)] as Plane; }), top + 0.8, P), { tone: "faint" });
+  const a = from + span * 0.2;
+  s += L(k.lineOnTop([dx, dy], [dx + 13 * Math.sin(a), dy - 13 * Math.cos(a)], top + 1.2, P), { tone: "lit", className: "thick" });
+  s += S(k.cylinder(dx, dy, 1.8, top + 0.8, 1, P, 16), { tone: "hi", crease: "none" });
+  // terminals on the front of the lid
+  s += post(m.x + 8, m.y + 12, top, P) + post(m.x + 8, m.y + 30, top, P);
+  return s;
+}
+
+function bench(P: Projection) {
+  let s = plate(P);
+  // two leads from the lamp's socket to the meter's terminals, lying on the bench
+  const [lx, ly] = LAMP;
+  const lead = (dy: number, tx: number, ty: number) => k.onTop([[lx + 16, ly + dy], [lx + 30, ly + dy * 1.6], [tx - 18, ty + 6], [tx - 9, ty + 2]], 0.6, P);
+  s += L(lead(-3, METER.x + 8, METER.y + 12), { tone: "mid" }) + L(lead(4, METER.x + 8, METER.y + 30), { tone: "mid" });
+  s += k.lineSvg(k.segment([METER.x + 8 - 9, METER.y + 14, 0.6], [METER.x + 8, METER.y + 12, 24], P) + k.segment([METER.x + 8 - 9, METER.y + 32, 0.6], [METER.x + 8, METER.y + 30, 24], P), { tone: "mid" });
+  s += lamp(P) + meter(P);
+  return s;
+}
+
+const BENCH_P = k.fitProjection([...k.boxCorners(PLATE, -12, 0), [LAMP[0], LAMP[1], 74], [LAMP[0] - 22, LAMP[1], 50], [LAMP[0], LAMP[1] - 22, 50]], BW, BH, { pad: 12, azimuth: AZ });
+const FIG2 = `<!--fig2--><div class="isofig u" style="--c:1/8;--r:2;align-self:end;--i:2"><svg class="iso-svg" viewBox="0 0 ${BW} ${BH}" role="img" aria-label="A light bulb glowing on an instrument bench, wired to a wattmeter whose needle rests low on its dial">${bench(BENCH_P)}</svg></div><!--/fig2-->`;
+
 // ---------- page ----------
 function card(dev: Device, i: number) {
   const P = k.fitProjection(dev.bounds, W, H, { pad: dev.pad ?? 8, azimuth: AZ });
@@ -445,7 +549,8 @@ const SLIDE = `<section class="pg sl" data-title="The vision" aria-label="Slide 
   + `</div><div class="dfolio">10</div></section>`;
 
 const CSS = `/* devices:start */
-.bento{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:0;min-height:0;border-top:1px solid var(--rule);
+.bento{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:0;min-height:0;border-top:1px solid var(--rule)}
+.bento,.isofig{
  --anatomy-paper:#fffcf8;--anatomy-face:#fff;--anatomy-top:#fffdfa;--anatomy-shade-0:#e3d9cf;--anatomy-shade-1:#ebe2d9;--anatomy-shade-2:#f2eae2;--anatomy-shade-3:#f8f2ec;
  --anatomy-lit-top:#fff3e6;--anatomy-lit-shade:#ffe0c2;--anatomy-hi:#6f6157;--anatomy-mid:#93857a;--anatomy-lo:#bfb2a7;--anatomy-faint:#ddd2c8;--anatomy-lit:var(--hot);
  --anatomy-dot:#3a2e26;--anatomy-weight:.75px}
@@ -476,7 +581,10 @@ const CSS = `/* devices:start */
 .iso-dots[data-tone="hi"] circle{opacity:.85}.iso-dots[data-tone="mid"] circle{opacity:.45}
 .iso-dots[data-tone="lo"] circle{opacity:.22}.iso-dots[data-tone="faint"] circle{opacity:.5;fill:#8a7a6f}
 .bx .inkf{fill:#2a211b;stroke:none}
-.bx .litf{fill:var(--anatomy-lit);stroke:none}
+.bx .litf,.isofig .litf{fill:var(--anatomy-lit);stroke:none}
+.isofig{min-height:0;display:flex;align-items:flex-end}
+.isofig .iso-svg{display:block;width:100%;height:auto;max-height:100%;overflow:visible}
+.isofig .bulbglass{fill:#fffcf8;fill-opacity:.6;stroke:none}
 .bx .bub{fill:var(--anatomy-shade-1);stroke:none}
 .bx .glass{fill:#efe6dd;stroke:none}
 .bx .glass2{fill:var(--anatomy-shade-1);stroke:none}
@@ -487,7 +595,7 @@ if (preview > 0) {
   const page = `<!doctype html><meta charset="utf-8"><style>:root{--hot:#E8693A;--paper:#FAF9F6}body{margin:0;background:#FAF9F6;font:20px Geist,system-ui,sans-serif}
 ${CSS}
 .bento{display:block}.bx{width:780px;height:470px;margin:0 auto}.bx .iso-svg{height:calc(100% - 100px)}figcaption .t{font-size:28px}figcaption .s{color:#8A7A6F}p{margin:0}</style>
-<div class="bento">${DEVICES.map(card).join("")}</div>`;
+<div class="bento">${DEVICES.map(card).join("")}</div><div class="isofig" style="width:900px;margin:40px auto">${FIG2}</div>`;
   writeFileSync(process.argv[preview + 1], page);
   console.log("preview written");
   process.exit(0);
@@ -501,5 +609,8 @@ html = html.replace(".reach{position:absolute;inset:0;width:100%;height:100%;z-i
 const block = /\/\* devices:start \*\/[\s\S]*?\/\* devices:end \*\//;
 html = block.test(html) ? html.replace(block, CSS) : html.replace(/\n<\/style>\s*\n<main class="deck">/, (m) => `\n${CSS}${m}`);
 if (!html.includes("/* devices:start */")) throw new Error("could not place the device styles");
+const two = /(<section class="pg sl ?"(?: data-title="[^"]*")? aria-label="Slide 2">[\s\S]*?)(?:<!--fig2-->[\s\S]*?<!--\/fig2-->)?(<\/div><div class="dfolio">02<\/div><\/section>)/;
+if (!two.test(html)) throw new Error("slide 2 not found");
+html = html.replace(two, (_, head, tail) => head + FIG2 + tail);
 writeFileSync(DECK, html);
 console.log(`slide 10: ${DEVICES.length} devices, ${(SLIDE.length / 1024).toFixed(0)} KB`);

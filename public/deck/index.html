@@ -146,18 +146,18 @@ canvas.kid{height:100%;margin:-96px 0}
    The script then zooms each slide out only as far as it needs to fit. */
 .cp .in{padding:112px 64px 48px;column-gap:32px;row-gap:40px}
 .cp .row12,.cp .cols{column-gap:32px}
-.cp .tbar .tbt{right:330px;overflow:hidden;text-overflow:ellipsis}
+/* small screens: one thin row; the logo shows only on the cover, every other slide puts its eyebrow in its place */
+.cp .pg.sl:not(.cover) .tbar :is(.tbm,.tbn){display:none}
+.cp .tbar .tbt{left:0;right:280px;overflow:hidden;text-overflow:ellipsis}
 /* landscape phones: illustrations take the room left in their row instead of their full width */
 .cp:not(.pt) .isofig{align-self:stretch!important;min-height:240px}.cp:not(.pt) .isofig .iso-svg{height:100%}
 .cp:not(.pt) .dcol .iso-svg{max-height:200px}
 .cp .cvw{left:auto;right:0;width:62.5%}
 .cp .head .cvw{width:52%}
-.pt .in{display:flex;flex-direction:column;gap:40px;padding:152px 48px 56px}
+.pt .in{display:flex;flex-direction:column;gap:40px;padding:118px 48px 56px}
 .pt .in>*{align-self:stretch!important;flex:none}
 .pt .in>:first-child:not(:only-child){margin-bottom:auto}
 .pt .in>:only-child{margin-top:auto}
-/* portrait top bar: mark, name, confidentiality and page on one row; the section title on its own row below */
-.pt .tbar{height:104px}.pt .tbar .tbn{left:34px}.pt .tbar .tbt{left:0;right:0;top:66px}
 .pt h1,.pt .n{font-size:88px}
 .pt .cvw{left:0;right:auto;width:100%;top:14%;height:52%}
 .pt .head .cvw{top:34%;height:42%;left:-18%;width:118%}

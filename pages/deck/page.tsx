@@ -6,7 +6,7 @@ export default function Deck() {
       title="Telepath deck"
       autoFocus
       onLoad={e => e.currentTarget.focus()}
-      style={{ position: "fixed", inset: 0, width: "100%", height: "100%", border: 0, zIndex: 100, background: "#141210" }}
+      style={{ position: "fixed", inset: 0, width: "100%", height: "100%", border: 0, zIndex: 100, background: "#FAF9F6" }}
     />
   );
 }

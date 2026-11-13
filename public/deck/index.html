@@ -619,7 +619,7 @@ requestAnimationFrame(frame);
 var slide=document.querySelector('.deck .pg.sl.tt'); if(!slide) return;
 var cv=document.createElement('canvas'); cv.className='cvflow'; cv.setAttribute('aria-hidden','true'); slide.appendChild(cv);
 var W=1920,H=1080,CX=960,CY=540, INK='31,23,18', HOT='232,105,58', GREY='150,137,126';   /* GREY: the fan's lines, a warm mid-grey so the bundle never reads as black */
-var MONO='"IBM Plex Mono",ui-monospace,monospace', SERIF='Newsreader, Georgia, serif';
+var MONO='"IBM Plex Mono",ui-monospace,monospace', SANS='Geist, system-ui, sans-serif';
 function rng(s){return function(){s=(s*16807)%2147483647;return (s-1)/2147483646;};}
 var R=rng(20261113), gauss=function(){return (R()+R()+R()+R()-2)*1.73;};
 var cl=function(v,a,b){return Math.min(b,Math.max(a,v));}, ease=function(v){v=cl(v,0,1);return v<.5?4*v*v*v:1-Math.pow(-2*v+2,3)/2;};
@@ -665,7 +665,7 @@ function frame(now){
   /* a few of the grains are words */
   WORDS.forEach(function(wd){wd.u+=wd.v*(SLOW+FAST*wd.u)*dt; if(wd.u>=0.93){wd.u=0;wd.n=gauss()*0.55;}
     var al=cl(wd.u*8,0,1)*(1-cl((wd.u-0.7)/0.23,0,1)); if(al<=0.01) return;
-    x.globalAlpha=0.62*al; x.font='italic 300 '+(22-9*wd.u)+'px '+SERIF; x.fillStyle='rgb('+(wd.u>0.5?HOT:INK)+')'; x.textAlign='center';
+    x.globalAlpha=0.62*al; x.font='400 '+(22-9*wd.u)+'px '+SANS; x.fillStyle='rgb('+(wd.u>0.5?HOT:INK)+')'; x.textAlign='center';
     x.fillText(wd.w,gx(wd.u),CY+(wd.n+0.18*Math.sin(t*0.5+wd.ph))*spread(wd.u)); x.textAlign='left'; x.globalAlpha=1;});
 
   /* the cloud thins behind the title */

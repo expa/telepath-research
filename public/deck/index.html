@@ -141,6 +141,42 @@ canvas.kid{height:100%;margin:-96px 0}
 .ztxt s{color:var(--muted);text-decoration-thickness:1px}
 .ztxt b{font-weight:400;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:6px}
 
+/* small screens: html.cp = compact (slide takes the viewport's shape), html.pt = portrait reflow, one column.
+   The script then zooms each slide out only as far as it needs to fit. */
+.cp .in{padding:56px 64px;column-gap:32px;row-gap:40px}
+.cp .row12,.cp .cols{column-gap:32px}
+.cp .dfolio{right:64px;bottom:56px}
+.cp .cvw{left:auto;right:0;width:62.5%}
+.cp .head .cvw{width:52%}
+.pt .in{display:flex;flex-direction:column;gap:40px;padding:80px 48px 56px}
+.pt .in>*{align-self:stretch!important;flex:none}
+.pt .in>:first-child:not(:only-child){margin-bottom:auto}
+.pt .in>:only-child{margin-top:auto}
+.pt .dfolio{top:32px;bottom:auto;right:48px}
+.pt h1,.pt .n{font-size:88px}
+.pt .cvw{left:0;right:auto;width:100%;top:14%;height:52%}
+.pt .head .cvw{top:34%;height:42%}
+.pt .cols,.pt .cols.wide{grid-template-columns:repeat(2,minmax(0,1fr));gap:40px 32px}
+.pt .cols[style*="--n:3"],.pt .cols.wide{grid-template-columns:minmax(0,1fr)}
+.pt .cols[style*="--n:6"]{grid-template-columns:repeat(3,minmax(0,1fr))}
+.pt .cols[style*="--n:8"],.pt .cols.stairs{grid-template-columns:repeat(4,minmax(0,1fr));column-gap:16px}
+.pt .cols[style*="--n:3"]:has(.vbars){grid-template-columns:repeat(2,minmax(0,1fr))}
+.pt .cols[style*="--n:3"]:has(.vbars)>:nth-child(3){grid-column:1/-1}
+.pt .vb{height:180px}.pt .vbars i{height:calc(var(--h)*1.6px)}
+.pt .vizw{flex:1 1 0;min-height:300px}
+.pt .vizw.short{flex:none;height:140px;min-height:0}
+.pt .br.wide{grid-template-columns:200px minmax(0,1fr) 90px}
+.pt .row12{column-gap:16px;row-gap:8px}
+.pt .row12>:nth-child(1){grid-column:1/-1}
+.pt .row12>:nth-child(2){grid-column:1/4}
+.pt .row12>:nth-child(3){grid-column:4/10}
+.pt .row12>:nth-child(4){grid-column:10/13}
+.pt .th>:first-child{display:none}
+.pt .wer .row12>:nth-child(1){grid-column:1/9;grid-row:1}
+.pt .wer .row12>:nth-child(3){grid-column:9/13;grid-row:1;text-align:right}
+.pt .wer .row12>:nth-child(2),.pt .wer .row12>:nth-child(4){grid-column:1/-1}
+.pt .leg{flex-wrap:wrap;gap:12px 32px}
+
 /* motion: one calm, staggered reveal per slide */
 @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 @keyframes fade{from{opacity:0}to{opacity:1}}
@@ -168,7 +204,7 @@ canvas.kid{height:100%;margin:-96px 0}
  @page{size:1920px 1080px;margin:0}
  html,body{overflow:visible;height:auto;background:#fff}
  .deck{position:static}
- .pg.sl{display:block!important;position:relative;left:auto;top:auto;transform:none!important;break-after:page}
+ .pg.sl{display:block!important;position:relative;left:auto;top:auto;width:1920px!important;height:1080px!important;transform:none!important;break-after:page}
  *{animation:none!important}.homes i,.zw{opacity:1}.fig .draw{stroke-dashoffset:0}
 }
 </style>
@@ -233,7 +269,7 @@ canvas.kid{height:100%;margin:-96px 0}
 <div class="st rule" style="--c:7/13;--r:1/3;align-self:start"><p class="k">One request, 42 words, at 5% error</p><p class="t ztxt"><span class="zw" style="--d:0.00s">Can</span> <span class="zw" style="--d:0.05s">you</span> <span class="zw" style="--d:0.10s">move</span> <span class="zw" style="--d:0.15s">my</span> <span class="zw" style="--d:0.20s">three</span> <span class="zw" style="--d:0.25s">o’clock</span> <span class="zw" style="--d:0.30s">with</span> <span class="zw zx" style="--d:0.35s"><s>Dana</s> <b>Donna</b></span> <span class="zw" style="--d:0.40s">to</span> <span class="zw" style="--d:0.45s">Thursday</span> <span class="zw" style="--d:0.50s">and</span> <span class="zw" style="--d:0.55s">send</span> <span class="zw" style="--d:0.60s">her</span> <span class="zw" style="--d:0.65s">the</span> <span class="zw" style="--d:0.70s">notes</span> <span class="zw" style="--d:0.75s">from</span> <span class="zw" style="--d:0.80s">the</span> <span class="zw" style="--d:0.85s">board</span> <span class="zw" style="--d:0.90s">meeting?</span> <span class="zw" style="--d:0.95s">Also</span> <span class="zw" style="--d:1.00s">remind</span> <span class="zw" style="--d:1.05s">me</span> <span class="zw" style="--d:1.10s">to</span> <span class="zw" style="--d:1.15s">call</span> <span class="zw" style="--d:1.20s">Dad</span> <span class="zw" style="--d:1.25s">on</span> <span class="zw" style="--d:1.30s">the</span> <span class="zw" style="--d:1.35s">way</span> <span class="zw" style="--d:1.40s">home,</span> <span class="zw" style="--d:1.45s">and</span> <span class="zw" style="--d:1.50s">add</span> <span class="zw zx" style="--d:1.55s"><s>oat</s> <b>oak</b></span> <span class="zw" style="--d:1.60s">milk,</span> <span class="zw" style="--d:1.65s">eggs</span> <span class="zw" style="--d:1.70s">and</span> <span class="zw" style="--d:1.75s">coffee</span> <span class="zw" style="--d:1.80s">to</span> <span class="zw" style="--d:1.85s">the</span> <span class="zw" style="--d:1.90s">grocery</span> <span class="zw" style="--d:1.95s">list</span> <span class="zw" style="--d:2.00s">before</span> <span class="zw" style="--d:2.05s">Sunday.</span> </p></div>
 <p class="ft">Words per day: Mehl et al., Science (2007). Error counts are arithmetic: 16,000 × 5%. Example transcript is illustrative.</p></div><div class="dfolio">A6</div></section>
 <section class="pg sl " aria-label="Slide 22"><div class="in"><div class="hd" style="--c:1/9;--r:1"><h2>Frozen speech models fail the people <em>who need them most.</em></h2></div>
-<div class="grp tbl" style="--r:2;align-self:end"><p class="s th">Word error rate: share of words gotten wrong</p><div class="row12 tr"><p class="t" style="--c:1/4">Typical speech</p><div style="--c:4/8"><div class="bar"><i class="" style="--w:6%"></i></div></div><p class="t" style="--c:8/10">4–7%</p><p class="s" style="--c:10/13">Commercial ASR, published range</p></div><div class="row12 tr"><p class="t" style="--c:1/4">White speakers</p><div style="--c:4/8"><div class="bar"><i class="" style="--w:19%"></i></div></div><p class="t" style="--c:8/10">19%</p><p class="s" style="--c:10/13">Five commercial systems, 2020</p></div><div class="row12 tr"><p class="t" style="--c:1/4">Black speakers</p><div style="--c:4/8"><div class="bar"><i class="ink" style="--w:35%"></i></div></div><p class="t" style="--c:8/10">35%</p><p class="s" style="--c:10/13">Same five systems, same study</p></div><div class="row12 tr"><p class="t" style="--c:1/4">Dysarthric speech</p><div style="--c:4/8"><div class="bar"><i class="ink" style="--w:64%"></i></div></div><p class="t" style="--c:8/10">60–67%</p><p class="s" style="--c:10/13">ALS, stroke, Parkinson’s, cerebral palsy</p></div></div>
+<div class="grp tbl wer" style="--r:2;align-self:end"><p class="s th">Word error rate: share of words gotten wrong</p><div class="row12 tr"><p class="t" style="--c:1/4">Typical speech</p><div style="--c:4/8"><div class="bar"><i class="" style="--w:6%"></i></div></div><p class="t" style="--c:8/10">4–7%</p><p class="s" style="--c:10/13">Commercial ASR, published range</p></div><div class="row12 tr"><p class="t" style="--c:1/4">White speakers</p><div style="--c:4/8"><div class="bar"><i class="" style="--w:19%"></i></div></div><p class="t" style="--c:8/10">19%</p><p class="s" style="--c:10/13">Five commercial systems, 2020</p></div><div class="row12 tr"><p class="t" style="--c:1/4">Black speakers</p><div style="--c:4/8"><div class="bar"><i class="ink" style="--w:35%"></i></div></div><p class="t" style="--c:8/10">35%</p><p class="s" style="--c:10/13">Same five systems, same study</p></div><div class="row12 tr"><p class="t" style="--c:1/4">Dysarthric speech</p><div style="--c:4/8"><div class="bar"><i class="ink" style="--w:64%"></i></div></div><p class="t" style="--c:8/10">60–67%</p><p class="s" style="--c:10/13">ALS, stroke, Parkinson’s, cerebral palsy</p></div></div>
 <p class="ft">Sources: Koenecke et al., PNAS (2020), average WER across Amazon, Apple, Google, IBM and Microsoft; dysarthric and typical ranges as summarized in Speech Technology (2023).</p></div><div class="dfolio">A7</div></section>
 <section class="pg sl " aria-label="Slide 23"><div class="in"><div class="hd" style="--c:1/9;--r:1"><h2>The newest models are better. <em>Real conversation still breaks them.</em></h2></div>
 <div class="grp cols wide" style="--r:2;align-self:end;--n:2"><div class="grp st rule"><p class="k">Leading speech APIs · average word error rate</p><div class="bars"><div class="br wide"><p class="s ink">AssemblyAI Universal-3.5 Pro</p><div class="bar"><i class="" style="--w:54.4%"></i></div><p class="t">4.35%</p></div><div class="br wide"><p class="s ink">OpenAI GPT-4o Transcribe</p><div class="bar"><i class="" style="--w:66.8%"></i></div><p class="t">5.34%</p></div><div class="br wide"><p class="s ink">ElevenLabs Scribe v2</p><div class="bar"><i class="" style="--w:73.4%"></i></div><p class="t">5.87%</p></div><div class="br wide"><p class="s ink">Deepgram Nova-3</p><div class="bar"><i class="" style="--w:83.2%"></i></div><p class="t">6.66%</p></div><div class="br wide"><p class="s ink">Microsoft Azure</p><div class="bar"><i class="" style="--w:87.8%"></i></div><p class="t">7.02%</p></div></div><p class="s">Pre-recorded audio: medical, accented, general and webinar speech. Published by AssemblyAI, Oct 2026.</p></div>
@@ -275,18 +311,37 @@ canvas.kid{height:100%;margin:-96px 0}
 /* no orphans: text-wrap:pretty first; where a last line still holds one or two words, narrow that block a little until it holds three */
 function last(el){var w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT),n,tops=[];while(n=w.nextNode()){var re=/\S+/g,m;while(m=re.exec(n.data)){var r=document.createRange();r.setStart(n,m.index);r.setEnd(n,m.index+m[0].length);var b=r.getClientRects()[0];if(b)tops.push(b.top);}}
  if(tops.length<5)return{lines:1,tail:9};var t=tops[tops.length-1],k=0,lines=1;for(var i=tops.length-1;i>=0&&Math.abs(tops[i]-t)<4;i--)k++;for(var j=1;j<tops.length;j++)if(tops[j]-tops[j-1]>4)lines++;return{lines:lines,tail:k};}
-function fix(){document.querySelectorAll('.pg.sl').forEach(function(s){var d=s.style.display,v=s.style.visibility;s.style.display='block';s.style.visibility='hidden';
- s.querySelectorAll('.in h1,.in h2,.in p,.in li').forEach(function(el){if(el.querySelector('br')||el.closest('.nw'))return;var a=last(el);if(a.lines<2||a.tail>2)return;var W=el.clientWidth;
-  for(var k=1;k<=25;k++){el.style.maxWidth=Math.floor(W*(1-k*.02))+'px';var b=last(el);if(b.tail>2&&b.lines<=a.lines+(a.lines>2?2:1))return;}el.style.maxWidth='';});
- s.style.display=d;s.style.visibility=v;});}
-(document.fonts?document.fonts.ready:Promise.resolve()).then(fix);
+function unfix(s){s.querySelectorAll('[data-ow]').forEach(function(el){el.style.maxWidth='';el.removeAttribute('data-ow');});}
+function fix(s){s.querySelectorAll('.in h1,.in h2,.in p,.in li').forEach(function(el){if(el.querySelector('br')||el.closest('.nw'))return;var a=last(el);if(a.lines<2||a.tail>2)return;var W=el.clientWidth;el.setAttribute('data-ow','');
+  for(var k=1;k<=25;k++){el.style.maxWidth=Math.floor(W*(1-k*.02))+'px';var b=last(el);if(b.tail>2&&b.lines<=a.lines+(a.lines>2?2:1))return;}el.style.maxWidth='';});}
+window.deckFix={fix:fix,unfix:unfix};
 })();
 (function(){
 var sl=[].slice.call(document.querySelectorAll('.pg.sl')),cur=0;
 var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 /* staggered reveal: header first, then each item in reading order */
 sl.forEach(function(s){var n=0;s.querySelectorAll('.in > :not(.grp), .grp > :not(.grp)').forEach(function(e){e.classList.add('u');e.style.setProperty('--i',Math.min(n++,14));});});
-function fit(){var k=Math.min(innerWidth/1920,innerHeight/1080);sl.forEach(function(e){e.style.transform='translate(-50%,-50%) scale('+k+')';});}
+/* layout: desktop scales the 1920x1080 slide. Small screens (where that would shrink body text below ~11px) get a slide
+   in the viewport's own shape, reflowed by CSS (html.cp / html.pt), then zoomed out per slide only as far as it needs to fit. */
+function fits(s){var n=s.querySelector('.in'),cs=getComputedStyle(n),W=n.offsetWidth,H=n.offsetHeight,
+ L=parseFloat(cs.paddingLeft)-1,T=parseFloat(cs.paddingTop)-1,R=W-parseFloat(cs.paddingRight)+1,B=H-parseFloat(cs.paddingBottom)+1,
+ b=[].filter.call(n.children,function(e){return e.offsetParent===n&&getComputedStyle(e).position!=='absolute'&&e.offsetHeight;}).map(function(e){return[e.offsetLeft,e.offsetTop,e.offsetLeft+e.offsetWidth,e.offsetTop+e.offsetHeight];});
+ if([].some.call(n.children,function(e){return e.scrollHeight>e.clientHeight+12;}))return false;
+ for(var i=0;i<b.length;i++){if(b[i][0]<L||b[i][1]<T||b[i][2]>R||b[i][3]>B)return false;
+  for(var j=i+1;j<b.length;j++)if(b[i][0]<b[j][2]-1&&b[j][0]<b[i][2]-1&&b[i][1]<b[j][3]+23&&b[j][1]<b[i][3]+23)return false;}
+ if([].some.call(n.querySelectorAll('.vizw:not(.short)'),function(e){return e.offsetHeight<240;}))return false;
+ return ![].some.call(n.querySelectorAll('p,h1,h2,li,.cols>*,.st'),function(e){return e.scrollWidth>e.clientWidth+4;});}
+var lastKey='';
+function fit(){var vw=innerWidth,vh=innerHeight,k=Math.min(vw/1920,vh/1080),cp=k<.55,pt=cp&&vw<vh*1.1,R=document.documentElement,key=vw+'x'+vh+(window.fontsOK?'f':'');
+ if(key===lastKey)return;lastKey=key;R.classList.toggle('cp',cp);R.classList.toggle('pt',pt);
+ var k0=cp?Math.min((pt?vw:vh)/640,.8):k,w0=cp?vw/k0:1920,h0=cp?vh/k0:1080;
+ sl.forEach(function(s){var d=s.style.display,v=s.style.visibility,f=1;s.style.display='block';s.style.visibility='hidden';
+  var size=function(){s.style.width=Math.round(w0*f)+'px';s.style.height=Math.round(h0*f)+'px';};
+  window.deckFix.unfix(s);size();
+  if(cp)while(!fits(s)&&f<3){f*=1.05;size();}
+  if(window.fontsOK){window.deckFix.fix(s);if(cp)while(!fits(s)&&f<3){f*=1.05;size();}}
+  s.dataset.fit=(k0/f).toFixed(3);s.style.transform='translate(-50%,-50%) scale('+k0/f+')';s.style.display=d;s.style.visibility=v;});}
+(document.fonts?document.fonts.load('20px Geist').then(function(){return document.fonts.ready;}):Promise.resolve()).then(function(){window.fontsOK=1;fit();});
 function count(el){var to=+el.dataset.cnt,pre=el.dataset.pre||'',suf=el.dataset.suf||'',bar=el.dataset.sync==='bar',i=+(getComputedStyle(el).getPropertyValue('--i')||0),
  t0=performance.now()+(bar?600+i*90:600),dur=bar?1600:3200,fmt=function(v){return pre+v.toLocaleString('en-US')+suf;};
  function f(n){var u=Math.max(0,Math.min(1,(n-t0)/dur)),e=1-Math.pow(1-u,3);el.textContent=fmt(Math.max(1,Math.round(to*e)));if(u<1&&el.closest('.sl').classList.contains('on'))requestAnimationFrame(f);}
@@ -312,7 +367,7 @@ acc:function(f,t){var x=f.x,W=f.w,H=f.h,L=72,R=W-4,Tp=56,B=H-56;var y=function(v
  x.lineWidth=1;x.strokeStyle=C.ru;[50,60,70,80,90,100].forEach(function(v){x.beginPath();x.moveTo(L,y(v)+.5);x.lineTo(R,y(v)+.5);x.stroke();T(x,v+'%',0,y(v)+7,C.mu);});
  T(x,'Minutes of a new voice, learned while running',L,H-4,C.mu);
  x.setLineDash([4,6]);x.strokeStyle=C.mu;x.lineWidth=1.5;x.beginPath();x.moveTo(X(0),y(61.8));x.lineTo(X(1),y(61.8));x.stroke();x.setLineDash([]);
- T(x,'Frozen model: 61.8%, forever',R,y(61.8)+32,C.mu,'right');
+ T(x,'Frozen model: 61.8%, forever',R,y(61.8)+(W<720?-16:32),C.mu,'right');
  var u=eio((t-.8)/4.2),A=function(q){return 61.8+38.2*(1-Math.pow(1-q,2.4));};
  x.strokeStyle=C.hot;x.lineWidth=2;x.beginPath();for(var i=0;i<=160;i++){var q=u*i/160;i?x.lineTo(X(q),y(A(q))):x.moveTo(X(q),y(A(q)));}x.stroke();
  var v=A(u);x.fillStyle=C.hot;x.beginPath();x.arc(X(u),y(v),4,0,7);x.fill();

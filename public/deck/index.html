@@ -828,19 +828,36 @@ var bump=new Float32Array(G.length), heat=new Float32Array(G.length);
 /* glass, the same recipe as the cover logo (Figma 2765:195): see-through near the lower right, filling in to warm cream
    toward the upper left edge, with a faint 1px rim. One ramp, scaled by k for the brighter dots */
 var RAMP=[[.24,'255,255,255',.1],[.43,'255,246,222',.27],[.62,'255,243,208',.45],[.81,'255,241,198',.63],[1,'255,240,190',.8]];
-function ramp(gr,k){RAMP.forEach(function(s){gr.addColorStop(s[0],'rgba('+s[1]+','+Math.min(1,s[2]*k)+')');}); return gr;}
+/* c is the contrast: 1 is the logo's ramp; lower pulls every stop toward the ramp's mean (.45), so the clear centre fills a little and the bright rim softens */
+function ramp(gr,k,c){c=c==null?1:c; RAMP.forEach(function(s){gr.addColorStop(s[0],'rgba('+s[1]+','+Math.min(1,(.45+(s[2]-.45)*c)*k)+')');}); return gr;}
+/* plain dots are flat deep brown; the light ones (warm and lit dots, the bubbles and trails) are soft glass beads,
+   the logo's ramp at lower contrast */
+function dot(col){var c=document.createElement('canvas'); c.width=c.height=64; var g=c.getContext('2d');
+  g.fillStyle=col; g.beginPath(); g.arc(32,32,31,0,6.283); g.fill(); return c;}
 function bead(k){var c=document.createElement('canvas'); c.width=c.height=64; var g=c.getContext('2d');
-  g.fillStyle=ramp(g.createRadialGradient(44.8,51.2,0,44.8,51.2,40.1),k); g.beginPath(); g.arc(32,32,32,0,6.283); g.fill();
-  g.strokeStyle='rgba(255,250,236,'+Math.min(1,.28*k*1.6)+')'; g.lineWidth=2; g.beginPath(); g.arc(32,32,31,0,6.283); g.stroke(); return c;}
-var GLASS=bead(1.15), GLASSHOT=bead(1.45), GLASSLIT=bead(1.8);
+  g.fillStyle=ramp(g.createRadialGradient(44.8,51.2,0,44.8,51.2,40.1),k,.5); g.beginPath(); g.arc(32,32,32,0,6.283); g.fill();
+  g.strokeStyle='rgba(255,250,236,'+Math.min(1,.28*k*1.1)+')'; g.lineWidth=2; g.beginPath(); g.arc(32,32,31,0,6.283); g.stroke(); return c;}
+var GLASS=dot('#5A1A06'), GLASSHOT=bead(1.3), GLASSLIT=bead(1.5);
 /* a label pill in the same glass: it first clears the dots beneath it, so the page's orange shows through as it does
    behind the logo, then lays the logo's elliptical ramp and rim on top */
 function glassPill(x,px,py,w,h){var r=h/2;
   x.save(); x.globalCompositeOperation='destination-out'; x.fillStyle='#000'; x.beginPath(); x.roundRect(px,py,w,h,r); x.fill(); x.restore();
   x.save(); x.beginPath(); x.roundRect(px,py,w,h,r); x.clip();
   var cx=px+w*.7, cy=py+h*.8, sy=(h*1.167)/(w*.556); x.translate(cx,cy); x.scale(1,sy);
-  x.fillStyle=ramp(x.createRadialGradient(0,0,0,0,0,w*.556),1); x.fillRect(-w,-h/sy*2,w*2,h/sy*4); x.restore();
+  x.fillStyle=ramp(x.createRadialGradient(0,0,0,0,0,w*.556),1,.5); /* the softer contrast of the dots */ x.fillRect(-w,-h/sy*2,w*2,h/sy*4); x.restore();
   x.save(); x.strokeStyle='rgba(255,250,236,.28)'; x.lineWidth=1; x.beginPath(); x.roundRect(px+.5,py+.5,w-1,h-1,r-.5); x.stroke(); x.restore();}
+/* a word in its glass pill at full size (21px), anchored at (lx,ly) like fillText with textAlign al */
+/* the cover's background stops (the --orange gradient, top to bottom), to pick a word colour that reads on each pill */
+var BGS=['feb67a','ffb071','fea969','fda25f','fc9a56','fb934e','fa8b45','f6843e','f47b39','f07431','ec6b2c','e66424','e15b20','d8541a','cf4c18','c64413','ba3d0f','af350c','a32f0b','942808','882207'].map(function(h){return [0,2,4].map(function(i){return parseInt(h.substr(i,2),16);});}),
+    CVMAP={top:0,ch:1,sh:1}, INK_DARK='#6A2410';
+function lin(v){v/=255; return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4);}
+function lum(c){return .2126*lin(c[0])+.7152*lin(c[1])+.0722*lin(c[2]);}
+/* white or dark brown, whichever contrasts more with the pill: the background at that height under the pill's cream glass */
+function inkAt(x,ly){var t=x.getTransform(), y=CVMAP.top+(t.d*ly+t.f)*CVMAP.ch, f=cl(y/CVMAP.sh,0,1)*(BGS.length-1), i=Math.min(BGS.length-2,Math.floor(f)), u=f-i,
+    bg=[0,1,2].map(function(k){var v=BGS[i][k]+(BGS[i+1][k]-BGS[i][k])*u; return v+([255,243,208][k]-v)*.45;}), L=lum(bg);
+  return (1.05)/(L+.05) >= (L+.05)/(lum([106,36,16])+.05) ? '#fff' : INK_DARK;}
+function label(x,w,al,lx,ly){x.font='400 21px '+SANS; var tw=x.measureText(w).width, bx=al==='left'?lx:(al==='right'?lx-tw:lx-tw/2);
+  glassPill(x,bx-13,ly-23,tw+26,35); x.fillStyle=inkAt(x,ly-5.5); x.textAlign=al; x.fillText(w,lx,ly); x.textAlign='left';}
 function beads(x,arr,spr,m){for(var a=0;a<arr.length;a+=3){var r=arr[a+2]*m; x.drawImage(spr,arr[a]-r,arr[a+1]-r,2*r,2*r);}}
 
 /* the words, and for each one: the dot on the ring it lands on, the dots around it, and a small network grown from it */
@@ -872,6 +889,7 @@ function frame(now){
   if(t0===null) t0=now;
   var t=reduce?15.5:(now-t0)/1000, c=t%PER, fade=1-cl((c-PER+1.3)/1.1,0,1);
   var d=Math.min(window.devicePixelRatio||1,2); if(cv.width!==W*d){cv.width=W*d;cv.height=H*d;}
+  var cr=cv.getBoundingClientRect(), sr=slide.getBoundingClientRect(); CVMAP={top:cr.top-sr.top, ch:cr.height/(cv.height||1), sh:sr.height||1}; /* canvas pixels to slide height, for inkAt */
   var x=cv.getContext('2d'); x.setTransform(d,0,0,d,0,0); x.clearRect(0,0,W,H); x.setTransform(d*ZOOM,0,0,d*ZOOM,d*CX*(1-ZOOM),d*CY*(1-ZOOM));
 
   /* what each learned word adds to the dot field around it */
@@ -894,7 +912,8 @@ function frame(now){
     var u=(t*(0.09+0.13*g.h3)+g.h3*7.3)%1, tw=u<0.06?Math.sin(Math.PI*u/0.06):0;
     if(tw>0.05) lit.push(g.x,g.y,rad*(1+0.75*tw));
     else (heat[k2]>g.h2*0.85||body>0.6&&g.h2<0.16||g.h2<0.02?hot:ink).push(g.x,g.y,rad);}
-  beads(x,ink,GLASS,1.3); beads(x,hot,GLASSHOT,1.45); beads(x,lit,GLASSLIT,1.6);
+  /* the plain brown dots sit back at lower opacity so the connections read over them; warm and lit dots stay bright */
+  x.globalAlpha=0.55; beads(x,ink,GLASS,1); x.globalAlpha=0.9; beads(x,hot,GLASSHOT,1.35); x.globalAlpha=1; beads(x,lit,GLASSLIT,1.5);
 
   /* connections: from the dot where a word landed, lines draw themselves out to nearby dots, each lighting as it is reached */
   HOSTS.forEach(function(hst,n){var k=kt[n]; if(k<0) return; var rest=(0.42+0.58*Math.exp(-k/1.6))*fade;
@@ -904,18 +923,16 @@ function frame(now){
     x.fillStyle='rgba('+HOTRGB+','+fade+')';
     for(q=0;q<hst.nodes.length;q++){var nd2=hst.nodes[q], age=k-nd2.t; if(age<0) continue; var sz=(q?4.6:7)+7*Math.exp(-age/0.28); disc(x,nd2.x,nd2.y,sz*0.56);}
     if(k<1){x.strokeStyle='rgba('+HOTRGB+','+(0.7*Math.pow(1-k,2)*fade)+')'; x.lineWidth=1.2; x.beginPath(); x.arc(hst.x,hst.y,8+70*k,0,7); x.stroke();}
-    /* the word stays beside its dot, on the outside of the ring */
-    x.font='400 21px '+SANS; var al=hst.al, lx=hst.lx, ly=hst.ly, tw=x.measureText(hst.w).width, bx=al==='left'?lx:(al==='right'?lx-tw:lx-tw/2);
-    x.globalAlpha=cl(k*3,0,1)*fade; glassPill(x,bx-13,ly-23,tw+26,35);   /* a glass pill fades in, so the word reads over the dots */
-    x.globalAlpha=fade; x.fillStyle='#fff'; x.textAlign=al; x.fillText(hst.w,lx,ly); x.textAlign='left'; x.globalAlpha=1;});
+    /* the word stays beside its dot, on the outside of the ring, in its glass pill */
+    x.globalAlpha=fade; label(x,hst.w,hst.al,hst.lx,hst.ly); x.globalAlpha=1;});
 
   /* words growing from the inside: each starts small at the centre of the ring and grows as it travels outward,
      trailing dots, until it reaches its place on the ring at full size */
   HOSTS.forEach(function(hst,n){var v=(c-(0.6+n*GAP))/FLY; if(v<0||v>=1) return; var s=ease(v), p=qb(hst.path,s);
     x.fillStyle=HOT; for(var q=1;q<=14;q++){var sq=s-q*0.024; if(sq<=0) break; var tp=qb(hst.path,sq), ts=4.4*(1-q/15); x.globalAlpha=(1-q/15)*fade; disc(x,tp[0],tp[1],ts*0.56);}
     if(v<0.35){var cp=7+16*(v/0.35); x.globalAlpha=(1-v/0.35)*fade; disc(x,CX,CY,cp*0.56);}             /* the centre pulses as a word leaves it */
-    x.globalAlpha=cl(v*4,0,1)*fade; x.font='400 '+(7+14*s)+'px '+SANS; x.fillStyle='#FFFFFF'; x.textAlign=hst.al;
-    x.fillText(hst.w,p[0],p[1]); x.textAlign='left'; x.globalAlpha=1;});
+    /* the word travels inside its pill, the two growing together, so it never shows over bare dots */
+    var f=(7+14*s)/21; x.save(); x.globalAlpha=cl(v*4,0,1)*fade; x.translate(p[0],p[1]); x.scale(f,f); label(x,hst.w,hst.al,0,0); x.restore(); x.globalAlpha=1;}); /* restore() brings back the trail's alpha, so reset it or the next frame's dots draw faint */
 
   /* learned words fire together and a connection joins them across the ring */
   SAY.forEach(function(pair,j){var u=(c-(SAY0+j*SAYD))/2.6; if(u<0||u>1) return;

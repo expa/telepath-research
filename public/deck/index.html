@@ -253,7 +253,7 @@ canvas.kid{height:100%;margin:-96px 0}
 .tbar>*{position:absolute;top:26px}
 .tbar .tbm{top:27px;left:0;width:19px;height:20px;fill:currentColor}
 .tbar .tbn{left:86px}.tbar .tbt{left:345px}.tbar .tbc{right:66px}.tbar .tbf{right:0;font-variant-numeric:tabular-nums}
-:root{--orange:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 0 0 0 .04'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/160px 160px,radial-gradient(140% 105% at 50% 0%,rgba(80,16,0,0) 58%,rgba(80,16,0,.11) 100%),linear-gradient(180deg,#feb67a 0%,#ffb071 5%,#fea969 10%,#fda25f 15%,#fc9a56 20%,#fb934e 25%,#fa8b45 30%,#f6843e 35%,#f47b39 40%,#f07431 45%,#ec6b2c 50%,#e66424 55%,#e15b20 60%,#d8541a 65%,#cf4c18 70%,#c64413 75%,#ba3d0f 80%,#af350c 85%,#a32f0b 90%,#942808 95%,#882207 100%)} /* the cover gradient: 21 stops, darker lower edges, and a faint grain that dithers away banding */
+:root{--orange:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 0 0 0 .04'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/160px 160px,radial-gradient(140% 105% at 50% 0%,rgba(80,16,0,0) 58%,rgba(80,16,0,.11) 100%),linear-gradient(180deg,#fc9a56 0%,#fb9450 5%,#fa8e49 10%,#f88842 15%,#f6823d 20%,#f47b39 25%,#f17533 30%,#ee6f2e 35%,#ea6829 40%,#e56223 45%,#e15b20 50%,#da551b 55%,#d34f19 60%,#cb4916 65%,#c44312 70%,#ba3d0f 75%,#b1370d 80%,#a8310b 85%,#9d2c0a 90%,#922708 95%,#882207 100%)} /* the cover gradient: 21 stops, darker lower edges, and a faint grain that dithers away banding */
 .pg.sl.cover{background:var(--orange)}
 @media screen{body:has(.pg.sl.cover.on){background:var(--orange)}.pg.sl.cover{background:none}}
 .cover h1,.cover .tbar{color:#fff}
@@ -961,10 +961,11 @@ var GLASSHOT=bead(1.3), GLASSLIT=bead(1.5);
    magnified and frosted, as through a lens; a faint white body brightens toward the top, the inner edge catches the
    light like a thick rim, and the edge glints softly at the upper left and lower right, with no visible outline between */
 /* Drawn in two parts so the costly ones are made once: the lens, live each frame (the dots beneath, copied, frosted by
-   drawing them at a third of the size and back up, then 18% larger about the pill's centre), and a sprite per pill size
-   holding the rest (shadow, body, rim, glints), rendered at the canvas's resting scale PS and drawn at any scale. */
+   drawing them at a third of the size and back up, then 18% larger about the pill's centre), and a sprite per word
+   holding the rest (shadow, body, rim, glints, and the word itself in glass), rendered at the canvas's resting scale PS and drawn at any scale. */
 var LENS=document.createElement('canvas'), LSM=document.createElement('canvas'), PILLS={}, PS=1;
-function pillSprite(w,h){var key=Math.round(w*4)+'x'+Math.round(h*4), c=PILLS[key]; if(c) return c;
+if(document.fonts) document.fonts.ready.then(function(){PILLS={};}); /* a word cached before Geist arrived is redrawn in it */
+function pillSprite(w,h,word){var key=word+'|'+Math.round(w*4)+'x'+Math.round(h*4), c=PILLS[key]; if(c) return c;
   var s=PS, dw=w*s, dh=h*s, dr=dh/2, P=Math.ceil(30*s); c=document.createElement('canvas'); c.width=Math.ceil(dw+2*P); c.height=Math.ceil(dh+2*P); c.P=P; c.s=s;
   var g=c.getContext('2d'), dx=P, dy=P;
   /* the shadow it casts, outside the pill only */
@@ -981,8 +982,18 @@ function pillSprite(w,h){var key=Math.round(w*4)+'x'+Math.round(h*4), c=PILLS[ke
   /* the specular edge: no outline, only a soft glint at the upper left and a fainter one at the lower right */
   var sp=g.createLinearGradient(dx,dy,dx+dw,dy+dh); sp.addColorStop(0,'rgba(255,255,255,.6)'); sp.addColorStop(.22,'rgba(255,255,255,.1)'); sp.addColorStop(.45,'rgba(255,255,255,0)'); sp.addColorStop(.8,'rgba(255,255,255,0)'); sp.addColorStop(1,'rgba(255,255,255,.32)');
   g.filter='blur('+(.5*s).toFixed(2)+'px)'; g.strokeStyle=sp; g.lineWidth=Math.max(1,1.1*s); g.beginPath(); g.roundRect(dx+.5*s,dy+.5*s,dw-s,dh-s,dr-.5*s); g.stroke();
+  /* the word, in the same glass as the "Telepath" caption: a white body thinning toward the middle of its height, a soft
+     glint across the upper left and lower right, a hairline of light along the tops of the letters, and the warm shadow */
+  g.font='400 '+(21*s)+'px '+SANS; g.textAlign='left'; g.filter='none';
+  var tx=P+13*s, ty=P+23*s, tw=g.measureText(word).width, top=ty-16*s, bot=ty+5*s;
+  g.save(); g.shadowColor='rgba(90,26,6,.22)'; g.shadowBlur=9*s; g.shadowOffsetY=4*s;
+  g.fillStyle='rgba(255,255,255,.35)'; g.fillText(word,tx,ty-s); g.restore();
+  var fill=g.createLinearGradient(0,top,0,bot); fill.addColorStop(0,'rgba(255,255,255,.9)'); fill.addColorStop(.55,'rgba(255,250,240,.66)'); fill.addColorStop(1,'rgba(255,246,232,.78)');
+  g.fillStyle=fill; g.fillText(word,tx,ty);
+  var gl=g.createLinearGradient(tx,top,tx+tw,bot); gl.addColorStop(0,'rgba(255,255,255,.45)'); gl.addColorStop(.32,'rgba(255,255,255,0)'); gl.addColorStop(.72,'rgba(255,255,255,0)'); gl.addColorStop(1,'rgba(255,255,255,.22)');
+  g.fillStyle=gl; g.fillText(word,tx,ty);
   return PILLS[key]=c;}
-function glassPill(x,px,py,w,h){var t=x.getTransform(), a=x.globalAlpha,
+function glassPill(x,px,py,w,h,word){var t=x.getTransform(), a=x.globalAlpha,
     dx=t.a*px+t.e, dy=t.d*py+t.f, dw=t.a*w, dh=t.d*h, dr=dh/2;
   /* what lies beneath, before the pill clears it */
   var sw=Math.max(1,Math.ceil(dw)), sh=Math.max(1,Math.ceil(dh));
@@ -999,12 +1010,11 @@ function glassPill(x,px,py,w,h){var t=x.getTransform(), a=x.globalAlpha,
   x.clip(); var M=1.18; x.globalAlpha=a*.85; x.drawImage(LSM,0,0,mw,mh,dx-dw*(M-1)/2,dy-dh*(M-1)/2,dw*M,dh*M);
   x.restore();
   /* the glass, from its sprite, at this pill's scale */
-  var sp=pillSprite(w,h), k=t.a/sp.s; x.save(); x.setTransform(1,0,0,1,0,0); x.globalAlpha=a;
+  var sp=pillSprite(w,h,word), k=t.a/sp.s; x.save(); x.setTransform(1,0,0,1,0,0); x.globalAlpha=a;
   x.drawImage(sp,dx-sp.P*k,dy-sp.P*k,sp.width*k,sp.height*k); x.restore();}
 /* a word in its glass pill at full size (21px), anchored at (lx,ly) like fillText with textAlign al */
-var INK_DARK='#6A2410'; /* every word is dark brown on its glass pill */
 function label(x,w,al,lx,ly){x.font='400 21px '+SANS; var tw=x.measureText(w).width, bx=al==='left'?lx:(al==='right'?lx-tw:lx-tw/2);
-  glassPill(x,bx-13,ly-23,tw+26,35); x.fillStyle=INK_DARK; x.textAlign=al; x.fillText(w,lx,ly); x.textAlign='left';}
+  glassPill(x,bx-13,ly-23,tw+26,35,w);} /* the word is drawn into the pill's sprite, in glass */
 /* the flat brown dots in one path and one fill: the same discs as the flat sprite (radius 31/32), at a fraction of the cost of a
    draw call each. They never overlap, so one fill at the shared alpha matches drawing them one by one */
 function flat(x,arr,col){x.fillStyle=col; x.beginPath(); for(var a=0;a<arr.length;a+=3){var r=arr[a+2]*31/32; x.moveTo(arr[a]+r,arr[a+1]); x.arc(arr[a],arr[a+1],r,0,6.2832);} x.fill();}

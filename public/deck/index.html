@@ -289,7 +289,8 @@ canvas.kid{height:100%;margin:-96px 0}
 .cover .hd>h1,.pg.sl h1.glass{padding-bottom:.22em;margin-bottom:-.22em}
 .cover .hd>.cvname{padding-bottom:.25em;margin-bottom:calc(14px - .25em)}
 .cover .in{padding-top:96px}.cp .cover .in{padding-top:64px}
-.pt .cover .hd{margin-top:auto}.pt .cover .cvbrand{position:absolute;right:48px;bottom:140.2px}.pt .cover .cvmark{width:146.2px} /* portrait phones: the mark moves to the bottom right, as tall as the headline's ink (88px Geist: top of "Intelligence" to the baseline of "that grows", 150.5px) and level with it */
+.pt .cover .hd{margin-top:auto}.pt .cover .cvbrand{position:absolute;right:48px;bottom:65.75px}.pt .cover .cvmark{width:146.2px} /* portrait phones: the mark moves to the bottom right, as tall as headline and tagline together: its top level with the headline's capitals, its last dot's foot on the tagline's baseline (65.75px above the slide's foot). The headline steps down to 58.5px and the tagline tucks closer (12px) to make that span 150.5px, the mark's height */
+.pt .cover .hd>h1{font-size:58.5px}.pt .cover .hd>.l{margin-top:-12px}
 .bleed .tbar{color:#fff}
 .in{padding:136px 120px 56px 134px} /* left edge lines up with "Telepath" in the bar */
 .dfolio,.cover .in>.t,.pg.sl .brand{visibility:hidden}
@@ -955,41 +956,58 @@ function bead(k){var S=80, C=40, R=32, c=document.createElement('canvas'); c.wid
   g.save(); g.filter='blur(.8px)';
   var sp=g.createLinearGradient(C-R,C-R,C+R,C+R); sp.addColorStop(0,'rgba(255,255,255,'+A(.75)+')'); sp.addColorStop(.22,'rgba(255,255,255,'+A(.12)+')'); sp.addColorStop(.45,'rgba(255,255,255,0)'); sp.addColorStop(.8,'rgba(255,255,255,0)'); sp.addColorStop(1,'rgba(255,255,255,'+A(.4)+')');
   g.strokeStyle=sp; g.lineWidth=2.5; g.beginPath(); g.arc(C,C,R-1.25,0,6.283); g.stroke(); g.restore(); return c;}
-var GLASS=dot('#5A1A06'), GLASSHOT=bead(1.3), GLASSLIT=bead(1.5);
+var GLASSHOT=bead(1.3), GLASSLIT=bead(1.5);
 /* a label pill in liquid glass. It lifts off the slide on a soft shadow, and inside it the dots beneath show through
    magnified and frosted, as through a lens; a faint white body brightens toward the top, the inner edge catches the
    light like a thick rim, and the edge glints softly at the upper left and lower right, with no visible outline between */
-var LENS=document.createElement('canvas');
-function glassPill(x,px,py,w,h){var r=h/2, t=x.getTransform(), a=x.globalAlpha,
+/* Drawn in two parts so the costly ones are made once: the lens, live each frame (the dots beneath, copied, frosted by
+   drawing them at a third of the size and back up, then 18% larger about the pill's centre), and a sprite per pill size
+   holding the rest (shadow, body, rim, glints), rendered at the canvas's resting scale PS and drawn at any scale. */
+var LENS=document.createElement('canvas'), LSM=document.createElement('canvas'), PILLS={}, PS=1;
+function pillSprite(w,h){var key=Math.round(w*4)+'x'+Math.round(h*4), c=PILLS[key]; if(c) return c;
+  var s=PS, dw=w*s, dh=h*s, dr=dh/2, P=Math.ceil(30*s); c=document.createElement('canvas'); c.width=Math.ceil(dw+2*P); c.height=Math.ceil(dh+2*P); c.P=P; c.s=s;
+  var g=c.getContext('2d'), dx=P, dy=P;
+  /* the shadow it casts, outside the pill only */
+  g.shadowColor='rgba(90,26,6,.22)'; g.shadowBlur=14*s; g.shadowOffsetY=5*s; g.fillStyle='#000';
+  g.beginPath(); g.roundRect(dx,dy,dw,dh,dr); g.fill(); g.shadowColor='transparent';
+  g.globalCompositeOperation='destination-out'; g.fill(); g.globalCompositeOperation='source-over';
+  g.save(); g.beginPath(); g.roundRect(dx,dy,dw,dh,dr); g.clip();
+  /* the glass body: a whisper of white, brighter at the top */
+  var body=g.createLinearGradient(0,dy,0,dy+dh); body.addColorStop(0,'rgba(255,255,255,.3)'); body.addColorStop(.55,'rgba(255,250,240,.12)'); body.addColorStop(1,'rgba(255,245,230,.18)');
+  g.fillStyle=body; g.fillRect(dx,dy,dw,dh);
+  /* the thick rim catching light on the inside edge */
+  var rim=g.createLinearGradient(0,dy,0,dy+dh); rim.addColorStop(0,'rgba(255,255,255,.38)'); rim.addColorStop(.4,'rgba(255,255,255,0)'); rim.addColorStop(.75,'rgba(255,255,255,0)'); rim.addColorStop(1,'rgba(255,255,255,.16)');
+  g.filter='blur('+(1.5*s).toFixed(2)+'px)'; g.strokeStyle=rim; g.lineWidth=6*s; g.beginPath(); g.roundRect(dx,dy,dw,dh,dr); g.stroke(); g.restore();
+  /* the specular edge: no outline, only a soft glint at the upper left and a fainter one at the lower right */
+  var sp=g.createLinearGradient(dx,dy,dx+dw,dy+dh); sp.addColorStop(0,'rgba(255,255,255,.6)'); sp.addColorStop(.22,'rgba(255,255,255,.1)'); sp.addColorStop(.45,'rgba(255,255,255,0)'); sp.addColorStop(.8,'rgba(255,255,255,0)'); sp.addColorStop(1,'rgba(255,255,255,.32)');
+  g.filter='blur('+(.5*s).toFixed(2)+'px)'; g.strokeStyle=sp; g.lineWidth=Math.max(1,1.1*s); g.beginPath(); g.roundRect(dx+.5*s,dy+.5*s,dw-s,dh-s,dr-.5*s); g.stroke();
+  return PILLS[key]=c;}
+function glassPill(x,px,py,w,h){var t=x.getTransform(), a=x.globalAlpha,
     dx=t.a*px+t.e, dy=t.d*py+t.f, dw=t.a*w, dh=t.d*h, dr=dh/2;
   /* what lies beneath, before the pill clears it */
   var sw=Math.max(1,Math.ceil(dw)), sh=Math.max(1,Math.ceil(dh));
   if(LENS.width<sw||LENS.height<sh){LENS.width=Math.max(LENS.width,sw);LENS.height=Math.max(LENS.height,sh);}
-  var lg=LENS.getContext('2d'); lg.clearRect(0,0,LENS.width,LENS.height); lg.drawImage(x.canvas,dx,dy,sw,sh,0,0,sw,sh);
+  var lg=LENS.getContext('2d'); lg.clearRect(0,0,sw,sh); lg.drawImage(x.canvas,dx,dy,sw,sh,0,0,sw,sh);
+  /* frosted: down to a third of the size and back up softens it like a blur of about 1.4 slide px */
+  var q=Math.max(1,1.4*t.a), mw=Math.max(1,Math.ceil(sw/q)), mh=Math.max(1,Math.ceil(sh/q));
+  if(LSM.width<mw||LSM.height<mh){LSM.width=Math.max(LSM.width,mw);LSM.height=Math.max(LSM.height,mh);}
+  var sg=LSM.getContext('2d'); sg.clearRect(0,0,mw,mh); sg.drawImage(LENS,0,0,sw,sh,0,0,mw,mh);
   x.save(); x.setTransform(1,0,0,1,0,0);
-  /* the shadow it casts, then the hole it leaves */
-  x.shadowColor='rgba(90,26,6,'+(.22*a)+')'; x.shadowBlur=14*t.a; x.shadowOffsetY=5*t.d; x.fillStyle='#000';
-  x.beginPath(); x.roundRect(dx,dy,dw,dh,dr); x.fill(); x.shadowColor='transparent';
-  x.globalCompositeOperation='destination-out'; x.globalAlpha=1; x.fill(); x.globalCompositeOperation='source-over'; x.globalAlpha=a;
-  x.beginPath(); x.roundRect(dx,dy,dw,dh,dr); x.clip();
-  /* the lens: the dots beneath, 18% larger about the pill's centre and frosted */
-  var M=1.18; x.filter='blur('+(1.4*t.a).toFixed(2)+'px)'; x.globalAlpha=a*.85;
-  x.drawImage(LENS,0,0,sw,sh,dx-dw*(M-1)/2,dy-dh*(M-1)/2,dw*M,dh*M); x.filter='none';
-  /* the glass body: a whisper of white, brighter at the top */
-  var body=x.createLinearGradient(0,dy,0,dy+dh); body.addColorStop(0,'rgba(255,255,255,'+(.3*a)+')'); body.addColorStop(.55,'rgba(255,250,240,'+(.12*a)+')'); body.addColorStop(1,'rgba(255,245,230,'+(.18*a)+')');
-  x.globalAlpha=1; x.fillStyle=body; x.fillRect(dx,dy,dw,dh);
-  /* the thick rim catching light on the inside edge */
-  var rim=x.createLinearGradient(0,dy,0,dy+dh); rim.addColorStop(0,'rgba(255,255,255,'+(.38*a)+')'); rim.addColorStop(.4,'rgba(255,255,255,0)'); rim.addColorStop(.75,'rgba(255,255,255,0)'); rim.addColorStop(1,'rgba(255,255,255,'+(.16*a)+')');
-  x.filter='blur('+(1.5*t.a).toFixed(2)+'px)'; x.strokeStyle=rim; x.lineWidth=6*t.a; x.beginPath(); x.roundRect(dx,dy,dw,dh,dr); x.stroke();
+  /* the hole it leaves in the dots, then the lens inside it */
+  x.beginPath(); x.roundRect(dx,dy,dw,dh,dr);
+  x.globalCompositeOperation='destination-out'; x.globalAlpha=1; x.fill(); x.globalCompositeOperation='source-over';
+  x.clip(); var M=1.18; x.globalAlpha=a*.85; x.drawImage(LSM,0,0,mw,mh,dx-dw*(M-1)/2,dy-dh*(M-1)/2,dw*M,dh*M);
   x.restore();
-  /* the specular edge: no outline, only a soft glint at the upper left and a fainter one at the lower right */
-  x.save(); x.setTransform(1,0,0,1,0,0);
-  var sp=x.createLinearGradient(dx,dy,dx+dw,dy+dh); sp.addColorStop(0,'rgba(255,255,255,'+(.6*a)+')'); sp.addColorStop(.22,'rgba(255,255,255,'+(.1*a)+')'); sp.addColorStop(.45,'rgba(255,255,255,0)'); sp.addColorStop(.8,'rgba(255,255,255,0)'); sp.addColorStop(1,'rgba(255,255,255,'+(.32*a)+')');
-  x.filter='blur('+(.5*t.a).toFixed(2)+'px)'; x.globalAlpha=1; x.strokeStyle=sp; x.lineWidth=Math.max(1,1.1*t.a); x.beginPath(); x.roundRect(dx+.5*t.a,dy+.5*t.a,dw-t.a,dh-t.a,dr-.5*t.a); x.stroke(); x.restore();}
+  /* the glass, from its sprite, at this pill's scale */
+  var sp=pillSprite(w,h), k=t.a/sp.s; x.save(); x.setTransform(1,0,0,1,0,0); x.globalAlpha=a;
+  x.drawImage(sp,dx-sp.P*k,dy-sp.P*k,sp.width*k,sp.height*k); x.restore();}
 /* a word in its glass pill at full size (21px), anchored at (lx,ly) like fillText with textAlign al */
 var INK_DARK='#6A2410'; /* every word is dark brown on its glass pill */
 function label(x,w,al,lx,ly){x.font='400 21px '+SANS; var tw=x.measureText(w).width, bx=al==='left'?lx:(al==='right'?lx-tw:lx-tw/2);
   glassPill(x,bx-13,ly-23,tw+26,35); x.fillStyle=INK_DARK; x.textAlign=al; x.fillText(w,lx,ly); x.textAlign='left';}
+/* the flat brown dots in one path and one fill: the same discs as the flat sprite (radius 31/32), at a fraction of the cost of a
+   draw call each. They never overlap, so one fill at the shared alpha matches drawing them one by one */
+function flat(x,arr,col){x.fillStyle=col; x.beginPath(); for(var a=0;a<arr.length;a+=3){var r=arr[a+2]*31/32; x.moveTo(arr[a]+r,arr[a+1]); x.arc(arr[a],arr[a+1],r,0,6.2832);} x.fill();}
 function beads(x,arr,spr,m){var q=spr.k||1; for(var a=0;a<arr.length;a+=3){var r=arr[a+2]*m*q; x.drawImage(spr,arr[a]-r,arr[a+1]-r,2*r,2*r);}}
 
 /* the words, and for each one: the dot on the brain's outline it lands on, the dots around it, and a small network grown from it */
@@ -1014,6 +1032,12 @@ var HOSTS=HEARD.map(function(w,n){
   /* where the word comes from: the middle of the brain. It travels outward, through its dot, to where its label rests */
   var cs0=Math.cos(th), sn0=Math.sin(th), lx=hx+cs0*58, ly=hy+sn0*58+7, bend=(n%2?1:-1)*24;
   return {w:w,x:hx,y:hy,th:th,near:near,nodes:nodes,lx:lx,ly:ly,al:cs0>0.35?'left':(cs0<-0.35?'right':'center'),path:[CX,CY,(CX+lx)/2-sn0*bend,(CY+ly)/2+cs0*bend,lx,ly]};});
+/* the only cells that can ever show a dot: the brain's, those a word's landing can reach, and the faint stray ones whose
+   threshold the background speckle beats. Every other cell's density is 0 and its dot never shows, so the loop skips them */
+var ACT=(function(){var on=new Uint8Array(G.length);
+  for(var a=0;a<G.length;a++) if(G[a].b>0||0.011*G[a].edge>G[a].h-0.025) on[a]=1;
+  HOSTS.forEach(function(hst){hst.near.forEach(function(e){on[e.k]=1;});});
+  var out=[]; for(a=0;a<G.length;a++) if(on[a]) out.push(a); return out;})();
 function disc(x,px,py,r){r*=GLASSHOT.k; x.drawImage(GLASSHOT,px-r,py-r,2*r,2*r);} /* bubbles are glass beads too; globalAlpha still fades them */
 function qb(P,s){var u=1-s;return [u*u*P[0]+2*u*s*P[2]+s*s*P[4],u*u*P[1]+2*u*s*P[3]+s*s*P[5]];}
 var PER=24, GAP=1.2, FLY=1.5, SAY0=16.4, SAYD=1.5;
@@ -1023,8 +1047,12 @@ function frame(now){
   if(!slide.classList.contains('on')){t0=null;requestAnimationFrame(frame);return;}
   if(t0===null) t0=now;
   var t=reduce?15.5:(now-t0)/1000, c=t%PER, fade=1-cl((c-PER+1.3)/1.1,0,1);
-  var d=Math.min(window.devicePixelRatio||1,2); if(cv.width!==W*d){cv.width=W*d;cv.height=H*d;}
+  /* draw at the canvas's on-screen resolution (device pixels, at most 2x): a phone shows this 1920x1080 field ~620px wide,
+     where a fixed 2x store would paint and composite ten times the pixels it can show. Stepped in eighths so it settles */
+  var d=Math.min(2,Math.max(.25,Math.ceil((cv.getBoundingClientRect().width||W)*(window.devicePixelRatio||1)/W*8)/8));
+  if(cv.width!==Math.round(W*d)){cv.width=Math.round(W*d);cv.height=Math.round(H*d);}
   var x=cv.getContext('2d'); x.setTransform(d,0,0,d,0,0); x.clearRect(0,0,W,H); x.setTransform(d*ZOOM,0,0,d*ZOOM,d*CX*(1-ZOOM),d*CY*(1-ZOOM));
+  if(PS!==d*ZOOM){PS=d*ZOOM;PILLS={};} /* pill sprites are made at the canvas's resting scale */
 
   /* what each learned word adds to the dot field around it */
   bump.fill(0); heat.fill(0);
@@ -1036,7 +1064,7 @@ function frame(now){
 
   /* the dots */
   var phase=2.35+t*0.07, grow=1+0.022*learned*fade, ink=[], hot=[], lit=[];
-  for(var k2=0;k2<G.length;k2++){var g=G[k2], side=0.5+0.5*Math.cos(g.th-phase);
+  for(var ai=0;ai<ACT.length;ai++){var k2=ACT[ai], g=G[k2], side=0.5+0.5*Math.cos(g.th-phase);
     var body=g.b*grow*(0.62+0.38*Math.pow(side,1.2)); /* the brain, brighter on the side that travels round */
     var dens=body+bump[k2]+0.011*g.edge;
     var on=cl((dens-g.h)/0.05+0.5,0,1); if(on<=0.02) continue;
@@ -1046,7 +1074,7 @@ function frame(now){
     if(tw>0.05) lit.push(g.x,g.y,rad*(1+0.75*tw));
     else (heat[k2]>g.h2*0.85||body>0.6&&g.h2<0.16||g.h2<0.02?hot:ink).push(g.x,g.y,rad);}
   /* the plain brown dots sit back at lower opacity so the connections read over them; warm and lit dots stay bright */
-  x.globalAlpha=0.55; beads(x,ink,GLASS,1); x.globalAlpha=0.9; beads(x,hot,GLASSHOT,1.35); x.globalAlpha=1; beads(x,lit,GLASSLIT,1.5);
+  x.globalAlpha=0.55; flat(x,ink,'#5A1A06'); x.globalAlpha=0.9; beads(x,hot,GLASSHOT,1.35); x.globalAlpha=1; beads(x,lit,GLASSLIT,1.5);
 
   /* connections: from the dot where a word landed, lines draw themselves out to nearby dots, each lighting as it is reached */
   HOSTS.forEach(function(hst,n){var k=kt[n]; if(k<0) return; var rest=(0.42+0.58*Math.exp(-k/1.6))*fade;
@@ -1140,7 +1168,10 @@ function frame(now){
   if(!slide.classList.contains('on')){t0=null;requestAnimationFrame(frame);return;}
   if(t0===null) t0=now;
   var t=reduce?6:(now-t0)/1000+LIFE*0.42; /* open mid-loop, so the slide never starts empty */
-  var d=Math.min(window.devicePixelRatio||1,2); if(cv.width!==W*d){cv.width=W*d;cv.height=H*d;}
+  /* draw at the canvas's on-screen resolution (device pixels, at most 2x): a phone shows this 1920x1080 field ~620px wide,
+     where a fixed 2x store would paint and composite ten times the pixels it can show. Stepped in eighths so it settles */
+  var d=Math.min(2,Math.max(.25,Math.ceil((cv.getBoundingClientRect().width||W)*(window.devicePixelRatio||1)/W*8)/8));
+  if(cv.width!==Math.round(W*d)){cv.width=Math.round(W*d);cv.height=Math.round(H*d);}
   var x=cv.getContext('2d'); x.setTransform(d,0,0,d,0,0); x.clearRect(0,0,W,H);
   for(var L=0;L<LAYERS;L++){var u=((t/LIFE)+L/LAYERS)%1, s=S0*Math.exp(LN*u);
     /* in from nothing, out past the frame */

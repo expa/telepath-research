@@ -183,6 +183,16 @@ canvas.kid{height:100%;margin:-96px 0}
 .pt .cols[style*="--n:8"],.pt .cols.stairs{grid-template-columns:repeat(4,minmax(0,1fr));column-gap:16px}
 .pt .cols[style*="--n:3"]:has(.vbars){grid-template-columns:repeat(2,minmax(0,1fr))}
 .pt .cols[style*="--n:3"]:has(.vbars)>:nth-child(3){grid-column:1/-1}
+.pt .vl .nm{font-size:44px} /* A15: the market figures fit half a phone's width */
+.pt .cols[style*="--n:4"]>.dcol .iso-svg{max-height:200px} /* slide 09 and A14: the four drawings, two by two, a little shorter */
+.pt .cols[style*="--n:3"]:has(.co){grid-template-columns:repeat(2,minmax(0,1fr))}.pt .cols[style*="--n:3"]:has(.co)>:nth-child(3){grid-column:1/-1} /* A16: the two company lists side by side, the takeaway below */
+/* slide 12 on portrait phones: founders as avatar-and-text rows, research and engineering three across, a little tighter.
+   (The reveal script rewrites a nested element's style attribute, so "--n:6" there reads "--n: 6".) */
+.pt .team{gap:32px}.pt .team>.grp.cols{row-gap:28px}
+.pt .team>.grp.cols>.st{display:grid;grid-template-columns:72px minmax(0,1fr);column-gap:24px;row-gap:6px;align-items:start}
+.pt .team>.grp.cols>.st>.person{display:contents}.pt .team>.grp.cols>.st .av{grid-row:1/3;--s:72px!important}.pt .team>.grp.cols>.st>.s{grid-column:2}
+.pt .team .cols:is([style*="--n:6"],[style*="--n: 6"]){grid-template-columns:repeat(3,minmax(0,1fr))}.pt .team .nw{white-space:normal}
+.pt .team .cols .st.tight .av{--s:56px!important;margin-bottom:12px}
 .pt .vb{height:180px}.pt .vbars i{height:calc(var(--h)*1.6px)}
 .pt .vizw{flex:1 1 0;min-height:300px}
 .pt .vizw.short{flex:none;height:140px;min-height:0}
@@ -200,12 +210,16 @@ canvas.kid{height:100%;margin:-96px 0}
 .pt .wer .row12>:nth-child(2),.pt .wer .row12>:nth-child(4){grid-column:1/-1}
 .pt .leg{flex-wrap:wrap;gap:12px 32px}
 .pt .bento{flex:1 1 0;min-height:880px;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(4,minmax(0,1fr))}
+.pt .cols[style*="--n:3"]>.dcol{display:grid;grid-template-columns:200px minmax(0,1fr);column-gap:32px;align-items:center}.pt .cols[style*="--n:3"]>.dcol .iso-svg{max-height:170px} /* portrait phones, where the phases stack in one column (A17): each drawing sits beside its text, so they take half the height */
 /* cover ring: drawn in 1920x1080 slide pixels, so keep that shape; portrait centres the ring, landscape pins it right */
 .cp canvas.cvflow{inset:0 0 auto auto;width:auto;height:100%;aspect-ratio:16/9}
 .pt canvas.cvflow{inset:auto;left:50%;top:40%;width:165%;height:auto;transform:translate(-69.27%,-50%)}
 
 
 /* motion: one calm, staggered reveal per slide */
+/* while the deck measures a slide, its reveal is held at rest: the rise's 14px lift would otherwise read as overflow on the slide
+   being shown (an !important transform outranks the running animation without restarting it) */
+.pg.sl.fitting .u{transform:none!important}
 @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 @keyframes fade{from{opacity:0}to{opacity:1}}
 @keyframes grow{from{width:0}}
@@ -523,7 +537,8 @@ sl.forEach(function(s){var n=0;s.querySelectorAll('.in > :not(.grp), .grp > :not
    in the viewport's own shape, reflowed by CSS (html.cp / html.pt), then zoomed out per slide only as far as it needs to fit. */
 function fits(s){var n=s.querySelector('.in'),cs=getComputedStyle(n),W=n.offsetWidth,H=n.offsetHeight,
  L=parseFloat(cs.paddingLeft)-1,T=parseFloat(cs.paddingTop)-1,R=W-parseFloat(cs.paddingRight)+1,B=H-parseFloat(cs.paddingBottom)+1,
- b=[].filter.call(n.children,function(e){return e.offsetParent===n&&getComputedStyle(e).position!=='absolute'&&e.offsetHeight;}).map(function(e){return[e.offsetLeft,e.offsetTop,e.offsetLeft+e.offsetWidth,e.offsetTop+e.offsetHeight];});
+ /* a negative bottom margin is ink room (the glass headlines pad their box for descenders and pull it back): it may overhang */
+ b=[].filter.call(n.children,function(e){return e.offsetParent===n&&getComputedStyle(e).position!=='absolute'&&e.offsetHeight;}).map(function(e){var mb=Math.min(0,parseFloat(getComputedStyle(e).marginBottom)||0);return[e.offsetLeft,e.offsetTop,e.offsetLeft+e.offsetWidth,e.offsetTop+e.offsetHeight+mb];});
  if([].some.call(n.children,function(e){return e.scrollHeight>e.clientHeight+12;}))return false;
  for(var i=0;i<b.length;i++){if(b[i][0]<L||b[i][1]<T||b[i][2]>R||b[i][3]>B)return false;
   for(var j=i+1;j<b.length;j++)if(b[i][0]<b[j][2]-1&&b[j][0]<b[i][2]-1&&b[i][1]<b[j][3]+23&&b[j][1]<b[i][3]+23)return false;}
@@ -535,7 +550,7 @@ function fit(){var vw=innerWidth,vh=innerHeight,k=Math.min(vw/1920,vh/1080),cp=k
  var k0=cp?Math.min((pt?vw:vh)/640,.8):k,w0=cp?vw/k0:1920,h0=cp?vh/k0:1080;
  /* every slide shares one scale, so moving between slides never changes the size of the type: measure what each slide
     needs, then lay them all out at the smallest of those (more room never breaks a slide that already fit) */
- var F=1,each=function(cb){sl.forEach(function(s){var d=s.style.display,v=s.style.visibility;s.style.display='block';s.style.visibility='hidden';cb(s);s.style.display=d;s.style.visibility=v;});},
+ var F=1,each=function(cb){sl.forEach(function(s){var d=s.style.display,v=s.style.visibility;s.style.display='block';s.style.visibility='hidden';s.classList.add('fitting');cb(s);s.classList.remove('fitting');s.style.display=d;s.style.visibility=v;});},
   size=function(s,f){s.style.width=Math.round(w0*f)+'px';s.style.height=Math.round(h0*f)+'px';};
  if(cp)each(function(s){var f=1;window.deckFix.unfix(s);size(s,f);
   while(!fits(s)&&f<3){f*=1.05;size(s,f);}

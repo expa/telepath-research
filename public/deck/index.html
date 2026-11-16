@@ -23,6 +23,8 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden;background:var(--paper)}
 html{touch-action:manipulation;-webkit-tap-highlight-color:transparent} /* no tap delay or double-tap zoom: taps turn pages */
+/* no automatic text inflation on phones (iOS Safari enlarges some paragraphs and not others): the deck sizes its own type */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{font-family:Geist,system-ui,sans-serif;font-weight:400;color:var(--ink);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
 .deck{position:fixed;inset:0}
 .pg.sl{position:absolute;left:50%;top:50%;width:1920px;height:1080px;display:none;background:var(--paper);overflow:hidden;transform-origin:center}
@@ -198,6 +200,13 @@ canvas.kid{height:100%;margin:-96px 0}
 .pt .vizw.short{flex:none;height:140px;min-height:0}
 /* paper figures (signal, look-ahead, ring, paper stack) give up height before the slide has to shrink */
 .pt .figw{flex:1 1 0;min-height:0}.pt .figw svg{width:100%;height:100%}
+/* A3 to A5 on portrait phones (a chart, then three results): each result is one row, its figure beside its line, so the
+   chart gets the height to run the full width, and its labels are set larger to read at phone size. A3's left-hand labels
+   stay a little smaller so "With look-ahead" ends before its curve starts */
+.pt .figw+.grp.cols{row-gap:16px}
+.pt .figw+.grp.cols>.st{display:grid;grid-template-columns:170px minmax(0,1fr);column-gap:24px;align-items:center;padding-top:16px}
+.pt .figw+.grp.cols>.st>.nm{font-size:44px}
+.pt .figw:has(+.grp.cols) .fig .tx{font-size:30px}.pt .figw:has(+.grp.cols) .fig[aria-label^="A slow layer"] .tx{font-size:24px}
 .pt .br.wide{grid-template-columns:200px minmax(0,1fr) 90px}
 .pt .row12{column-gap:16px;row-gap:8px}
 .pt .row12>:nth-child(1){grid-column:1/-1}
@@ -901,7 +910,10 @@ function frame(now){
     var uu=cl((u-0.28)/0.72,0,1); if(uu<=0) return;
     var s=ph.join(' '), e=1-Math.pow(1-uu,2), px=mouth[0]-30-e*80, py=mouth[1]+6-e*22;
     x.globalAlpha=cl(uu*6,0,1)*(1-cl((uu-0.7)/0.3,0,1))*fade; x.font='400 '+(24+6*e)+'px '+SANS; x.fillStyle=HOT; x.textAlign='right'; x.fillText('“'+s+'”',px,py); x.textAlign='left'; x.globalAlpha=1;
-    for(var k=0;k<3;k++){var rk=((uu*2.4+k*0.33)%1); x.strokeStyle='rgba(232,105,58,'+(0.45*(1-rk))*fade+')'; x.lineWidth=.9; x.beginPath(); x.arc(mouth[0]-4,mouth[1],8+rk*28,Math.PI*0.72,Math.PI*1.28); x.stroke();}});
+    /* the sound rings start just in front of the lips (a point in the silhouette's own drawing, left of the lower lip and under
+       the upper one), so they open outward into the air rather than across the mouth */
+    var lip=KM.transformPoint(new DOMPoint(104,694));
+    for(var k=0;k<3;k++){var rk=((uu*2.4+k*0.33)%1); x.strokeStyle='rgba(232,105,58,'+(0.45*(1-rk))*fade+')'; x.lineWidth=.9; x.beginPath(); x.arc(lip.x,lip.y,8+rk*28,Math.PI*0.72,Math.PI*1.28); x.stroke();}});
   if(c>SAY0-0.4&&c<SAY0+SAY.length*SAYD+1){x.globalAlpha=fade;txt(x,'SPEAKS',mouth[0]-30,mouth[1]+60,MUT,'right');x.globalAlpha=1;}
   var rx=W-28, ry=H-330;
   /* on-slide credit removed on request. Source: head scan “Infinite” by Lee Perry-Smith, CC BY 3.0 (licence asks for attribution somewhere) */

@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "modulato dev",
-    "build": "modulato build",
+    "build": "modulato build && node scripts/deck-gate-output.mjs",
     "check": "modulato check && tsc --noEmit"
   },
   "engines": {
